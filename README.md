@@ -1,4 +1,5 @@
-twitter-vis-test-project
+Real-time Tweets Visualization
 ========================
 
+Description:
 http://socredu.github.io/test-project-seed/#/projects
