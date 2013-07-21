@@ -7,10 +7,14 @@
 	<!-- Jquery -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
 	<!-- Twitter Boostrap -->
-	<link rel="stylesheet" type="text/css" href="bootstrap.css">
-	<!-- Icons
-	<link rel="stylesheet" type="image/png" href="glyphicons-halflings.png">
-	<link rel="stylesheet" type="image/png" href="glyphicons-halflings-white.png">-->
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-responsive.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-responsive.min.css">
+	<link rel="stylesheet" type="img/png" href="bootstrap/img/glyphicons-halflings.png">
+	<link rel="stylesheet" type="img/png" href="bootstrap/img/glyphicons-halflings-white.png">
+	<link rel="stylesheet" type="text/js" href="bootstrap/js/bootstrap.js">
+	<link rel="stylesheet" type="text/js" href="bootstrap/js/bootstrap.min.js">
 	<!-- Our CSS -->
 	<link rel="stylesheet" type ="text/css" href="index.css">
 	<!-- Our JS -->
@@ -24,31 +28,35 @@
 		<div class="row-fluid">
 			<!-- Insert graph onto the left three quarters of the page -->
 			<div class="span9">
+				<div class="progress progress-striped active">
+				  <div class="bar" style="width: 50%"></div>
+				</div>
 				<div id="graph">Graphing now . . .</div>
 			</div>
 			<!-- Insert search query, graphing options on right quarter of page -->
 			<div class="span3">
+				<!--<button class="close" style='color: red'>&times;</button>-->
 				<h5>Welcome. Below you may search for any tweeted hashtag and SOCR will display its number of tweets over any specified period of time.</h5>
-				<input type="text" id="userInput" value="#search" onFocus="this.value=''" placeholder='#search'><br>
-				<h6>1. Valid tweets consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 hashtags to search for.<br>3. You may graph any selection of hashtags below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered hashtags below at any given time by clicking the red 'X' to the right of that search.<br></h6>
-				<p align=right><input type="submit" class="add" value ="Add"><p>
-				<div id="successfulSearch"><strong>Successful search.</strong></div>
-				<div id="failedSearch"><strong>Try again please. Please preface your query with a "#" and only search for a combination of letters, numbers, and underscores.</strong></div>
-				<div id='none'><strong>Please enter something.</strong></div>
-				<div id="tooMany"><strong>We can only accept 5 inputs. Please delete one and try again.</strong></div>
-				<div id="sameInput"><strong>That input has already been processed. Please try another hashtag.</strong></div>
-				<div id="enoughInput"><strong>Successful search, but that's five inputs now. Please delete before making your next query.</strong></div>
+				<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='#search'><br>
+				<p align=center><i class='icon-info-sign'></i></p><h6>1. Valid hashtag expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 hashtags to search for. After typing in one hashtag, press 'Add' below so you may type in another.<br>3. You may graph any selection of hashtags below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered hashtags below at any given time by clicking the ' ' to the right of that search.<br></h6>
+				<p align=right><button class="btn btn-large btn-success add" type="button"><i class='icon-plus icon-white'></i> Add</button></p>
+				<div id="successfulSearch"><strong><i class='icon-ok-circle'></i> Successful search.</strong></div>
+				<div id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Please preface your query with a "#" and only search for a combination of letters, numbers, and underscores.</strong></div>
+				<div id='none'><strong><i class='icon-question-sign'></i> Please enter something.</strong></div>
+				<div id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 inputs. Please delete one and try again.</strong></div>
+				<div id="sameInput"><strong><i class='icon-ban-circle'></i> That input has already been processed. Please try another hashtag.</strong></div>
+				<div id="enoughInput"><strong><i class='icon-flag'></i> Successful search, but that's five inputs now. Please delete before making your next query.</strong></div>
 				<fieldset>
-					<legend>Search Results:</legend>
-					<input type='checkbox'  id='searchOption1' value='1'><!--<p align=right>--><div id='Option1'></div><button class="btn btn-mini btn-danger delete1" type="button"><!--<i class='icon-minus-sign icon-white'></i>--> Delete</button><!--</p>--><br>
-					<input type='checkbox' id='searchOption2' value='1'><!--<p align=right>--><div id='Option2'></div><button class="btn btn-mini btn-danger delete2" type="button">Delete</button><!--</p>--><br>
-					<input type='checkbox' id='searchOption3' value='1'><!--<p align=right>--><div id='Option3'></div><button class="btn btn-mini btn-danger delete3" type="button">Delete</button><!--</p>--><br>
-					<input type='checkbox' id='searchOption4' value='1'><!--<p align=right>--><div id='Option4'></div><button class="btn btn-mini btn-danger delete4" type="button">Delete</button><!--</p>--><br>
-					<input type='checkbox' id='searchOption5' value='1'><!--<p align=right>--><div id='Option5'></div><button class="btn btn-mini btn-danger delete5" type="button">Delete</button><!--</p>--><br>
+					<legend><i class='icon-search'></i> Search Results:</legend>
+					<input type='checkbox'  id='searchOption1' value='1'><div id='Option1'></div><p align=right><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+					<input type='checkbox' id='searchOption2' value='1'><div id='Option2'></div><p align=right><button class="btn btn-mini btn-danger delete2" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+					<input type='checkbox' id='searchOption3' value='1'><div id='Option3'></div><p align=right><button class="btn btn-mini btn-danger delete3" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+					<input type='checkbox' id='searchOption4' value='1'><div id='Option4'></div><p align=right><button class="btn btn-mini btn-danger delete4" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+					<input type='checkbox' id='searchOption5' value='1'><div id='Option5'></div><p align=right><button class="btn btn-mini btn-danger delete5" type="button"><i class='icon-remove icon-white'></i></button></p><br>
 				</fieldset>
 				<p>
 				  <input type='checkbox' class="btn btn-large" value='1'> Auto-update
-				  <button class="btn btn-large btn-primary" id='update' type="button">Update Now</button>
+				  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
 				</p>
 			</div>
 		</div>
