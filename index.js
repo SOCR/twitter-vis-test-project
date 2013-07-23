@@ -6,26 +6,15 @@
 // 5. dropdown menu for stats metrics
 // 6. after delete nothing reappears
 
-/*
-store://s3-us-west-2.amazonaws.com/Socr
-// Step 1 of Twitter
-var encoded1 = encodeURIComponent('fEHJVzLzqYjRz9Ico8ZflA');//, 'UTF-8');
-var encoded2 = encodeURIComponent('oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw');
-var totalEncoding = encoded1 + ':' + encoded2;
-var baseString = window.btoa(totalEncoding);
-
-// Step 2 of Twitter
-$.ajax({
-	url: 'https://api.twitter.com/oauth2/token',
-	type: 'POST',
-	datatype: 'json',
-	data: 'grant_type=client_credentials',
-	success: function() {alert("Success");},
-	error: function() {alert("Failure!");},
-	beforeSend: function (xhr){xhr.setRequestHeader('Authorization', 'Basic ' + baseString); xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8')}
-});*/
-
-
+/* 
+	Twitter Pseudocode
+	1. Check whether user searched for is not protected
+		if so, continue
+		if not, ask for new input
+	2. For graph retrieval
+		We need: created_at, text, .user.name
+	3. d3
+*/
 
 $(document).ready(function(){
 
@@ -33,6 +22,7 @@ $(document).ready(function(){
 	window.onload = function(){
 		$('#successfulSearch').hide();
 		$('#failedSearch').hide();
+		$('#protectedUser').hide();
 		$('#tooMany').hide();
 		$('#none').hide();
 		$('#sameInput').hide();
@@ -51,6 +41,29 @@ $(document).ready(function(){
 		$('.delete5').hide();
 	};
 
+	// Create new array for json parse
+	var tweets = new Array();
+
+	// Create new array for json parse description
+	var userinfo = new Array();
+
+	// Set up first part of query
+	var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22"
+	
+	// Set up second part of query
+	var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="		
+
+	// Success function for API
+	var cb = function(data) {
+		tweets = JSON.parse(data.query.results.result);
+		//userinfo = JSON.parse(data.query.results.user);
+		/*alert(tweets.length);
+		for (var i = 0; i < tweets.length; i++)
+		{
+			alert(tweets[i].text);
+		}*/
+	}
+
 	// Set counter variable for click function
 	var count = 0;
 	// Set counter variable to figure out which button was deleted
@@ -60,12 +73,11 @@ $(document).ready(function(){
 	// Delete button pressed
 	var deletePressed = false;
 
-
 	// Keep track of input to make sure there are no duplicates
 	var enteredInput = new Array();
 	enteredInput[0], enteredInput[1], enteredInput[2], enteredInput[3], enteredInput[4] = '';
 
-	// Display the input as checkboxes to graph
+	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
 
 		// Hide graph
@@ -86,8 +98,8 @@ $(document).ready(function(){
 		// Retrieve input
 		var retrievedSearch = $('#userInput').val();
 
-		// Clear search field back to #search
-		$('#userInput').val('#search');
+		// Clear search field back to username
+		$('#userInput').val('@username');
 
 		// Check to make sure there is input
 		if (retrievedSearch == '')
@@ -97,12 +109,12 @@ $(document).ready(function(){
 			return;
 		}
 
-		// Check for hashtag, and if no hashtag append one to beginning
-		if (retrievedSearch[0] != '#')
-				retrievedSearch = '#' + retrievedSearch;
+		// Append @
+		if (retrievedSearch[0] != '@')
+			retrievedSearch = '@' + retrievedSearch;
 
 		// Check for duplicate input
-		for (var i = 0; i < 5; i++)//enteredInput.length; i++)
+		for (var i = 0; i < 5; i++)
 		{
 			if(retrievedSearch == enteredInput[i])
 			{			
@@ -112,10 +124,10 @@ $(document).ready(function(){
 			}
 		}	
 		
-		// Check for double hashtags
+		// Check for double @
 		for (var i = 1; i < retrievedSearch.length; i++)
 		{
-			if (retrievedSearch[i] == '#')
+			if (retrievedSearch[i] == '@')
 			{
 				count--;
 				$('#failedSearch').show().delay(3000).fadeOut();
@@ -127,6 +139,7 @@ $(document).ready(function(){
 		var findDiv = '#searchOption';
 		var findDel = '.delete';
 		var findTag = 'Option';
+		var findDescription = '#description';
 
 		// If delete was pressed, make sure to put new input in old spot of where the one was deleted
 		if(deletePressed)
@@ -139,24 +152,65 @@ $(document).ready(function(){
 		else
 			whichToUse = count;
 
-		// Scan tweet for anything other than numbers, letters, underscores, and initial hashtag
+		/* Check for whether user is protected
+		if (user protected)
+		{
+			count--;
+			$('#protectedUser').show().delay(3000).fadeOut();
+			return;
+		}
+		*/
+
+		// Scan tweet for anything other than numbers, letters, and underscores
 		// If valid, add to search list
-		if (/^[0-9A-Za-z_#]+$/.test(retrievedSearch))
+		if (/[0-9A-Za-z_]{1,15}/.test(retrievedSearch))
 		{
 			// Keep track of div tags
 			findDiv += whichToUse;
 			findDel += whichToUse;
 			findTag += whichToUse;
+			findDescription += whichToUse;
 
 			// Keep track of input to check duplicates
 			enteredInput[whichToUse-1] = retrievedSearch;
 
+			// Form URL to search for using AJAX
+			var searchURL = first + retrievedSearch + second;
+
+			// Use Twitter API to retrieve data
+			$.ajax({
+		        url: searchURL,
+		        success: cb
+			});
 			
-			// insert retrieved search with a space before
+			// insert retrieved search with a space before next to check mark
 			var toDisplay = ' ' + retrievedSearch;
 			document.getElementById(findTag).innerHTML = toDisplay;
-			
-			//$(retrievedSearch).insertAfter(findDiv);
+			//$(findDiv).html(" " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>");
+			/*var inserttext = " " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>";
+			$(inserttext).insertAfter(findDiv);*/
+			/*<input type='checkbox'  id='searchOption1' value='1'><div id='Option1' class='inline'></div><p align=right 
+			class='inline'><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i>
+			</button></p><br>
+			$(retrievedSearch).insertAfter(findDiv);*/
+
+			// Set up Description Boxes
+			/*function displayDescription(){
+
+				//Retrieve desired information
+				var screen_name = tweets[0].user.screen_name;
+				var numberOfFollowers = tweets[0].user.followers_count;
+				var URL = tweets[0].user.url;
+				var numberOfStatuses = tweets[0].user.statuses_count;
+				var dateOfOrigin = tweets[0].user.created_at;
+				var photo = tweets[0].user.profile_image_url;
+				var name = tweets[0].user.name;
+
+				// Set up html
+				$(findDescription).html("<p align=center><img src='"+ photo +"' class='profilephoto'>  " + name + "     " + screen_name + "     " + dateOfOrigin + "     " + numberOfFollowers + "     " + numberOfStatuses + "<a href=" + URL + "</a>     " + URL + "</p>");
+			}
+
+			displayDescription();*/
 
 			// Display the text and the delete button
 			$(findDiv).show();

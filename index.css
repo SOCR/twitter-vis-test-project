@@ -19,6 +19,11 @@ h1 {
 	font-style: oblique;
 }
 
+#protectedUser {
+    color: red;
+    font-style: oblique;
+}
+
 #none {
     color: red;
     font-style: oblique;
@@ -41,6 +46,41 @@ h1 {
 
 #userInput{
     font-style: italic;
+}
+
+#descriptions {
+    font-weight: bold;
+}
+
+.description {
+    border-style: solid;
+    border-width: 3px;
+    padding: 8px;
+}
+
+#description1 {
+    border-color: solid black;
+}
+
+#description2 {
+    border-color: red;
+}
+
+#description3 {
+    border-color: blue;
+}
+
+#description4 {
+    border-color: green;
+}
+
+#description5 {
+    border-color: yellow;
+}
+
+.profilephoto {
+    height: 60px;
+    width: 60px;
 }
 
 /*

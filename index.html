@@ -32,20 +32,57 @@
 				  <div class="bar" style="width: 50%"></div>
 				</div>
 				<div id="graph">Graphing now . . .</div>
+				<div id='descriptions'>The username's information is displayed below following their profile picture in this order: Name, Screen Name, Date their Twitter Account was created, their number of followers, their total number of statuses to date, and their URL which you may use to link directly to their account.<br><br>
+					<div class="row">
+
+						<!-- Following info will show the information to eventually display -->
+
+						<div class='description' id='description1'>
+							<p align=center>
+							<img src='specific_images/glyphicons_198_ok.png' class='profilephoto'>
+							The Rock     therock     2/11/2011     5000000     6000     http://t.co/oa15jibQAk
+							</p>
+						</div><br>
+						<div class='description' id='description2'>
+							<p align=center>
+							<img src='specific_images/glyphicons_198_ok.png' class='profilephoto'>
+							The Rock     therock     2/11/2011     5000000     6000     http://t.co/oa15jibQAk
+							</p>
+						</div><br>
+						<div class='description' id='description3'>
+							<p align=center>
+							<img src='specific_images/glyphicons_198_ok.png' class='profilephoto'>
+							The Rock     therock     2/11/2011     5000000     6000     http://t.co/oa15jibQAk
+							</p>
+						</div><br>
+						<div class='description' id='description4'>
+							<p align=center>
+							<img src='specific_images/glyphicons_198_ok.png' class='profilephoto'>
+							The Rock     therock     2/11/2011     5000000     6000     http://t.co/oa15jibQAk
+							</p>
+						</div><br>
+						<div class='description' id='description5'>
+							<p align=center>
+							<img src='specific_images/glyphicons_198_ok.png' class='profilephoto'>
+							The Rock     therock     2/11/2011     5000000     6000     http://t.co/oa15jibQAk
+							</p>
+						</div><br>
+					</div>
+				</div>
 			</div>
 			<!-- Insert search query, graphing options on right quarter of page -->
 			<div class="span3">
-				<!--<button class="close" style='color: red'>&times;</button>-->
-				<h5>Welcome. Below you may search for any tweeted hashtag and SOCR will display its number of tweets over any specified period of time.</h5>
-				<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='#search'><br>
-				<p align=center><i class='icon-info-sign'></i></p><h6>1. Valid hashtag expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 hashtags to search for. After typing in one hashtag, press 'Add' below so you may type in another.<br>3. You may graph any selection of hashtags below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered hashtags below at any given time by clicking the ' ' to the right of that search.<br></h6>
+				<h5>Welcome. Below you may search for any user name and SOCR will display their number of tweets over any specified period of time. In addition you may view their exact tweet text and user information.</h5>
+				<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'><br>
+				<p align=center><i class='icon-info-sign'></i></p><h6>1. Valid username expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 usernames to track. After typing in one username, press 'Add' below so you may type in another.<br>3. You may graph any selection of usernames below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered usernames below at any given time by clicking the red 'X' to the right of that search.<br></h6>
 				<p align=right><button class="btn btn-large btn-success add" type="button"><i class='icon-plus icon-white'></i> Add</button></p>
-				<div id="successfulSearch"><strong><i class='icon-ok-circle'></i> Successful search.</strong></div>
-				<div id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Please preface your query with a "#" and only search for a combination of letters, numbers, and underscores.</strong></div>
+				<div id="successfulSearch"><strong><i class='icon-ok-circle'></i> Found them!</strong></div>
+				<div id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Only search for a combination of letters, numbers, and underscores.</strong></div>
+				<div id="protectedUser"><strong><i class='icon-warning-sign'></i> This user has made their Twitter account protected so we cannot retrieve anything from their account. Please try another username.</strong></div>
 				<div id='none'><strong><i class='icon-question-sign'></i> Please enter something.</strong></div>
-				<div id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 inputs. Please delete one and try again.</strong></div>
-				<div id="sameInput"><strong><i class='icon-ban-circle'></i> That input has already been processed. Please try another hashtag.</strong></div>
-				<div id="enoughInput"><strong><i class='icon-flag'></i> Successful search, but that's five inputs now. Please delete before making your next query.</strong></div>
+				<div id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 usernames. Please delete one and try again.</strong></div>
+				<div id="sameInput"><strong><i class='icon-ban-circle'></i> That username has already been processed. Please try another username.</strong></div>
+				<div id="enoughInput"><strong><i class='icon-flag'></i> Successful search, but that's five usernames now. Please delete before making your next query.</strong></div>
 				<fieldset>
 					<legend><i class='icon-search'></i> Search Results:</legend>
 					<input type='checkbox'  id='searchOption1' value='1'><div id='Option1'></div><p align=right><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i></button></p><br>
