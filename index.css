@@ -83,6 +83,10 @@ h1 {
     width: 60px;
 }
 
+.btn-danger {
+    : 50px;
+}
+
 /*
 .btn-danger {
     background: none;
