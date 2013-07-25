@@ -252,15 +252,16 @@ $(document).ready(function(){
 			}
 
 			// Set up html
-			//$(findDescription).html("<p align=center><img src='"+ photo +"' class='profilephoto'>     " + name + "     " + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
 			$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
 			$(findDescription).fadeIn(500);
 
 
-			/* NEEDS WORK
+			//NEEDS WORK
 			// insert retrieved search with a space before next to check mark
 			var toDisplay = ' ' + retrievedSearch;
 			document.getElementById(findTag).innerHTML = toDisplay;
+			
+			/*
 			//$(findDiv).html(" " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>");
 			var inserttext = " " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>";
 			$(inserttext).insertAfter(findDiv);
