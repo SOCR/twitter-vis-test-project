@@ -10,6 +10,7 @@
 // 1. verify user exists
 // 2. displaying information in wrong boxes
 // 3. regex does not detect space
+// 4. time zones
 
 /* 
 	Twitter Pseudocode
@@ -19,6 +20,14 @@
 	2. For graph retrieval
 		We need: created_at, text, .user.name
 	3. d3
+*/
+
+/*
+	d3 - thurs/fri
+	store times of all tweets and assign to an interval
+	display number of tweets for each user per 4 hrs -|^
+	fix undefined stuff
+	regex expression
 */
 
 $(document).ready(function(){
@@ -44,15 +53,22 @@ $(document).ready(function(){
 		$('.delete4').hide();
 		$('#searchOption5').hide();
 		$('.delete5').hide();
+		$('.description').hide();
 	};
 
 	// Create new array for json parse
 	var tweets = new Array();
 
-	var screen_name, numberOfFollowers, URL, numberOfStatuses,dateOfOrigin, photo, name, protection = '';
+	var user1tweets = new Array();
+	var user2tweets = new Array();
+	var user3tweets = new Array();
+	var user4tweets = new Array();
+	var user5tweets = new Array();
+
+	var screen_name, numberOfFollowers, URL, numberOfStatuses, photo, name, protection = '';
 
 	// Create new array for json parse description
-	//var userinfo = new Array();
+	var tweetWeekday, tweetMonth, tweetDate, tweetHour, tweetMinute, tweetSecond;
 
 	// Set up first part of query
 	var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22"
@@ -60,22 +76,49 @@ $(document).ready(function(){
 	// Set up second part of query
 	var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="		
 
+	/*
+	function customParser(date) {
+		var day = date[0] + date[1] + date[2];
+	}
+	*/
+
 	function displayDescription() {
 		//Retrieve desired information depending on input
 		screen_name = tweets[0].user.screen_name;
 		numberOfFollowers = tweets[0].user.followers_count;
 		URL = tweets[0].user.url;
 		numberOfStatuses = tweets[0].user.statuses_count;
-		dateOfOrigin = tweets[0].user.created_at;
 		photo = tweets[0].user.profile_image_url;
 		name = tweets[0].user.name;
 		protection = tweets[0].user.protected;
 	}
+	/*
+	function parseTimes() {
+		//var whichUser = 'user';
+		//whichUser += whichToUse;
+		//whichUser += 'tweets';
+		for (var i = 0; i < tweets.length; i++)
+		{
+			//whichUser[i] = tweets[i].created_at;
+			//alert(tweets[i].created_at);
+			tweetWeekday = tweets[i].created_at[0] + tweets[i].created_at[1] + tweets[i].created_at[2];
+			tweetMonth = tweets[i].created_at[4] + tweets[i].created_at[5] + tweets[i].created_at[6];
+			tweetDate = tweets[i].created_at[8] + tweets[i].created_at[9];
+			tweetHour = tweets[i].created_at[11] + tweets[i].created_at[12];
+			tweetMinute = tweets[i].created_at[14] + tweets[i].created_at[15];
+			tweetSecond = tweets[i].created_at[17] + tweets[i].created_at[18];
+			alert(tweets[i].created_at + ',' + tweetWeekday);
+			//alert(tweets)
+			//alert(dayOfWeek);
+		}
+	}
+	*/
 
 	// Success function for API
 	var cb = function(data) {
 		tweets = JSON.parse(data.query.results.result);
 		displayDescription();
+		//parseTimes();
 	}
 
 	// Set counter variable for click function
@@ -90,6 +133,18 @@ $(document).ready(function(){
 	// Keep track of input to make sure there are no duplicates
 	var enteredInput = new Array();
 	enteredInput[0], enteredInput[1], enteredInput[2], enteredInput[3], enteredInput[4] = '';
+
+	// Graph
+	/*function createGraph() {
+		// Create y axis
+		var yscale = d3.scale.linear().domain([0, 20]).range([0,20]);
+		var xAxis = d3.svg.axis()
+							  .scale(yScale)
+							  .orient("bottom");
+		// Create x axis
+
+	}*/
+
 
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
@@ -168,7 +223,7 @@ $(document).ready(function(){
 
 		// Scan tweet for anything other than numbers, letters, and underscores
 		// If valid, add to search list
-		if (/[0-9A-Za-z_]{1,15}/.test(retrievedSearch)) //[0-9A-Za-z_]{1,15}/.test(retrievedSearch))
+		if (/[0-9A-Za-z_@]{1,15}/.test(retrievedSearch)) //[0-9A-Za-z_]{1,15}/.test(retrievedSearch))
 		{
 			// Keep track of div tags
 			findDiv += whichToUse;
@@ -197,43 +252,27 @@ $(document).ready(function(){
 			}
 
 			// Set up html
-			$(findDescription).html("<p align=center><img src='"+ photo +"' class='profilephoto'>  " + name + "     " + screen_name + "     " + dateOfOrigin + "     " + numberOfFollowers + "     " + numberOfStatuses + "<a href=" + URL + "</a>     " + URL + "</p>");
-	
+			//$(findDescription).html("<p align=center><img src='"+ photo +"' class='profilephoto'>     " + name + "     " + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+			$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+			$(findDescription).fadeIn(500);
+
+
+			/* NEEDS WORK
 			// insert retrieved search with a space before next to check mark
 			var toDisplay = ' ' + retrievedSearch;
 			document.getElementById(findTag).innerHTML = toDisplay;
 			//$(findDiv).html(" " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>");
-			/*var inserttext = " " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>";
-			$(inserttext).insertAfter(findDiv);*/
-			/*<input type='checkbox'  id='searchOption1' value='1'><div id='Option1' class='inline'></div><p align=right 
+			var inserttext = " " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>";
+			$(inserttext).insertAfter(findDiv);
+			<input type='checkbox'  id='searchOption1' value='1'><div id='Option1' class='inline'></div><p align=right 
 			class='inline'><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i>
-			</button></p><br>*/
+			</button></p><br>
 
 			//$(retrievedSearch).insertAfter(findDiv);
 
 			//$("<div id='Option1'>" + retrievedSearch + "</div>").insertAfter(findDiv);
 			
-			//$("<label class='checkbox'><input type='checkbox'></label>" + " " + retrievedSearch).insertBefore(".delete1");
-
-
-
-			// Set up Description Boxes
-			/*function displayDescription(){
-
-				//Retrieve desired information
-				var screen_name = tweets[0].user.screen_name;
-				var numberOfFollowers = tweets[0].user.followers_count;
-				var URL = tweets[0].user.url;
-				var numberOfStatuses = tweets[0].user.statuses_count;
-				var dateOfOrigin = tweets[0].user.created_at;
-				var photo = tweets[0].user.profile_image_url;
-				var name = tweets[0].user.name;
-
-				// Set up html
-				$(findDescription).html("<p align=center><img src='"+ photo +"' class='profilephoto'>  " + name + "     " + screen_name + "     " + dateOfOrigin + "     " + numberOfFollowers + "     " + numberOfStatuses + "<a href=" + URL + "</a>     " + URL + "</p>");
-			}
-
-			displayDescription();*/
+			//$("<label class='checkbox'><input type='checkbox'></label>" + " " + retrievedSearch).insertBefore(".delete1"); */
 
 			// Display the text and the delete button
 			$(findDiv).show();
@@ -268,8 +307,8 @@ $(document).ready(function(){
 	$('#userInput').keyup(function(event) {
 	    var keycode = (event.keyCode ? event.keyCode : event.which);
 	    if(keycode == '13') {
-	    	// Set focus onto update now button to help user, also clears search form easier
-			$('#update').focus();
+	    	// Set focus onto home button to keep description boxes in view, also clears search form easier
+			$('#focusHere').focus();
 			// Run function to display results
 	        displayCheckboxes();
 	    }
@@ -296,6 +335,8 @@ $(document).ready(function(){
 		$('.delete1').hide();
 		// Hide the input
 		$('#Option1').hide();
+		// Hide description box
+		$('#description1').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
 	});
@@ -315,6 +356,8 @@ $(document).ready(function(){
 		$('.delete2').hide();
 		// Hide the input
 		$('#Option2').hide();
+		// Hide description box
+		$('#description2').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
 	});
@@ -334,6 +377,8 @@ $(document).ready(function(){
 		$('.delete3').hide();
 		// Hide the input
 		$('#Option3').hide();
+		// Hide description box
+		$('#description3').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
 	});
@@ -353,6 +398,8 @@ $(document).ready(function(){
 		$('.delete4').hide();
 		// Hide the input
 		$('#Option4').hide();
+		// Hide description box
+		$('#description4').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
 	});
@@ -372,6 +419,8 @@ $(document).ready(function(){
 		$('.delete5').hide();
 		// Hide the input
 		$('#Option5').hide();
+		// Hide description box
+		$('#description5').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
 	});
