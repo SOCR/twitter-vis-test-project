@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- Designate a title for the tab display -->
+	<title>SOCR Tweets</title>
+	<!-- Jquery -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
+	<!-- Twitter Boostrap -->
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-responsive.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-responsive.min.css">
+	<link rel="stylesheet" type="img/png" href="bootstrap/img/glyphicons-halflings.png">
+	<link rel="stylesheet" type="img/png" href="bootstrap/img/glyphicons-halflings-white.png">
+	<link rel="stylesheet" type="text/js" href="bootstrap/js/bootstrap.js">
+	<link rel="stylesheet" type="text/js" href="bootstrap/js/bootstrap.min.js">
+	<!-- Our CSS -->
+	<link rel="stylesheet" type ="text/css" href="index.css">
+	<!-- Our JS -->
+	<script type="text/javascript" src="index.js"></script>
+	<!-- d3.js -->
+	<!--<script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>-->
+</head>
+
+<body>
+	<!-- Put a large title at the top of the page -->
+	<h1><p align=center><strong>Statistics Online Computational Resource: Real-time Tweets Visualization</strong><br></p></h1>
+	SOCR<br>&nbsp->&nbsp&nbsp<a href='http://www.socr.ucla.edu/' target='_blank' id='focusHere'><img src='specific_images/glyphicons_020_home.png'></a>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<!-- Insert graph and descriptions onto the left three quarters of the page -->
+			<div class="span12">
+				<div class="span7 offset1">
+					<div class="row-fluid">
+						<div class="span6">
+							<div id='descriptions'><i class='icon-info-sign'></i>&nbsp&nbspAfter you add a username, some of the user's information is displayed with their profile picture. This includes their real name off to the left of the photo, their screen name off to the right of the photo, and their URL which you may use to link directly to their personal site, twitter account, facebook account, etc. There is also a table displaying their number of followers and their total number of tweets to date.<br><br></div>
+							<div class="row-fluid">
+								<div class="span12">
+									<div class='description' id='description2'></div><br>
+									<div class="row-fluid">
+										<div class"span12">
+											<div class='description' id='description4'></div><br>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="span6">
+							<div class='description' id='description1'></div><br>
+							<div class="row-fluid">
+								<div class="span12">
+									<div class='description' id='description3'></div><br>
+									<div class="row-fluid">
+										<div class"span12">
+											<div class='description' id='description5'></div><br>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="progress progress-striped active">
+					  <div class="bar" style="width: 50%"></div>
+					</div>
+					<div id="graph">Graphing now . . .</div>
+					<div class= "tweettext" id='tweettext1'></div>
+					<div class= "tweettext" id='tweettext2'></div>
+					<div class= "tweettext" id='tweettext3'></div>
+					<div class= "tweettext" id='tweettext4'></div>
+					<div class= "tweettext" id='tweettext5'></div>
+				</div>
+				<!-- Insert search query, graphing options on right quarter of page -->
+				<div class="span3 offset1">
+					<h5>Welcome. Below you may search for any user name and SOCR will display their number of tweets over any specified period of time. In addition you may view their exact tweet text and user information.</h5>
+					<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'><br>
+					<p align=center><i class='icon-info-sign'></i></p><h6>1. Valid username expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 usernames to track. After typing in one username, press 'Add' below so you may type in another.<br>3. You may graph any selection of usernames below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered usernames below at any given time by clicking the red 'X' to the right of that search.<br></h6>
+					<p align=right><button class="btn btn-large btn-success add" type="button"><i class='icon-plus icon-white'></i> Add</button></p>
+					<div id="successfulSearch"><strong><i class='icon-ok-circle'></i> Found them!</strong></div>
+					<div id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Only search for a combination of letters, numbers, and underscores.</strong></div>
+					<div id="protectedUser"><strong><i class='icon-warning-sign'></i> This user has made their Twitter account protected so we cannot retrieve anything from their account. Please try another username.</strong></div>
+					<div id='none'><strong><i class='icon-question-sign'></i> Please enter something.</strong></div>
+					<div id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 usernames. Please delete one and try again.</strong></div>
+					<div id="sameInput"><strong><i class='icon-ban-circle'></i> That username has already been processed. Please try another username.</strong></div>
+					<div id="enoughInput"><strong><i class='icon-flag'></i> Successful search, but that's five usernames now. Please delete before making your next query.</strong></div>
+					<fieldset>
+						<legend><i class='icon-search'></i> Search Results:</legend>
+						<!--<form class="form-inline">
+	  						<label class="checkbox"><input type="checkbox" id='searchOption1'></label>
+	  						&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+	  						<button class="btn btn-mini btn-danger delete1" type="button" align=right><i class='icon-remove icon-white'></i></button>
+						</form><br>-->
+						<input type='checkbox'  id='searchOption1' value='1'><div id='Option1'></div><p align=right><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+						<input type='checkbox' id='searchOption2' value='1'><div id='Option2'></div><p align=right><button class="btn btn-mini btn-danger delete2" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+						<input type='checkbox' id='searchOption3' value='1'><div id='Option3'></div><p align=right><button class="btn btn-mini btn-danger delete3" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+						<input type='checkbox' id='searchOption4' value='1'><div id='Option4'></div><p align=right><button class="btn btn-mini btn-danger delete4" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+						<input type='checkbox' id='searchOption5' value='1'><div id='Option5'></div><p align=right><button class="btn btn-mini btn-danger delete5" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+					</fieldset>
+					<p>
+					  <input type='checkbox' class="btn btn-large" value='1'> Auto-update
+					  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+		
+	<!--<script src="http://mbostock.github.com/d3/d3.v2.js"></script>
+		<style>
+			/* tell the SVG path to be a thin blue line without any area fill */
+			path {
+				stroke-width: 1;
+				fill: none;
+			}
+			
+			.data1 {
+				stroke: steelblue;
+			}
+ 
+			.data2 {
+				stroke: orange;
+			}
+ 
+			.axis {
+			  shape-rendering: crispEdges;
+			}
+ 
+			.x.axis line {
+			  stroke: lightgrey;
+			}
+ 
+			.x.axis .minor {
+			  stroke-opacity: .5;
+			}
+ 
+			.x.axis path {
+			  display: none;
+			}
+			
+			.x.axis text {
+				font-size: 14;
+			}
+ 
+			.y.axis line, .y.axis path {
+			  fill: none;
+			  stroke: #000;
+			}
+ 
+			.y.axis text {
+				font-size: 14;
+			}
+ 
+			.y.axisRight text {
+				fill: orange;
+			}
+			
+			.y.axisLeft text {
+				fill: steelblue;
+			}
+		</style>
+
+	<div id="graph" class="aGraph" style="position:absolute;top:0px;left:0; float:left;"></div>
+	<script>
+		/* implementation heavily influenced by http://bl.ocks.org/1166403 */
+		/* some arguments AGAINST the use of dual-scaled axes line graphs can be found at http://www.perceptualedge.com/articles/visual_business_intelligence/dual-scaled_axes.pdf */
+		
+		// define dimensions of graph
+		var m = [80, 80, 80, 80]; // margins
+		var w = 900 - m[1] - m[3];	// width
+		var h = 400 - m[0] - m[2]; // height
+		
+		// create a simple data array that we'll plot with a line (this array represents only the Y values, X will just be the index location)
+		var data1 = [3, 6, 2, 7, 5, 2, 0, 3, 8, 9, 2, 5, 9, 3, 6, 3, 6, 2, 7, 5, 2, 1, 3, 8, 9, 2, 5, 9, 2, 7];
+		var data2 = [543, 367, 215, 56, 65, 62, 87, 156, 287, 398, 523, 685, 652, 674, 639, 619, 589, 558, 605, 574, 564, 496, 525, 476, 432, 458, 421, 387, 375, 368];
+ 
+		// X scale will fit all values from data[] within pixels 0-w
+		var x = d3.scale.linear().domain([0, data1.length]).range([0, w]);
+		// Y scale will fit values from 0-10 within pixels h-0 (Note the inverted domain for the y-scale: bigger is up!)
+		var y1 = d3.scale.linear().domain([0, 10]).range([h, 0]); // in real world the domain would be dynamically calculated from the data
+		var y2 = d3.scale.linear().domain([0, 700]).range([h, 0]);  // in real world the domain would be dynamically calculated from the data
+			// automatically determining max range can work something like this
+			// var y = d3.scale.linear().domain([0, d3.max(data)]).range([h, 0]);
+ 
+		// create a line function that can convert data[] into x and y points
+		var line1 = d3.svg.line()
+			// assign the X function to plot our line as we wish
+			.x(function(d,i) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting X1 value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				// return the X coordinate where we want to plot this datapoint
+				return x(i); 
+			})
+			.y(function(d) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting Y1 value for data point: ' + d + ' to be at: ' + y1(d) + " using our y1Scale.");
+				// return the Y coordinate where we want to plot this datapoint
+				return y1(d); 
+			})
+			
+		// create a line function that can convert data[] into x and y points
+		var line2 = d3.svg.line()
+			// assign the X function to plot our line as we wish
+			.x(function(d,i) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting X2 value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				// return the X coordinate where we want to plot this datapoint
+				return x(i); 
+			})
+			.y(function(d) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting Y2 value for data point: ' + d + ' to be at: ' + y2(d) + " using our y2Scale.");
+				// return the Y coordinate where we want to plot this datapoint
+				return y2(d); 
+			})
+ 
+ 
+			// Add an SVG element with the desired dimensions and margin.
+			var graph = d3.select("#graph").append("svg:svg")
+			      .attr("width", w + m[1] + m[3])
+			      .attr("height", h + m[0] + m[2])
+			    .append("svg:g")
+			      .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+ 
+			// create yAxis
+		    var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(true);
+			// Add the x-axis.
+			graph.append("svg:g")
+			      .attr("class", "x axis")
+			      .attr("transform", "translate(0," + h + ")")
+			      .call(xAxis);
+ 
+ 
+			// create left yAxis
+			var yAxisLeft = d3.svg.axis().scale(y1).ticks(4).orient("left");
+			// Add the y-axis to the left
+			graph.append("svg:g")
+			      .attr("class", "y axis axisLeft")
+			      .attr("transform", "translate(-15,0)")
+			      .call(yAxisLeft);
+ 
+	  		// create right yAxis
+	  		var yAxisRight = d3.svg.axis().scale(y2).ticks(6).orient("right");
+  			// Add the y-axis to the right
+  			graph.append("svg:g")
+  			      .attr("class", "y axis axisRight")
+  			      .attr("transform", "translate(" + (w+15) + ",0)")
+  			      .call(yAxisRight);
+			
+			// add lines
+			// do this AFTER the axes above so that the line is above the tick-lines
+  			graph.append("svg:path").attr("d", line1(data1)).attr("class", "data1");
+  			graph.append("svg:path").attr("d", line2(data2)).attr("class", "data2");
+			
+ 
+	</script>-->
+</body>
+</html>
