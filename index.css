@@ -84,6 +84,33 @@ h1 {
     width: 60px;
 }
 
+.tweettext {
+    border-style: solid;
+    border-width: 3px;
+    padding: 3px;
+    font-weight: bold;
+}
+
+#tweettext1 {
+    border-color: solid black;
+}
+
+#tweettext2 {
+    border-color: red;
+}
+
+#tweettext3 {
+    border-color: blue;
+}
+
+#tweettext4 {
+    border-color: green;
+}
+
+#texttweet5 {
+    border-color: yellow;
+}
+
 
 /*.btn-danger {
     : 50px;

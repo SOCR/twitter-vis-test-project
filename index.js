@@ -9,7 +9,7 @@
 // Twitter Stuff
 // 1. verify user exists
 // 2. displaying information in wrong boxes
-// 3. regex does not detect space
+// 3. if bad input, does twitter know, stuff shows up twice if so
 // 4. time zones
 
 /* 
@@ -27,7 +27,12 @@
 	store times of all tweets and assign to an interval
 	display number of tweets for each user per 4 hrs -|^
 	fix undefined stuff
-	regex expression
+*/
+
+/*
+	does twitter api verify the user existing
+	time zone
+	undefined
 */
 
 $(document).ready(function(){
@@ -54,16 +59,22 @@ $(document).ready(function(){
 		$('#searchOption5').hide();
 		$('.delete5').hide();
 		$('.description').hide();
+		$('#descriptions').hide();
+		$('.tweettext').hide();
 	};
 
 	// Create new array for json parse
 	var tweets = new Array();
 
+	/*
 	var user1tweets = new Array();
 	var user2tweets = new Array();
 	var user3tweets = new Array();
 	var user4tweets = new Array();
-	var user5tweets = new Array();
+	var user5tweets = new Array();*/
+
+	var texttweets = new Array();
+	var datetweets = new Array();
 
 	var screen_name, numberOfFollowers, URL, numberOfStatuses, photo, name, protection = '';
 
@@ -71,10 +82,10 @@ $(document).ready(function(){
 	var tweetWeekday, tweetMonth, tweetDate, tweetHour, tweetMinute, tweetSecond;
 
 	// Set up first part of query
-	var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22"
+	var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22";
 	
 	// Set up second part of query
-	var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="		
+	var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";		
 
 	/*
 	function customParser(date) {
@@ -91,6 +102,21 @@ $(document).ready(function(){
 		photo = tweets[0].user.profile_image_url;
 		name = tweets[0].user.name;
 		protection = tweets[0].user.protected;
+	}
+
+	function getText() {
+		for (var i = 0; i < tweets.length; i++)
+		{
+			texttweets[i] = tweets[i].text;
+			//alert(texttweets[i]);
+		}
+	}
+
+	function getTimes() {
+		for (var i = 0; i < tweets.length; i++)
+		{
+			datetweets[i] = tweets[i].created_at;
+		}
 	}
 	/*
 	function parseTimes() {
@@ -118,6 +144,8 @@ $(document).ready(function(){
 	var cb = function(data) {
 		tweets = JSON.parse(data.query.results.result);
 		displayDescription();
+		getText();
+		getTimes();
 		//parseTimes();
 	}
 
@@ -223,8 +251,10 @@ $(document).ready(function(){
 
 		// Scan tweet for anything other than numbers, letters, and underscores
 		// If valid, add to search list
-		if (/[0-9A-Za-z_@]{1,15}/.test(retrievedSearch)) //[0-9A-Za-z_]{1,15}/.test(retrievedSearch))
+		if (/^@?(\w){1,15}$/.test(retrievedSearch))	///[0-9A-Za-z_@]{1,15}/.test(retrievedSearch)) //[0-9A-Za-z_]{1,15}/.test(retrievedSearch))
 		{
+			// Display description information
+			$('#descriptions').fadeIn(500);
 			// Keep track of div tags
 			findDiv += whichToUse;
 			findDel += whichToUse;
@@ -247,13 +277,26 @@ $(document).ready(function(){
 			if (protection == true)
 			{
 				count--;
-				$('#protectedUser').show().delay(3000).fadeOut();
+				$('#protectedUser').show().delay(5000).fadeOut();
 				return;
 			}
 
 			// Set up html
 			$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
 			$(findDescription).fadeIn(500);
+
+			// Show tweet text
+			var htmlstring = '';
+			for (var i = 0; i < tweets.length; i++)
+			{
+				htmlstring += (i+1);
+				htmlstring += ". Time tweet made: "; 
+				htmlstring += datetweets[i];
+				htmlstring += "<br> Text of that tweet: '"
+				htmlstring += texttweets[i]; //tweets[i].text;
+				htmlstring += "' <br>";
+			}
+			$('#tweettext' + whichToUse).html(htmlstring);//.fadeIn(500);
 
 
 			//NEEDS WORK
@@ -283,7 +326,7 @@ $(document).ready(function(){
 			// If five inputs display enough Input and hide search box
 			if(count == 5)
 			{
-				$('#enoughInput').show().delay(2500).fadeOut();
+				$('#enoughInput').show().delay(4000).fadeOut();
 				$('#userInput').attr('disabled', 'disabled');
 			}
 				
@@ -296,7 +339,7 @@ $(document).ready(function(){
 		else
 		{
 			count--;
-			$('#failedSearch').show().delay(3000).fadeOut();
+			$('#failedSearch').show().delay(6000).fadeOut();
 		}
 	}
 
@@ -340,6 +383,7 @@ $(document).ready(function(){
 		$('#description1').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
+		$('#tweettext1').hide();
 	});
 
 	$('.delete2').click(function(){
@@ -361,6 +405,7 @@ $(document).ready(function(){
 		$('#description2').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
+		$('#tweettext2').hide();
 	});
 
 	$('.delete3').click(function(){
@@ -382,6 +427,7 @@ $(document).ready(function(){
 		$('#description3').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
+		$('#tweettext3').hide();
 	});
 
 	$('.delete4').click(function(){
@@ -403,6 +449,7 @@ $(document).ready(function(){
 		$('#description4').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
+		$('#tweettext4').hide();
 	});
 
 	$('.delete5').click(function(){
@@ -424,5 +471,27 @@ $(document).ready(function(){
 		$('#description5').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
+		$('#tweettext5').hide();
 	});
+
+	$('#description1').click(function(){
+		$('#tweettext1').fadeIn(500);
+	});
+
+	$('#description2').click(function(){
+		$('#tweettext2').fadeIn(500);
+	});
+
+	$('#description3').click(function(){
+		$('#tweettext3').fadeIn(500);
+	});
+
+	$('#description4').click(function(){
+		$('#tweettext4').fadeIn(500);
+	});
+
+	$('#description5').click(function(){
+		$('#tweettext5').fadeIn(500);
+	});
+
 }); // end ready
