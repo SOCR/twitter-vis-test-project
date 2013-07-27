@@ -1,38 +1,19 @@
-// Glaring Issues
-// 1. search results dropping down after error message
-// 2. get checkbox delete and input on same line
-// 3. sync progress bar with graph
-// 4. badge to display count
-// 5. dropdown menu for stats metrics
-// 6. after delete nothing reappears
+/* TO DO
 
-// Twitter Stuff
-// 1. verify user exists
-// 2. displaying information in wrong boxes
-// 3. if bad input, does twitter know, stuff shows up twice if so
-// 4. time zones
+D3 Graph (time zone - use gmt)
+Fix delete buttons
+Get ajax working with text and times for all users
+Search suggestions
 
-/* 
-	Twitter Pseudocode
-	1. Check whether user searched for is not protected
-		if so, continue
-		if not, ask for new input
-	2. For graph retrieval
-		We need: created_at, text, .user.name
-	3. d3
-*/
+Store times and tweet text, format time in desired manner
 
-/*
-	d3 - thurs/fri
-	store times of all tweets and assign to an interval
-	display number of tweets for each user per 4 hrs -|^
-	fix undefined stuff
-*/
+Does twitter verify whether user exists
 
-/*
-	does twitter api verify the user existing
-	time zone
-	undefined
+Minor issues:
+1. search results dropping down after error message
+2. sync progress bar with graph
+3. dropdown menu for stats metrics, types of d3 (cumulative, periodic)
+
 */
 
 $(document).ready(function(){
@@ -48,16 +29,16 @@ $(document).ready(function(){
 		$('#enoughInput').hide();
 		$('#graph').hide();
 		$('.progress').hide();
-		$('#searchOption1').hide();
-		$('.delete1').hide();
-		$('#searchOption2').hide();
-		$('.delete2').hide();
-		$('#searchOption3').hide();
-		$('.delete3').hide();
-		$('#searchOption4').hide();
-		$('.delete4').hide();
-		$('#searchOption5').hide();
-		$('.delete5').hide();
+		//$('#searchOption1').hide();
+		//$('.delete1').hide();
+		//$('#searchOption2').hide();
+		//$('.delete2').hide();
+		//$('#searchOption3').hide();
+		//$('.delete3').hide();
+		//$('#searchOption4').hide();
+		//$('.delete4').hide();
+		//$('#searchOption5').hide();
+		//$('.delete5').hide();
 		$('.description').hide();
 		$('#descriptions').hide();
 		$('.tweettext').hide();
@@ -79,7 +60,9 @@ $(document).ready(function(){
 	var screen_name, numberOfFollowers, URL, numberOfStatuses, photo, name, protection = '';
 
 	// Create new array for json parse description
-	var tweetWeekday, tweetMonth, tweetDate, tweetHour, tweetMinute, tweetSecond;
+	//var tweetWeekday, tweetMonth, tweetDate, tweetHour, tweetMinute, tweetSecond;
+
+	var findDescription = '#description';
 
 	// Set up first part of query
 	var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22";
@@ -97,27 +80,16 @@ $(document).ready(function(){
 		//Retrieve desired information depending on input
 		screen_name = tweets[0].user.screen_name;
 		numberOfFollowers = tweets[0].user.followers_count;
-		URL = tweets[0].user.url;
+		if (tweets[0].user.url == null)
+			URL = 'No Link on Twitter Page';
+		else
+			URL = tweets[0].user.url;
 		numberOfStatuses = tweets[0].user.statuses_count;
 		photo = tweets[0].user.profile_image_url;
 		name = tweets[0].user.name;
 		protection = tweets[0].user.protected;
 	}
 
-	function getText() {
-		for (var i = 0; i < tweets.length; i++)
-		{
-			texttweets[i] = tweets[i].text;
-			//alert(texttweets[i]);
-		}
-	}
-
-	function getTimes() {
-		for (var i = 0; i < tweets.length; i++)
-		{
-			datetweets[i] = tweets[i].created_at;
-		}
-	}
 	/*
 	function parseTimes() {
 		//var whichUser = 'user';
@@ -144,8 +116,24 @@ $(document).ready(function(){
 	var cb = function(data) {
 		tweets = JSON.parse(data.query.results.result);
 		displayDescription();
-		getText();
-		getTimes();
+		for (var i = 0; i < tweets.length; i++)
+		{
+			texttweets[i] = tweets[i].text;
+			datetweets[i] = tweets[i].created_at;
+		}
+		var htmlstring = '';
+		for (var i = 0; i < tweets.length; i++)
+		{
+			htmlstring += (i+1);
+			htmlstring += ". Time tweet made: "; 
+			htmlstring += datetweets[i];
+			htmlstring += "<br> Text of that tweet: '"
+			htmlstring += texttweets[i]; //tweets[i].text;
+			htmlstring += "' <br>";
+		}
+		$('#tweettext' + whichToUse).html(htmlstring);
+		// Set up html
+		$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");	
 		//parseTimes();
 	}
 
@@ -234,9 +222,6 @@ $(document).ready(function(){
 
 		// Helps to keep track of div tags
 		var findDiv = '#searchOption';
-		var findDel = '.delete';
-		var findTag = 'Option';
-		var findDescription = '#description';
 
 		// If delete was pressed, make sure to put new input in old spot of where the one was deleted
 		if(deletePressed)
@@ -251,14 +236,10 @@ $(document).ready(function(){
 
 		// Scan tweet for anything other than numbers, letters, and underscores
 		// If valid, add to search list
-		if (/^@?(\w){1,15}$/.test(retrievedSearch))	///[0-9A-Za-z_@]{1,15}/.test(retrievedSearch)) //[0-9A-Za-z_]{1,15}/.test(retrievedSearch))
+		if (/^@?(\w){1,15}$/.test(retrievedSearch))	
 		{
-			// Display description information
-			$('#descriptions').fadeIn(500);
 			// Keep track of div tags
 			findDiv += whichToUse;
-			findDel += whichToUse;
-			findTag += whichToUse;
 			findDescription += whichToUse;
 
 			// Keep track of input to check duplicates
@@ -281,12 +262,13 @@ $(document).ready(function(){
 				return;
 			}
 
-			// Set up html
-			$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+			// Display description information
+			$('#descriptions').fadeIn(500);
+
 			$(findDescription).fadeIn(500);
 
 			// Show tweet text
-			var htmlstring = '';
+			/*var htmlstring = '';
 			for (var i = 0; i < tweets.length; i++)
 			{
 				htmlstring += (i+1);
@@ -296,32 +278,10 @@ $(document).ready(function(){
 				htmlstring += texttweets[i]; //tweets[i].text;
 				htmlstring += "' <br>";
 			}
-			$('#tweettext' + whichToUse).html(htmlstring);//.fadeIn(500);
+			$('#tweettext' + whichToUse).html(htmlstring);*/
 
-
-			//NEEDS WORK
-			// insert retrieved search with a space before next to check mark
-			var toDisplay = ' ' + retrievedSearch;
-			document.getElementById(findTag).innerHTML = toDisplay;
-			
-			/*
-			//$(findDiv).html(" " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>");
-			var inserttext = " " + retrievedSearch + "<p align=right class='inline'><button class='btn btn-mini btn-danger delete1' type='button'><i class='icon-remove icon-white'></i></button></p><br>";
-			$(inserttext).insertAfter(findDiv);
-			<input type='checkbox'  id='searchOption1' value='1'><div id='Option1' class='inline'></div><p align=right 
-			class='inline'><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i>
-			</button></p><br>
-
-			//$(retrievedSearch).insertAfter(findDiv);
-
-			//$("<div id='Option1'>" + retrievedSearch + "</div>").insertAfter(findDiv);
-			
-			//$("<label class='checkbox'><input type='checkbox'></label>" + " " + retrievedSearch).insertBefore(".delete1"); */
-
-			// Display the text and the delete button
-			$(findDiv).show();
-			$(findDel).show();
-			$(findTag).show();
+			// Show input along with checkbox and delete button
+			$(findDiv).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp" + retrievedSearch + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
 
 			// If five inputs display enough Input and hide search box
 			if(count == 5)
@@ -341,6 +301,7 @@ $(document).ready(function(){
 			count--;
 			$('#failedSearch').show().delay(6000).fadeOut();
 		}
+		$('.badge-info').html("Your number of valid searches is " + count + "!");
 	}
 
 	// Add button clicked
@@ -362,6 +323,29 @@ $(document).ready(function(){
 	$('#update').click(function(){
 		$('#graph').show();
 		$('.progress').show();
+		/* Make the checkmarks exist so it is easier to run graph
+		for (var i = count + 1; i < 6; i++)
+		{
+			$('#searchOption' + i).html("<input type='checkbox' id='box" + i + "'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + i +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>").hide();
+		}
+		// Make array of checked boxes
+		var checks = new Array();
+		for (var i = 1; i < 6; i++)
+		{
+			var x = '#box' + i;
+			if($(x).prop('checked'))
+				checks.push(i);
+		}
+		var y = "SOCR will graph the tweets for the following users: ";
+		for (var i = 0; i < checks.length; i++)
+		{
+			y += checks[i];
+			if (i == (checks.length - 1))
+				y += '.';
+			else
+				y += ', ';
+		}
+		$('#toGraph').html(y);*/
 	})
 
 	$('.delete1').click(function(){
@@ -375,15 +359,12 @@ $(document).ready(function(){
 		deletePressed = true;
 		// Hide the checkbox
 		$('#searchOption1').hide();
-		// Hide the delete button
-		$('.delete1').hide();
-		// Hide the input
-		$('#Option1').hide();
 		// Hide description box
 		$('#description1').hide();
+		// Hide the tweettext
+		$('#tweettext1').hide();
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
-		$('#tweettext1').hide();
 	});
 
 	$('.delete2').click(function(){
@@ -397,10 +378,6 @@ $(document).ready(function(){
 		deletePressed = true;
 		// Hide the checkbox
 		$('#searchOption2').hide();
-		// Hide the delete button
-		$('.delete2').hide();
-		// Hide the input
-		$('#Option2').hide();
 		// Hide description box
 		$('#description2').hide();
 		// Enable text input
@@ -419,10 +396,6 @@ $(document).ready(function(){
 		deletePressed = true;
 		// Hide the checkbox
 		$('#searchOption3').hide();
-		// Hide the delete button
-		$('.delete3').hide();
-		// Hide the input
-		$('#Option3').hide();
 		// Hide description box
 		$('#description3').hide();
 		// Enable text input
@@ -441,10 +414,6 @@ $(document).ready(function(){
 		deletePressed = true;
 		// Hide the checkbox
 		$('#searchOption4').hide();
-		// Hide the delete button
-		$('.delete4').hide();
-		// Hide the input
-		$('#Option4').hide();
 		// Hide description box
 		$('#description4').hide();
 		// Enable text input
@@ -463,10 +432,6 @@ $(document).ready(function(){
 		deletePressed = true;
 		// Hide the checkbox
 		$('#searchOption5').hide();
-		// Hide the delete button
-		$('.delete5').hide();
-		// Hide the input
-		$('#Option5').hide();
 		// Hide description box
 		$('#description5').hide();
 		// Enable text input
