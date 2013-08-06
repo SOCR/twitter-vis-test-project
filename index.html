@@ -20,12 +20,12 @@
 	<!-- Our JS -->
 	<script type="text/javascript" src="index.js"></script>
 	<!-- d3.js -->
-	<!--<script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>-->
+	<script type="text/javascript" src="http://d3js.org/d3.v2.js"></script> 
 </head>
 
 <body>
 	<!-- Put a large title at the top of the page -->
-	SOCR ->&nbsp&nbsp<a href='http://www.socr.ucla.edu/' target='_blank' id='focusHere'><img src='specific_images/glyphicons_020_home.png'></a><h1><p align=center><strong>Statistics Online Computational Resource: Real-time Tweets Visualization</strong><br></p></h1>
+	<h1><p align=center><strong>Statistics Online Computational Resource: Real-time Tweets Visualization</strong><br></p></h1>
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<!-- Insert graph and descriptions onto the left three quarters of the page -->
@@ -60,16 +60,22 @@
 						</div>
 					</div>
 					<div class="progress progress-striped active">
-					  <div class="bar" style="width: 50%"></div>
+					  <div class="bar" style="width: 0%"></div>
 					</div>
-					<div id="graph">Graphing now . . .</div>
+					<div id="graph">Graphing now . . .</div><br>
+					<!--<div id='toGraph'></div><br>-->
+					<div class= "tweettext" id='tweettext1'></div>
+					<div class= "tweettext" id='tweettext2'></div>
+					<div class= "tweettext" id='tweettext3'></div>
+					<div class= "tweettext" id='tweettext4'></div>
+					<div class= "tweettext" id='tweettext5'></div>
 				</div>
 				<!-- Insert search query, graphing options on right quarter of page -->
 				<div class="span3 offset1">
 					<h5>Welcome. Below you may search for any user name and SOCR will display their number of tweets over any specified period of time. In addition you may view their exact tweet text and user information.</h5>
 					<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'><br>
-					<p align=center><i class='icon-info-sign'></i></p><h6>1. Valid username expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 usernames to track. After typing in one username, press 'Add' below so you may type in another.<br>3. You may graph any selection of usernames below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered usernames below at any given time by clicking the red 'X' to the right of that search.<br></h6>
-					<p align=right><button class="btn btn-large btn-success add" type="button"><i class='icon-plus icon-white'></i> Add</button></p>
+					<p align=right><span class="badge badge-info"></span></p>
+					<p align=right>&nbsp&nbsp&nbspSOCR Home Page: &nbsp&nbsp&nbsp<a href='http://www.socr.ucla.edu/' target='_blank' id='focusHere'><img src='specific_images/glyphicons_020_home.png'></a></p>
 					<div id="successfulSearch"><strong><i class='icon-ok-circle'></i> Found them!</strong></div>
 					<div id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Only search for a combination of letters, numbers, and underscores.</strong></div>
 					<div id="protectedUser"><strong><i class='icon-warning-sign'></i> This user has made their Twitter account protected so we cannot retrieve anything from their account. Please try another username.</strong></div>
@@ -77,23 +83,29 @@
 					<div id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 usernames. Please delete one and try again.</strong></div>
 					<div id="sameInput"><strong><i class='icon-ban-circle'></i> That username has already been processed. Please try another username.</strong></div>
 					<div id="enoughInput"><strong><i class='icon-flag'></i> Successful search, but that's five usernames now. Please delete before making your next query.</strong></div>
+					<br><p align=left><i class='icon-info-sign'></i></p>
+					<h6>1. Valid username expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 usernames to track. After typing in one username, press 'Add' below so you may type in another.<br>3. You may graph any selection of usernames below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered usernames below at any given time by clicking the red 'X' to the right of that search.<br></h6>
+					<p align=right><button class="btn btn-large btn-success add" type="button"><i class='icon-plus icon-white'></i> Add</button></p>
 					<fieldset>
 						<legend><i class='icon-search'></i> Search Results:</legend>
-						<!--<form class="form-inline">
-	  						<label class="checkbox"><input type="checkbox" id='searchOption1'></label>
-	  						&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-	  						<button class="btn btn-mini btn-danger delete1" type="button" align=right><i class='icon-remove icon-white'></i></button>
-						</form><br>-->
-						<input type='checkbox'  id='searchOption1' value='1'><div id='Option1'></div><p align=right><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+						<div id='searchOption1'></div>
+						<div id='searchOption2'></div>
+						<div id='searchOption3'></div>
+						<div id='searchOption4'></div>
+						<div id='searchOption5'></div>
+						<!--<input type='checkbox'  id='searchOption1' value='1'><div id='Option1'></div><p align=right><button class="btn btn-mini btn-danger delete1" type="button"><i class='icon-remove icon-white'></i></button></p><br>
 						<input type='checkbox' id='searchOption2' value='1'><div id='Option2'></div><p align=right><button class="btn btn-mini btn-danger delete2" type="button"><i class='icon-remove icon-white'></i></button></p><br>
 						<input type='checkbox' id='searchOption3' value='1'><div id='Option3'></div><p align=right><button class="btn btn-mini btn-danger delete3" type="button"><i class='icon-remove icon-white'></i></button></p><br>
 						<input type='checkbox' id='searchOption4' value='1'><div id='Option4'></div><p align=right><button class="btn btn-mini btn-danger delete4" type="button"><i class='icon-remove icon-white'></i></button></p><br>
-						<input type='checkbox' id='searchOption5' value='1'><div id='Option5'></div><p align=right><button class="btn btn-mini btn-danger delete5" type="button"><i class='icon-remove icon-white'></i></button></p><br>
+						<input type='checkbox' id='searchOption5' value='1'><div id='Option5'></div><p align=right><button class="btn btn-mini btn-danger delete5" type="button"><i class='icon-remove icon-white'></i></button></p><br>-->
 					</fieldset>
 					<p>
 					  <input type='checkbox' class="btn btn-large" value='1'> Auto-update
 					  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
 					</p>
+					<p align=center>** Please note that all times used in the graphs are using GMT times **</p>
+					<div id='gmttime'></div>
+					<div id='localtime'></div>
 				</div>
 			</div>
 		</div>

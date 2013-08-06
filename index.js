@@ -1,13 +1,17 @@
 /* TO DO
 
-D3 Graph (time zone - use gmt)
+TO BE DONE:
+Update graph in real time, dont spit out a new graph on update now
+Update now does not graph right, uses wrong color
+Do auto refresh once above works (easy)
+On hover over line, display last tweet text and time
+On click of line, display the tweets that made the graph
+Structure graphs with username in html?
 Fix delete buttons
 Get ajax working with text and times for all users
-Search suggestions
+Graph options: all on one might be tough
 
-Store times and tweet text, format time in desired manner
-
-Does twitter verify whether user exists
+Does twitter verify whether user exists?????
 
 Minor issues:
 1. search results dropping down after error message
@@ -17,6 +21,111 @@ Minor issues:
 */
 
 $(document).ready(function(){
+
+	function findTime() {
+
+		// Get gmt time for user
+		var d = new Date();
+		var month = d.getUTCMonth();
+		month++;
+		switch (month)
+		{
+			case 1: month = 'January'; break;
+			case 2: month = 'February'; break;
+			case 3: month = 'March'; break;
+			case 4: month = 'April'; break;
+			case 5: month = 'May'; break;
+			case 6: month = 'June'; break;
+			case 7: month = 'July'; break;
+			case 8: month = 'August'; break;
+			case 9: month = 'September'; break;
+			case 10: month = 'October'; break;
+			case 11: month = 'November'; break;
+			case 12: month = 'December'; break;
+		}
+		var day = d.getUTCDate();
+		var year = d.getUTCFullYear();
+		var hour = d.getUTCHours();
+		var morning = true;
+		if (hour > 12)
+		{
+			morning = false;
+			hour -= 12;
+		}
+		else if (hour == 0)
+			hour = 12;
+		var tempmin = d.getUTCMinutes();
+		var minute = '0';
+		if (tempmin < 10)
+		{
+			minute += tempmin;
+		}
+		else
+			minute = tempmin;
+		var tempsecond = d.getUTCSeconds();
+		var second = '0';
+		if (tempsecond < 10)
+			second += tempsecond;
+		else
+			second = tempsecond;
+		var y = 'The current GMT time is ' + month + ' ' + day + ' ' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		if (morning)
+			y += 'A.M.';
+		else
+			y += 'P.M.';
+		$('#gmttime').html(y);
+
+		// Get Local Time
+		var l = new Date();
+		var month = l.getMonth();
+		month++;
+		switch (month)
+		{
+			case 1: month = 'January'; break;
+			case 2: month = 'February'; break;
+			case 3: month = 'March'; break;
+			case 4: month = 'April'; break;
+			case 5: month = 'May'; break;
+			case 6: month = 'June'; break;
+			case 7: month = 'July'; break;
+			case 8: month = 'August'; break;
+			case 9: month = 'September'; break;
+			case 10: month = 'October'; break;
+			case 11: month = 'November'; break;
+			case 12: month = 'December'; break;
+		}
+		var day = l.getDate();
+		var year = l.getFullYear();
+		var hour = l.getHours();
+		var morning = true;
+		if (hour > 12)
+		{
+			morning = false;
+			hour -= 12;
+		}
+		else if (hour == 0)
+			hour = 12;
+		var tempmin = l.getUTCMinutes();
+		var minute = '0';
+		if (tempmin < 10)
+		{
+			minute += tempmin;
+		}
+		else
+			minute = tempmin;
+		var tempsecond = d.getUTCSeconds();
+		var second = '0';
+		if (tempsecond < 10)
+			second += tempsecond;
+		else
+			second = tempsecond;
+		var x = 'Your current local time is ' + month + ' ' + day + ' ' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		if (morning)
+			x += 'A.M.';
+		else
+			x += 'P.M.';
+		$('#localtime').html(x);
+	}
 
 	// Hide a lot of CSS stuff right after page load and let user display what they want
 	window.onload = function(){
@@ -42,7 +151,12 @@ $(document).ready(function(){
 		$('.description').hide();
 		$('#descriptions').hide();
 		$('.tweettext').hide();
+		findTime();
 	};
+
+	var intervalID = setInterval(function() {
+        findTime();
+    }, 1000);
 
 	// Create new array for json parse
 	var tweets = new Array();
@@ -69,12 +183,6 @@ $(document).ready(function(){
 	
 	// Set up second part of query
 	var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";		
-
-	/*
-	function customParser(date) {
-		var day = date[0] + date[1] + date[2];
-	}
-	*/
 
 	function displayDescription() {
 		//Retrieve desired information depending on input
@@ -112,14 +220,38 @@ $(document).ready(function(){
 	}
 	*/
 
-	// Success function for API
+	var converteddate = new Array();
+    var seconddif = new Array();
+    var finalArray = new Array();
+
+    // Success function for API
 	var cb = function(data) {
 		tweets = JSON.parse(data.query.results.result);
-		displayDescription();
+		//displayDescription();
+		screen_name = tweets[0].user.screen_name;
+		numberOfFollowers = tweets[0].user.followers_count;
+		if (tweets[0].user.url == null)
+			URL = 'No Link on Twitter Page';
+		else
+			URL = tweets[0].user.url;
+		numberOfStatuses = tweets[0].user.statuses_count;
+		photo = tweets[0].user.profile_image_url;
+		name = tweets[0].user.name;
+		protection = tweets[0].user.protected;
 		for (var i = 0; i < tweets.length; i++)
 		{
 			texttweets[i] = tweets[i].text;
 			datetweets[i] = tweets[i].created_at;
+			converteddate[i] = new Date(tweets[i].created_at);
+			seconddif[i]= converteddate[i].getTime() /1000 ;
+			var coordi = new Array();
+			var seconds = new Date().getTime() / 1000;
+			coordi[0] = (seconds- seconddif[i]) /3600;
+			coordi[1] = i;
+			if (coordi[0] <= 48) 
+			{
+				finalArray[i] = coordi;
+			}
 		}
 		var htmlstring = '';
 		for (var i = 0; i < tweets.length; i++)
@@ -131,11 +263,133 @@ $(document).ready(function(){
 			htmlstring += texttweets[i]; //tweets[i].text;
 			htmlstring += "' <br>";
 		}
+
 		$('#tweettext' + whichToUse).html(htmlstring);
+
 		// Set up html
 		$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");	
+		
 		//parseTimes();
-	}
+
+		// START OF D3
+
+		// Width and height
+		var w = 900;
+		var h = 400;
+		var padding = 20;       
+
+	    var thelength = finalArray.length;
+							  
+		var dataset = new Array();
+		dataset = finalArray;
+
+		//Create scale functions
+		var xScale = d3.scale.linear()
+							 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
+							 .range([w-8*padding,0+padding ]);
+
+		var yScale = d3.scale.linear()
+							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+							 .range([ 0+padding, h-padding ]);
+
+		var rScale = d3.scale.linear()
+							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+							 .range([3, 3]);
+
+		//Define X axis
+		var xAxis = d3.svg.axis()
+						  .scale(xScale)
+						  .orient("bottom")
+						  .ticks(5);
+
+		//Define Y axis
+		var yAxis = d3.svg.axis()
+						  .scale(yScale)
+						  .orient("left")
+						  .ticks(5);
+
+		//Create SVG element
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+		svg.selectAll("circle")
+		   .data(dataset)
+		   .enter()
+		   .append("circle")
+		   .attr("cx", function(d) {
+		   		return xScale(d[0]);
+		   })
+		   .attr("cy", function(d) {
+		   		return yScale(d[1]);
+		   })
+		   .attr("r", function(d) {
+		   		return rScale(d[1]);
+		   });
+
+		svg.selectAll("text")
+		   .data(dataset)
+		   .enter()
+		   .append("text")
+		   .text(function(d) {
+		   		return "#"+(thelength-d[1]);
+		   })
+		   .attr("x", function(d) {
+		   		return xScale(d[0]);
+		   })
+		   .attr("y", function(d) {
+		   		return yScale(d[1]);
+		   })
+		   .attr("font-family", "sans-serif")
+		   .attr("font-size", "11px")
+		   .attr("fill", "black");
+
+	    svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(0," + (h - padding) + ")")
+			.call(xAxis);
+			
+		// text label for the x axis
+		svg.append("text")      
+			.attr("class", "x label")
+	        .attr("text-anchor", "end")
+	        .attr("x", w)
+	        .attr("y",  h-6 )
+	        .text("Hours before Now (h)");
+
+	    svg.append("text")
+	        .attr("x", 120)            
+	        .attr("y", 12)
+	        .attr("text-anchor", "middle")  
+	        .style("font-size", "16px") 
+	        .style("font-style", "oblique") 
+	        .style("color", "blue")
+	        .style("text-decoration", "underline")  
+	        .text("Number of Tweets Over Time");
+
+	    // Create graph lines
+		var linecolor = "black";
+		switch (count)
+		{
+			case 2: linecolor = "red"; break;
+			case 3: linecolor = "blue"; break;
+			case 4: linecolor = "green"; break;
+			case 5: linecolor = "yellow"; break;
+		}     
+	    for (var k = 0; k < dataset.length; k++)
+  		{
+
+	        svg.append('line')
+	        .attr('x1',xScale((finalArray[k])[0]))
+	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
+	        .attr('y1',yScale((finalArray[k])[1]))
+	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
+	        .attr("stroke-width", 1)
+	        .attr("stroke", linecolor)
+		}
+	};
+
 
 	// Set counter variable for click function
 	var count = 0;
@@ -149,18 +403,6 @@ $(document).ready(function(){
 	// Keep track of input to make sure there are no duplicates
 	var enteredInput = new Array();
 	enteredInput[0], enteredInput[1], enteredInput[2], enteredInput[3], enteredInput[4] = '';
-
-	// Graph
-	/*function createGraph() {
-		// Create y axis
-		var yscale = d3.scale.linear().domain([0, 20]).range([0,20]);
-		var xAxis = d3.svg.axis()
-							  .scale(yScale)
-							  .orient("bottom");
-		// Create x axis
-
-	}*/
-
 
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
@@ -267,19 +509,6 @@ $(document).ready(function(){
 
 			$(findDescription).fadeIn(500);
 
-			// Show tweet text
-			/*var htmlstring = '';
-			for (var i = 0; i < tweets.length; i++)
-			{
-				htmlstring += (i+1);
-				htmlstring += ". Time tweet made: "; 
-				htmlstring += datetweets[i];
-				htmlstring += "<br> Text of that tweet: '"
-				htmlstring += texttweets[i]; //tweets[i].text;
-				htmlstring += "' <br>";
-			}
-			$('#tweettext' + whichToUse).html(htmlstring);*/
-
 			// Show input along with checkbox and delete button
 			$(findDiv).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp" + retrievedSearch + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
 
@@ -301,12 +530,13 @@ $(document).ready(function(){
 			count--;
 			$('#failedSearch').show().delay(6000).fadeOut();
 		}
+
+		// Display count of valid searches
 		$('.badge-info').html("Your number of valid searches is " + count + "!");
 	}
 
 	// Add button clicked
 	$('.add').click(displayCheckboxes);
-
 
 	// Enter key pressed equivalent to add button
 	$('#userInput').keyup(function(event) {
@@ -321,15 +551,13 @@ $(document).ready(function(){
 
 	// Press update now key
 	$('#update').click(function(){
-		$('#graph').show();
-		$('.progress').show();
-		/* Make the checkmarks exist so it is easier to run graph
+		// Make the checkmarks exist so it is easier to run graph
 		for (var i = count + 1; i < 6; i++)
 		{
 			$('#searchOption' + i).html("<input type='checkbox' id='box" + i + "'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + i +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>").hide();
 		}
 		// Make array of checked boxes
-		var checks = new Array();
+		/*var checks = new Array();
 		for (var i = 1; i < 6; i++)
 		{
 			var x = '#box' + i;
@@ -346,6 +574,20 @@ $(document).ready(function(){
 				y += ', ';
 		}
 		$('#toGraph').html(y);*/
+
+		// Make ajax calls to refresh graphs
+		for (var i = 1; i < 6; i++)
+		{
+			var x = '#box' + i;
+			if($(x).prop('checked'))
+			{
+				searchURL = first + enteredInput[i-1] + second;
+				$.ajax({
+			        url: searchURL,
+			        success: cb
+				});
+			}
+		}
 	})
 
 	$('.delete1').click(function(){
