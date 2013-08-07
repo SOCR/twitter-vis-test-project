@@ -6,10 +6,8 @@ ONE GRAPH
 
 Currently to do within current scope:
 On hover over line, display last tweet text and time
-Horizontal axis in logarithmic
-On click of line?
-text boxes dropdown collapse below graph
-fix numbering on graph
+1 graph
+get times to slide down
 
 Ideas:
 provide links within text?
@@ -25,8 +23,7 @@ Does twitter verify whether user exists?????
 
 Minor issues:
 1. search results dropping down after error message
-2. sync progress bar with graph
-3. dropdown menu for stats metrics, types of d3 (cumulative, periodic)
+2. dropdown menu for stats metrics, types of d3 (cumulative, periodic)
 
 */
 
@@ -276,34 +273,32 @@ $(document).ready(function(){
 			}
 		}
 		var htmlstring = '';
-		for (var i = 0; i < tweets.length; i++)
-		{
-			htmlstring += (i+1);
-			htmlstring += ". Time tweet made: ";
-			var manipulatedDate = changeDate(datetweets[i]); 
-			htmlstring += manipulatedDate;
-			htmlstring += "<br> Text of that tweet: '"
-			htmlstring += texttweets[i];
-			htmlstring += "' <br>";
-		}
 
-		/* attempt to get numbering correct
-		for (var i = tweets.length; i <= 0; i--)
+		//attempt to get numbering correct
+		for (var i = tweets.length; i > 0; i--)
 		{
 			htmlstring += i;
 			htmlstring += ". Time tweet made: ";
 			var manipulatedDate = changeDate(datetweets[i-1]); 
-			htmlstring += manipulatedDate;  //datetweets[i];
+			htmlstring += manipulatedDate;
 			htmlstring += "<br> Text of that tweet: '";
-			htmlstring += texttweets[i-1]; //tweets[i].text;
+			htmlstring += texttweets[i-1];
 			htmlstring += "' <br>";
-		}*/
+		}
 
 		$('#tweettext' + whichToUse).html(htmlstring);
 
 		// Set up html
-		$(findDescription + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>").show();	
+		//$(findDescription + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>").show();	
 		
+		$(findDescription + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+
+		$('.progress').hide();
+		$('#graph').hide();
+
+		$(findDescription + whichToUse).show();	
+
+		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 		//parseTimes();
 
 		// START OF D3
@@ -443,9 +438,9 @@ $(document).ready(function(){
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
 
-		// Hide graph
+		/*// Hide graph
 		$('#graph').hide();
-		$('.progress').hide();
+		$('.progress').hide();*/
 
 		// Button is clicked, increment counter; cannot exceed 5 inputs
 		count++;
@@ -528,6 +523,9 @@ $(document).ready(function(){
 			var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 			// Form URL to search for using AJAX
 			var searchURL = first + retrievedSearch + second;
+
+			$('.progress').show();
+			$('#graph').show();
 
 			// Use Twitter API to retrieve data
 			$.ajax({
@@ -628,6 +626,36 @@ $(document).ready(function(){
 			}
 		}
 	})
+
+	$('#user1').toggle(function(){
+		$('#tweettext1').slideDown(200);
+	}, function() {
+		$('#tweettext1').slideUp(200);
+	});
+
+	$('#user2').toggle(function(){
+		$('#tweettext2').slideDown(200);
+	}, function() {
+		$('#tweettext2').slideUp(200);
+	});
+
+	$('#user3').toggle(function(){
+		$('#tweettext3').slideDown(200);
+	}, function() {
+		$('#tweettext3').slideUp(200);
+	});
+
+	$('#user4').toggle(function(){
+		$('#tweettext4').slideDown(200);
+	}, function() {
+		$('#tweettext4').slideUp(200);
+	});
+
+	$('#user5').toggle(function(){
+		$('#tweettext5').slideDown(200);
+	}, function() {
+		$('#tweettext5').slideUp(200);
+	});
 
 /*
 	$('.delete1').click(function(){

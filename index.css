@@ -100,6 +100,16 @@ h1 {
     font-weight: bold;
 }
 
+#authors {
+    font-weight: bold;
+    font-style: oblique;
+    padding: 3px;
+    border-style: ridge;
+    border-width: 6px;
+    border-color: green;
+    text-align: center;
+}
+
 .description {
     border-style: solid;
     border-width: 3px;

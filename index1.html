@@ -20,7 +20,7 @@
 	<!-- Our JS -->
 	<script type="text/javascript" src="index.js"></script>
 	<!-- d3.js -->
-	<!--<script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>-->
+	<script type="text/javascript" src="http://d3js.org/d3.v2.js"></script> 
 </head>
 
 <body>
@@ -59,19 +59,45 @@
 							</div>
 						</div>
 					</div>
+					<div id="graph"><p align=center>Graphing now . . .</p></div><br>
 					<div class="progress progress-striped active">
-					  <div class="bar" style="width: 50%"></div>
+					 	<div class="bar" style="width: 50%"></div>
 					</div>
-					<div id="graph">Graphing now . . .</div><br>
+
 					<!--<div id='toGraph'></div><br>-->
+					<!-- COLLAPSIBLE TABLE
+					<div class="outermost">
+					    <p class="header" align=center>Category - 1<div id'tweettext1'></div></p>
+					    <div class="data">
+					        Sub Cateogry 1.1<br/>
+					        Sub Cateogry 1.2
+					    </div>
+					    <p class="header" align=center id='tweettext2'>Category - 2</p>
+					    <div class="data">
+					        Sub Cateogry 2.1<br/>
+					        Sub Cateogry 2.2
+					   </div>
+					   <table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table>
+					</div>-->
+					<div id='graphuser1'></div>
+					<div id='graphuser2'></div>
+					<div id='graphuser3'></div>
+					<div id='graphuser4'></div>
+					<div id='graphuser5'></div>
+					<div id='user1'></div>
 					<div class= "tweettext" id='tweettext1'></div>
+					<div id='user2'></div>
 					<div class= "tweettext" id='tweettext2'></div>
+					<div id='user3'></div>
 					<div class= "tweettext" id='tweettext3'></div>
+					<div id='user4'></div>
 					<div class= "tweettext" id='tweettext4'></div>
+					<div id='user5'></div>
 					<div class= "tweettext" id='tweettext5'></div>
 				</div>
 				<!-- Insert search query, graphing options on right quarter of page -->
 				<div class="span3 offset1">
+					<div id='authors'>~ SOCR Developers ~<br>Andrew Foglia<br>Abhishek Chowdhury<br>Brian Zhang</div>
 					<h5>Welcome. Below you may search for any user name and SOCR will display their number of tweets over any specified period of time. In addition you may view their exact tweet text and user information.</h5>
 					<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'><br>
 					<p align=right><span class="badge badge-info"></span></p>
@@ -103,6 +129,9 @@
 					  <input type='checkbox' class="btn btn-large" value='1'> Auto-update
 					  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
 					</p>
+					<p align=center>** Please note that all times used in the graphs are using GMT times **</p>
+					<div id='gmttime'></div>
+					<div id='localtime'></div>
 				</div>
 			</div>
 		</div>
