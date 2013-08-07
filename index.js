@@ -1,15 +1,25 @@
 /* TO DO
 
-TO BE DONE:
+TO BE DONE -
+
+ONE GRAPH
+
+Currently to do within current scope:
+On hover over line, display last tweet text and time
+Horizontal axis in logarithmic
+On click of line?
+text boxes dropdown collapse below graph
+fix numbering on graph
+
+Ideas:
+provide links within text?
+photo and screen name above graphs?
+
+New functionality:
 Update graph in real time, dont spit out a new graph on update now
 Update now does not graph right, uses wrong color
 Do auto refresh once above works (easy)
-On hover over line, display last tweet text and time
-On click of line, display the tweets that made the graph
-Structure graphs with username in html?
 Fix delete buttons
-Get ajax working with text and times for all users
-Graph options: all on one might be tough
 
 Does twitter verify whether user exists?????
 
@@ -23,7 +33,6 @@ Minor issues:
 $(document).ready(function(){
 
 	function findTime() {
-
 		// Get gmt time for user
 		var d = new Date();
 		var month = d.getUTCMonth();
@@ -127,6 +136,65 @@ $(document).ready(function(){
 		$('#localtime').html(x);
 	}
 
+	function changeDate(date) {
+		var tweetWeekday = date[0] + date[1] + date[2];
+		switch (tweetWeekday)
+		{	
+			case "Tue":
+				tweetWeekday += 'sday';
+				break;
+			case "Wed":
+				tweetWeekday += 'nesday';
+				break;
+			case "Thu":
+				tweetWeekday += 'rsday';
+				break;
+			case 'Sat':
+				tweetWeekday += 'urday';
+				break;
+			default:
+				tweetWeekday += 'day';
+				break;
+		}
+		var tweetMonth = date[4] + date[5] + date[6];
+		switch (tweetMonth)
+		{
+			case 'Jan': tweetMonth = '01'; break;
+			case 'Feb': tweetMonth = '02'; break;
+			case 'Mar': tweetMonth = '03'; break;
+			case 'Apr': tweetMonth = '04'; break;
+			case 'May': tweetMonth = '05'; break;
+			case 'Jun': tweetMonth = '06'; break;
+			case 'Jul': tweetMonth = '07'; break;
+			case 'Aug': tweetMonth = '08'; break;
+			case 'Sep': tweetMonth = '09'; break;
+			case 'Oct': tweetMonth = '10'; break;
+			case 'Nov': tweetMonth = '11'; break;
+			case 'Dec': tweetMonth = '12'; break;
+		}
+		var tweetDate = date[8] + date[9];
+		var tweetHour = date[11] + date[12];
+		var morning = true;
+		if (tweetHour > 12)
+		{
+			morning = false;
+			tweetHour -= 12;
+			if (tweetHour < 10)
+				tweetHour = '0' + tweetHour;
+		}
+		else if (tweetHour == 0)
+			tweetHour = 12;
+		var tweetMinute = date[14] + date[15];
+		var tweetSecond = date[17] + date[18];
+		var tweetYear = date[28] + date[29];
+		var returnedDate = tweetWeekday + ' ' + tweetMonth + '/' + tweetDate + '/' + tweetYear + ' ' + '@ ' + tweetHour + ':' + tweetMinute + ':' + tweetSecond + ' ';
+		if (morning)
+			returnedDate += 'A.M.';
+		else
+			returnedDate += 'P.M.';
+		return returnedDate;
+	}	
+
 	// Hide a lot of CSS stuff right after page load and let user display what they want
 	window.onload = function(){
 		$('#successfulSearch').hide();
@@ -171,54 +239,9 @@ $(document).ready(function(){
 	var texttweets = new Array();
 	var datetweets = new Array();
 
-	var screen_name, numberOfFollowers, URL, numberOfStatuses, photo, name, protection = '';
-
 	// Create new array for json parse description
-	//var tweetWeekday, tweetMonth, tweetDate, tweetHour, tweetMinute, tweetSecond;
 
-	var findDescription = '#description';
-
-	// Set up first part of query
-	var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22";
-	
-	// Set up second part of query
-	var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";		
-
-	function displayDescription() {
-		//Retrieve desired information depending on input
-		screen_name = tweets[0].user.screen_name;
-		numberOfFollowers = tweets[0].user.followers_count;
-		if (tweets[0].user.url == null)
-			URL = 'No Link on Twitter Page';
-		else
-			URL = tweets[0].user.url;
-		numberOfStatuses = tweets[0].user.statuses_count;
-		photo = tweets[0].user.profile_image_url;
-		name = tweets[0].user.name;
-		protection = tweets[0].user.protected;
-	}
-
-	/*
-	function parseTimes() {
-		//var whichUser = 'user';
-		//whichUser += whichToUse;
-		//whichUser += 'tweets';
-		for (var i = 0; i < tweets.length; i++)
-		{
-			//whichUser[i] = tweets[i].created_at;
-			//alert(tweets[i].created_at);
-			tweetWeekday = tweets[i].created_at[0] + tweets[i].created_at[1] + tweets[i].created_at[2];
-			tweetMonth = tweets[i].created_at[4] + tweets[i].created_at[5] + tweets[i].created_at[6];
-			tweetDate = tweets[i].created_at[8] + tweets[i].created_at[9];
-			tweetHour = tweets[i].created_at[11] + tweets[i].created_at[12];
-			tweetMinute = tweets[i].created_at[14] + tweets[i].created_at[15];
-			tweetSecond = tweets[i].created_at[17] + tweets[i].created_at[18];
-			alert(tweets[i].created_at + ',' + tweetWeekday);
-			//alert(tweets)
-			//alert(dayOfWeek);
-		}
-	}
-	*/
+	var findDescription = '#description';		
 
 	var converteddate = new Array();
     var seconddif = new Array();
@@ -227,17 +250,16 @@ $(document).ready(function(){
     // Success function for API
 	var cb = function(data) {
 		tweets = JSON.parse(data.query.results.result);
-		//displayDescription();
-		screen_name = tweets[0].user.screen_name;
-		numberOfFollowers = tweets[0].user.followers_count;
+		var screen_name = tweets[0].user.screen_name;
+		var numberOfFollowers = tweets[0].user.followers_count;
 		if (tweets[0].user.url == null)
-			URL = 'No Link on Twitter Page';
+			var URL = 'No Link on Twitter Page';
 		else
-			URL = tweets[0].user.url;
-		numberOfStatuses = tweets[0].user.statuses_count;
-		photo = tweets[0].user.profile_image_url;
-		name = tweets[0].user.name;
-		protection = tweets[0].user.protected;
+			var URL = tweets[0].user.url;
+		var numberOfStatuses = tweets[0].user.statuses_count;
+		var photo = tweets[0].user.profile_image_url;
+		var name = tweets[0].user.name;
+		var protection = tweets[0].user.protected;
 		for (var i = 0; i < tweets.length; i++)
 		{
 			texttweets[i] = tweets[i].text;
@@ -257,17 +279,30 @@ $(document).ready(function(){
 		for (var i = 0; i < tweets.length; i++)
 		{
 			htmlstring += (i+1);
-			htmlstring += ". Time tweet made: "; 
-			htmlstring += datetweets[i];
+			htmlstring += ". Time tweet made: ";
+			var manipulatedDate = changeDate(datetweets[i]); 
+			htmlstring += manipulatedDate;
 			htmlstring += "<br> Text of that tweet: '"
-			htmlstring += texttweets[i]; //tweets[i].text;
+			htmlstring += texttweets[i];
 			htmlstring += "' <br>";
 		}
+
+		/* attempt to get numbering correct
+		for (var i = tweets.length; i <= 0; i--)
+		{
+			htmlstring += i;
+			htmlstring += ". Time tweet made: ";
+			var manipulatedDate = changeDate(datetweets[i-1]); 
+			htmlstring += manipulatedDate;  //datetweets[i];
+			htmlstring += "<br> Text of that tweet: '";
+			htmlstring += texttweets[i-1]; //tweets[i].text;
+			htmlstring += "' <br>";
+		}*/
 
 		$('#tweettext' + whichToUse).html(htmlstring);
 
 		// Set up html
-		$(findDescription).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");	
+		$(findDescription + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>").show();	
 		
 		//parseTimes();
 
@@ -309,7 +344,8 @@ $(document).ready(function(){
 						  .ticks(5);
 
 		//Create SVG element
-		var svg = d3.select("body")
+		// after select, was body
+		var svg = d3.select("#graphuser" + whichToUse)
 					.append("svg")
 					.attr("width", w)
 					.attr("height", h);
@@ -336,10 +372,10 @@ $(document).ready(function(){
 		   		return "#"+(thelength-d[1]);
 		   })
 		   .attr("x", function(d) {
-		   		return xScale(d[0]);
+		   		return xScale(d[0]) - 20;
 		   })
 		   .attr("y", function(d) {
-		   		return yScale(d[1]);
+		   		return yScale(d[1]) - 8;
 		   })
 		   .attr("font-family", "sans-serif")
 		   .attr("font-size", "11px")
@@ -370,7 +406,7 @@ $(document).ready(function(){
 
 	    // Create graph lines
 		var linecolor = "black";
-		switch (count)
+		switch (whichToUse)
 		{
 			case 2: linecolor = "red"; break;
 			case 3: linecolor = "blue"; break;
@@ -385,7 +421,7 @@ $(document).ready(function(){
 	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
 	        .attr('y1',yScale((finalArray[k])[1]))
 	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
-	        .attr("stroke-width", 1)
+	        .attr("stroke-width", 2)
 	        .attr("stroke", linecolor)
 		}
 	};
@@ -482,11 +518,14 @@ $(document).ready(function(){
 		{
 			// Keep track of div tags
 			findDiv += whichToUse;
-			findDescription += whichToUse;
 
 			// Keep track of input to check duplicates
 			enteredInput[whichToUse-1] = retrievedSearch;
 
+			// Set up first part of query
+			var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22";
+			// Set up second part of query
+			var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 			// Form URL to search for using AJAX
 			var searchURL = first + retrievedSearch + second;
 
@@ -497,12 +536,12 @@ $(document).ready(function(){
 			});
 
 			// Check for whether user is protected
-			if (protection == true)
+			/*if (protection == true)
 			{
 				count--;
 				$('#protectedUser').show().delay(5000).fadeOut();
 				return;
-			}
+			}*/
 
 			// Display description information
 			$('#descriptions').fadeIn(500);
@@ -590,6 +629,7 @@ $(document).ready(function(){
 		}
 	})
 
+/*
 	$('.delete1').click(function(){
 		// Decrement count
 		count--;
@@ -680,6 +720,7 @@ $(document).ready(function(){
 		$('#userInput').removeAttr('disabled');
 		$('#tweettext5').hide();
 	});
+*/
 
 	$('#description1').click(function(){
 		$('#tweettext1').fadeIn(500);
