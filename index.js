@@ -5,13 +5,8 @@ TO BE DONE -
 ONE GRAPH
 
 Currently to do within current scope:
-On hover over line, display last tweet text and time
+On hover over line, display last tweet text and time photo screen name
 1 graph
-get times to slide down
-
-Ideas:
-provide links within text?
-photo and screen name above graphs?
 
 New functionality:
 Update graph in real time, dont spit out a new graph on update now
@@ -34,7 +29,7 @@ $(document).ready(function(){
 		var d = new Date();
 		var month = d.getUTCMonth();
 		month++;
-		switch (month)
+		/*switch (month)
 		{
 			case 1: month = 'January'; break;
 			case 2: month = 'February'; break;
@@ -48,7 +43,7 @@ $(document).ready(function(){
 			case 10: month = 'October'; break;
 			case 11: month = 'November'; break;
 			case 12: month = 'December'; break;
-		}
+		}*/
 		var day = d.getUTCDate();
 		var year = d.getUTCFullYear();
 		var hour = d.getUTCHours();
@@ -74,7 +69,7 @@ $(document).ready(function(){
 			second += tempsecond;
 		else
 			second = tempsecond;
-		var y = 'The current GMT time is ' + month + ' ' + day + ' ' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		var y = 'GMT time:<br> ' + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
 			y += 'A.M.';
 		else
@@ -85,7 +80,7 @@ $(document).ready(function(){
 		var l = new Date();
 		var month = l.getMonth();
 		month++;
-		switch (month)
+		/*switch (month)
 		{
 			case 1: month = 'January'; break;
 			case 2: month = 'February'; break;
@@ -99,7 +94,7 @@ $(document).ready(function(){
 			case 10: month = 'October'; break;
 			case 11: month = 'November'; break;
 			case 12: month = 'December'; break;
-		}
+		}*/
 		var day = l.getDate();
 		var year = l.getFullYear();
 		var hour = l.getHours();
@@ -125,7 +120,7 @@ $(document).ready(function(){
 			second += tempsecond;
 		else
 			second = tempsecond;
-		var x = 'Your current local time is ' + month + ' ' + day + ' ' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		var x = 'Local time:<br> ' + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
 			x += 'A.M.';
 		else
@@ -203,6 +198,7 @@ $(document).ready(function(){
 		$('#enoughInput').hide();
 		$('#graph').hide();
 		$('.progress').hide();
+		$('#texts').hide();
 		//$('#searchOption1').hide();
 		//$('.delete1').hide();
 		//$('#searchOption2').hide();
@@ -299,6 +295,7 @@ $(document).ready(function(){
 		$(findDescription + whichToUse).show();	
 
 		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
+		$('#texts').show();
 		//parseTimes();
 
 		// START OF D3
@@ -406,7 +403,7 @@ $(document).ready(function(){
 			case 2: linecolor = "red"; break;
 			case 3: linecolor = "blue"; break;
 			case 4: linecolor = "green"; break;
-			case 5: linecolor = "yellow"; break;
+			case 5: linecolor = "purple"; break;
 		}     
 	    for (var k = 0; k < dataset.length; k++)
   		{
@@ -749,25 +746,4 @@ $(document).ready(function(){
 		$('#tweettext5').hide();
 	});
 */
-
-	$('#description1').click(function(){
-		$('#tweettext1').fadeIn(500);
-	});
-
-	$('#description2').click(function(){
-		$('#tweettext2').fadeIn(500);
-	});
-
-	$('#description3').click(function(){
-		$('#tweettext3').fadeIn(500);
-	});
-
-	$('#description4').click(function(){
-		$('#tweettext4').fadeIn(500);
-	});
-
-	$('#description5').click(function(){
-		$('#tweettext5').fadeIn(500);
-	});
-
 }); // end ready
