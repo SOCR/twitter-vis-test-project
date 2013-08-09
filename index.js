@@ -2,11 +2,10 @@
 
 TO BE DONE -
 
-ONE GRAPH
-
 Currently to do within current scope:
 On hover over line, display last tweet text and time photo screen name
 1 graph
+Resizing issues everywhere (d3, time, backtotop)
 
 New functionality:
 Update graph in real time, dont spit out a new graph on update now
@@ -29,21 +28,6 @@ $(document).ready(function(){
 		var d = new Date();
 		var month = d.getUTCMonth();
 		month++;
-		/*switch (month)
-		{
-			case 1: month = 'January'; break;
-			case 2: month = 'February'; break;
-			case 3: month = 'March'; break;
-			case 4: month = 'April'; break;
-			case 5: month = 'May'; break;
-			case 6: month = 'June'; break;
-			case 7: month = 'July'; break;
-			case 8: month = 'August'; break;
-			case 9: month = 'September'; break;
-			case 10: month = 'October'; break;
-			case 11: month = 'November'; break;
-			case 12: month = 'December'; break;
-		}*/
 		var day = d.getUTCDate();
 		var year = d.getUTCFullYear();
 		var hour = d.getUTCHours();
@@ -80,21 +64,6 @@ $(document).ready(function(){
 		var l = new Date();
 		var month = l.getMonth();
 		month++;
-		/*switch (month)
-		{
-			case 1: month = 'January'; break;
-			case 2: month = 'February'; break;
-			case 3: month = 'March'; break;
-			case 4: month = 'April'; break;
-			case 5: month = 'May'; break;
-			case 6: month = 'June'; break;
-			case 7: month = 'July'; break;
-			case 8: month = 'August'; break;
-			case 9: month = 'September'; break;
-			case 10: month = 'October'; break;
-			case 11: month = 'November'; break;
-			case 12: month = 'December'; break;
-		}*/
 		var day = l.getDate();
 		var year = l.getFullYear();
 		var hour = l.getHours();
@@ -199,6 +168,13 @@ $(document).ready(function(){
 		$('#graph').hide();
 		$('.progress').hide();
 		$('#texts').hide();
+		$('.description').hide();
+		$('#descriptions').hide();
+		$('.tweettext').hide();
+		findTime();
+		
+		// Older delete buttons
+
 		//$('#searchOption1').hide();
 		//$('.delete1').hide();
 		//$('#searchOption2').hide();
@@ -209,10 +185,6 @@ $(document).ready(function(){
 		//$('.delete4').hide();
 		//$('#searchOption5').hide();
 		//$('.delete5').hide();
-		$('.description').hide();
-		$('#descriptions').hide();
-		$('.tweettext').hide();
-		findTime();
 	};
 
 	var intervalID = setInterval(function() {
@@ -284,9 +256,6 @@ $(document).ready(function(){
 
 		$('#tweettext' + whichToUse).html(htmlstring);
 
-		// Set up html
-		//$(findDescription + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>").show();	
-		
 		$(findDescription + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
 
 		$('.progress').hide();
@@ -296,7 +265,6 @@ $(document).ready(function(){
 
 		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 		$('#texts').show();
-		//parseTimes();
 
 		// START OF D3
 
@@ -434,10 +402,6 @@ $(document).ready(function(){
 
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
-
-		/*// Hide graph
-		$('#graph').hide();
-		$('.progress').hide();*/
 
 		// Button is clicked, increment counter; cannot exceed 5 inputs
 		count++;
@@ -624,6 +588,8 @@ $(document).ready(function(){
 		}
 	})
 
+	// Collapsible tweet text
+
 	$('#user1').toggle(function(){
 		$('#tweettext1').slideDown(200);
 	}, function() {
@@ -655,6 +621,8 @@ $(document).ready(function(){
 	});
 
 /*
+	Delete buttons
+	
 	$('.delete1').click(function(){
 		// Decrement count
 		count--;
