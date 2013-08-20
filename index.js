@@ -3,9 +3,11 @@
 TO BE DONE -
 
 Currently to do within current scope:
+Time scroll options: badges in navbar, show time in tweetboxes every ten tweets, mouseover effect, clock icon to right of number and mouseover shows gmt/local time above
+
 On hover over line, display last tweet text and time photo screen name
 1 graph
-Resizing issues everywhere (d3, time, backtotop)
+Resizing issues everywhere (d3)
 
 New functionality:
 Update graph in real time, dont spit out a new graph on update now
@@ -25,11 +27,16 @@ $(document).ready(function(){
 
 	// GLOBALS //
 
-	// Width and height
+	// Width, height, padding
 	var WIDTH = 900;
 	var HEIGHT = 575;
 	var PADDING = 20;
+	// Line colors
 	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
+	// Intervals of follower numbers
+	var INTERVALS = [100, 500, 100000, 1000000, 10000000];
+	// Options for thickness
+	var THICKNESS = [1, 2, 4, 6, 8, 10];
 
 	// Resize Window
 	/*$(window).resize(function() {
@@ -68,14 +75,14 @@ $(document).ready(function(){
 			second += tempsecond;
 		else
 			second = tempsecond;
-		var y = "GMT time:<br> " + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
+		//var y = "GMT time:<br> " + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
+		var y = "GMT time: " + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
-			y += 'A.M.';
+			y += 'A.M.&nbsp&nbsp&nbsp';
 		else
-			y += 'P.M.';
-		y += '</style>';
-		$('#gmttime').html(y);
-
+			y += 'P.M.&nbsp&nbsp&nbsp';
+		//$('.gmttime').html(y);
+		
 		// Get Local Time
 		var l = new Date();
 		var month = l.getMonth();
@@ -105,12 +112,13 @@ $(document).ready(function(){
 			second += tempsecond;
 		else
 			second = tempsecond;
-		var x = 'Local time:<br> ' + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
+		//var x = 'Local time:<br> ' + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
+		var x = 'Local time: ' + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
 			x += 'A.M.';
 		else
 			x += 'P.M.';
-		$('#localtime').html(x);
+		$('.showtime').html(y+x);
 	}
 
 	function changeDate(date) {
@@ -188,9 +196,9 @@ $(document).ready(function(){
 		$('.description').hide();
 		$('#descriptions').hide();
 		$('.tweettext').hide();
-		$('.alert alert-success').hide();
+		$('.showtime').hide();
 		findTime();
-		
+
 		// Older delete buttons
 
 		//$('#searchOption1').hide();
@@ -225,9 +233,9 @@ $(document).ready(function(){
 	for (var i = 0; i < 5; i++)
 		usertime[i] = new Array(20);
 	// Keep track of scales for axes
-	var allXScales = new Array();
-	var allYScales = new Array();
-	var allRScales = new Array();
+	var allXScales = new Array(5);
+	var allYScales = new Array(5);
+	var allRScales = new Array(5);
 
 	var texttweets = new Array();
 	var datetweets = new Array();	
@@ -252,6 +260,21 @@ $(document).ready(function(){
 		// Set up description box
 		var screen_name = tweets[0].user.screen_name;
 		var numberOfFollowers = tweets[0].user.followers_count;
+
+		// Calculate thickness of line
+		if (numberOfFollowers < INTERVALS[0])
+			thickness = THICKNESS[0];
+		else if (numberOfFollowers < INTERVALS[1])
+			thickness = THICKNESS[1];
+		else if (numberOfFollowers < INTERVALS[2])
+			thickness = THICKNESS[2];
+		else if (numberOfFollowers < INTERVALS[3])
+			thickness = THICKNESS[3];
+		else if (numberOfFollowers < INTERVALS[4])
+			thickness = THICKNESS[4];
+		else
+			thickness = THICKNESS[5];
+
 		if (tweets[0].user.url == null)
 			var URL = 'No Link on Twitter Page';
 		else
@@ -289,14 +312,20 @@ $(document).ready(function(){
 		for (var i = tweets.length; i > 0; i--)
 		{
 			htmlstring += i;
-			htmlstring += ". Time tweet made: ";
+			//htmlstring += ". Time tweet made: ";
+			htmlstring += ". <a class='time'><img src='specific_images/glyphicons_054_clock.png'><a class='showtime'></a></a><br>";
 			//var manipulatedDate = changeDate(datetweets[i-1]); 
 			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
 			htmlstring += manipulatedDate;
-			htmlstring += "<br> Text of that tweet: '";
+			//htmlstring += "<br> Text of that tweet: '";
+			htmlstring += "<br>'";
 			//htmlstring += texttweets[i-1];
 			htmlstring += usertweets[whichToUse][i-1];
-			htmlstring += "' <br>";
+
+			if(i == 1)
+				htmlstring += "' <br><br><p align=center><a href='#'>&uarr; back to top</a></p><br>";
+			else	
+				htmlstring += "' <br><br>";
 		}
 		$('#tweettext' + whichToUse).html(htmlstring);
 
@@ -314,9 +343,6 @@ $(document).ready(function(){
 		// START OF D3       
 		//var thelength = finalArray.length;
 	    var thelength = finalArray.length;
-							  
-		var dataset = new Array();
-		dataset = finalArray;
 
 		/*var dataset = new Array(5);
     	for (var i = 0; i < 5; i++)
@@ -325,19 +351,16 @@ $(document).ready(function(){
 
 		//Create scale functions
 		var xScale = d3.scale.linear()
-							 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
-							 .range([WIDTH-8*PADDING,0+PADDING ]);
-		allXScales.push(xScale);
+							 .domain([0, d3.max(finalArray, function(d) { return d[0]; })])
+							 .range([WIDTH-8*PADDING,0+PADDING]);
 
 		var yScale = d3.scale.linear()
-							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
-							 .range([ 0+PADDING, HEIGHT-PADDING ]);
-		allYScales.push(yScale);
+							 .domain([0, d3.max(finalArray, function(d) { return d[1]; })])
+							 .range([ 0+PADDING, HEIGHT-PADDING]);
 
 		var rScale = d3.scale.linear()
-							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+							 .domain([0, d3.max(finalArray, function(d) { return d[1]; })])
 							 .range([3, 3]);
-		allRScales.push(rScale);
 
 		//Define X axis
 		var xAxis = d3.svg.axis()
@@ -352,16 +375,13 @@ $(document).ready(function(){
 						  .ticks(5);
 		
 		//Create SVG element
-		
 		var svg = d3.select("#graphuser" + whichToUse)
 					.append("svg")
 					.attr("width", WIDTH)
 					.attr("height", HEIGHT);
 
-		//renderGraph(svg);
-		//renderGraph(dataset);
 		svg.selectAll("circle")
-		   .data(dataset)
+		   .data(finalArray)
 		   .enter()
 		   .append("circle")
 		   .attr("cx", function(d) {
@@ -376,7 +396,7 @@ $(document).ready(function(){
 		   .style('fill', COLORS[whichToUse-1]);
 
 		svg.selectAll("text")
-		   .data(dataset)
+		   .data(finalArray)
 		   .enter()
 		   .append("text")
 		   .text(function(d) {
@@ -417,7 +437,7 @@ $(document).ready(function(){
 
 	    // Create graph lines
 		var linecolor = COLORS[whichToUse-1];
-	    for (var k = 0; k < dataset.length; k++)
+	    for (var k = 0; k < finalArray.length; k++)
   		{
 
 	        svg.append('line')
@@ -425,7 +445,7 @@ $(document).ready(function(){
 	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
 	        .attr('y1',yScale((finalArray[k])[1]))
 	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
-	        .attr("stroke-width", 2)
+	        .attr("stroke-width", 2)//thickness)
 	        .attr("stroke", linecolor)
 		}
 	};
@@ -445,7 +465,7 @@ $(document).ready(function(){
 	enteredInput[0], enteredInput[1], enteredInput[2], enteredInput[3], enteredInput[4] = '';
 
 	// Create Graph
-	/*function renderGraph(info) {
+	/*function renderGraph() {
 
 		var svg = d3.select("#graphuser" + whichToUse)
 					.append("svg")
@@ -537,6 +557,14 @@ $(document).ready(function(){
 	        .attr("stroke", linecolor)
 		}
 	}*/
+
+	$('.time').mouseover(function(){
+		$('.showtime').show();
+	});
+
+	$('.time').mouseout(function(){
+		$('.showtime').hide();
+	});
 
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
