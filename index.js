@@ -200,7 +200,6 @@ $(document).ready(function(){
 		findTime();
 
 		// Older delete buttons
-
 		//$('#searchOption1').hide();
 		//$('.delete1').hide();
 		//$('#searchOption2').hide();
@@ -242,17 +241,16 @@ $(document).ready(function(){
 
 	var converteddate = new Array();
     var seconddif = new Array();
-    var finalArray = new Array();
 
-    /*var finalArray = new Array(5);
+    var finalArray = new Array(5);
     for (var i = 0; i < 5; i++)
-		finalArray[i] = new Array();*/
+		finalArray[i] = new Array();
 
     // Success function for API
 	var cb = function(data) {
 
 		// Clear array contents so graphs don't copy at all on accident
-		finalArray = [];
+		//finalArray = [whichToUse][];
 
 		// Parse data
 		tweets = JSON.parse(data.query.results.result);
@@ -291,8 +289,6 @@ $(document).ready(function(){
 		var j = tweets.length - 1;
 		for (var i = 0; i < tweets.length; i++)
 		{
-			//texttweets[i] = tweets[j].text;
-			//datetweets[i] = tweets[j].created_at;
 			usertweets[whichToUse][i] = tweets[j].text;
 			usertime[whichToUse][i] = tweets[j].created_at;;
 			j--;
@@ -302,9 +298,7 @@ $(document).ready(function(){
 			var seconds = new Date().getTime() / 1000;
 			coordi[0] = (seconds- seconddif[i]) /3600;
 			coordi[1] = i;
-			//if (coordi[0] <= 48) 
-				//finalArray[i] = coordi;
-				finalArray[i] = coordi;
+			finalArray[whichToUse-1][i] = coordi;
 		}
 
 		// Set up tweet text
@@ -341,25 +335,31 @@ $(document).ready(function(){
 		$('#texts').show();
 
 		// START OF D3       
-		//var thelength = finalArray.length;
-	    var thelength = finalArray.length;
+	    var thelength = finalArray[whichToUse-1].length;
 
-		/*var dataset = new Array(5);
-    	for (var i = 0; i < 5; i++)
-			dataset[i] = new Array();
-		dataset = finalArray;*/
+	    var scalingArray = new Array(100);
+    	for (var j = 0; j < 20; j++)
+	    	scalingArray[j] = finalArray[0][j];
+	    for (var j = 20; j < 40; j++)
+	    	scalingArray[j] = finalArray[1][j-20];
+	    for (var j = 40; j < 60; j++)
+	    	scalingArray[j] = finalArray[2][j-40];
+	    for (var j = 60; j < 80; j++)
+	    	scalingArray[j] = finalArray[3][j-60];
+	    for (var j = 80; j < 100; j++)
+	    	scalingArray[j] = finalArray[4][j-80];
 
 		//Create scale functions
 		var xScale = d3.scale.linear()
-							 .domain([0, d3.max(finalArray, function(d) { return d[0]; })])
+							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[0]; })])
 							 .range([WIDTH-8*PADDING,0+PADDING]);
 
 		var yScale = d3.scale.linear()
-							 .domain([0, d3.max(finalArray, function(d) { return d[1]; })])
+							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[1]; })])
 							 .range([ 0+PADDING, HEIGHT-PADDING]);
 
 		var rScale = d3.scale.linear()
-							 .domain([0, d3.max(finalArray, function(d) { return d[1]; })])
+							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[1]; })])
 							 .range([3, 3]);
 
 		//Define X axis
@@ -381,7 +381,7 @@ $(document).ready(function(){
 					.attr("height", HEIGHT);
 
 		svg.selectAll("circle")
-		   .data(finalArray)
+		   .data(finalArray[whichToUse-1])
 		   .enter()
 		   .append("circle")
 		   .attr("cx", function(d) {
@@ -396,7 +396,7 @@ $(document).ready(function(){
 		   .style('fill', COLORS[whichToUse-1]);
 
 		svg.selectAll("text")
-		   .data(finalArray)
+		   .data(finalArray[whichToUse-1])
 		   .enter()
 		   .append("text")
 		   .text(function(d) {
@@ -437,15 +437,14 @@ $(document).ready(function(){
 
 	    // Create graph lines
 		var linecolor = COLORS[whichToUse-1];
-	    for (var k = 0; k < finalArray.length; k++)
+	    for (var k = 0; k < finalArray[whichToUse-1].length; k++)
   		{
-
 	        svg.append('line')
-	        .attr('x1',xScale((finalArray[k])[0]))
-	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
-	        .attr('y1',yScale((finalArray[k])[1]))
-	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
-	        .attr("stroke-width", 2)//thickness)
+	        .attr('x1',xScale((finalArray[whichToUse-1][k])[0]))
+	        .attr('x2',xScale((finalArray[whichToUse-1][k+1])[0]))                                        
+	        .attr('y1',yScale((finalArray[whichToUse-1][k])[1]))
+	        .attr('y2',yScale((finalArray[whichToUse-1][k+1])[1]))                                     
+	        .attr("stroke-width", thickness)
 	        .attr("stroke", linecolor)
 		}
 	};
