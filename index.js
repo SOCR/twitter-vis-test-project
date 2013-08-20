@@ -25,8 +25,7 @@ Minor issues:
 
 $(document).ready(function(){
 
-	// GLOBALS //
-
+	/////////////////////// GLOBALS //////////////////////////////////
 	// Width, height, padding
 	var WIDTH = 900;
 	var HEIGHT = 575;
@@ -37,12 +36,43 @@ $(document).ready(function(){
 	var INTERVALS = [100, 500, 100000, 1000000, 10000000];
 	// Options for thickness
 	var THICKNESS = [1, 2, 4, 6, 8, 10];
+	//////////////////////////////////////////////////////////////////
 
-	// Resize Window
-	/*$(window).resize(function() {
-	    $("#width").text($(this).width());
-	    $("#height").text($(this).height());
-	});*/
+	// Hide a lot of CSS stuff right after page load and let user display what they want
+	window.onload = function(){
+		$('#successfulSearch').hide();
+		$('#failedSearch').hide();
+		$('#protectedUser').hide();
+		$('#tooMany').hide();
+		$('#none').hide();
+		$('#sameInput').hide();
+		$('#enoughInput').hide();
+		$('#graph').hide();
+		$('.progress').hide();
+		$('#texts').hide();
+		$('.description').hide();
+		$('#descriptions').hide();
+		$('.tweettext').hide();
+		$('.showtime').hide();
+		findTime();
+
+		// Older delete buttons
+		//$('#searchOption1').hide();
+		//$('.delete1').hide();
+		//$('#searchOption2').hide();
+		//$('.delete2').hide();
+		//$('#searchOption3').hide();
+		//$('.delete3').hide();
+		//$('#searchOption4').hide();
+		//$('.delete4').hide();
+		//$('#searchOption5').hide();
+		//$('.delete5').hide();
+	};
+
+	// Every one second, update gmt/local time
+	var intervalID = setInterval(function() {
+        findTime();
+    }, 1000);
 
 	function findTime() {
 
@@ -81,7 +111,6 @@ $(document).ready(function(){
 			y += 'A.M.&nbsp&nbsp&nbsp';
 		else
 			y += 'P.M.&nbsp&nbsp&nbsp';
-		//$('.gmttime').html(y);
 		
 		// Get Local Time
 		var l = new Date();
@@ -112,7 +141,6 @@ $(document).ready(function(){
 			second += tempsecond;
 		else
 			second = tempsecond;
-		//var x = 'Local time:<br> ' + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
 		var x = 'Local time: ' + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
 			x += 'A.M.';
@@ -181,48 +209,20 @@ $(document).ready(function(){
 		return returnedDate;
 	}	
 
-	// Hide a lot of CSS stuff right after page load and let user display what they want
-	window.onload = function(){
-		$('#successfulSearch').hide();
-		$('#failedSearch').hide();
-		$('#protectedUser').hide();
-		$('#tooMany').hide();
-		$('#none').hide();
-		$('#sameInput').hide();
-		$('#enoughInput').hide();
-		$('#graph').hide();
-		$('.progress').hide();
-		$('#texts').hide();
-		$('.description').hide();
-		$('#descriptions').hide();
-		$('.tweettext').hide();
-		$('.showtime').hide();
-		findTime();
-
-		// Older delete buttons
-		//$('#searchOption1').hide();
-		//$('.delete1').hide();
-		//$('#searchOption2').hide();
-		//$('.delete2').hide();
-		//$('#searchOption3').hide();
-		//$('.delete3').hide();
-		//$('#searchOption4').hide();
-		//$('.delete4').hide();
-		//$('#searchOption5').hide();
-		//$('.delete5').hide();
-	};
-
-	// Every one second, update gmt/local time
-	var intervalID = setInterval(function() {
-        findTime();
-    }, 1000);
+	function findMax(data) {
+		var maximum = data[0];
+		for (var i = 1; i < data.length; i++)
+	    {
+	    	if (isNaN(data[i]))
+	    		continue;
+	    	if (data[i] >= data[i-1])
+	    		maximum = data[i];
+	    }
+	    return maximum;
+	}
 
 	// Create new array for json parse
 	var tweets = new Array();
-
-	///////////
-	//   D3  //
-	///////////
 	// Keep track of text
 	var usertweets = new Array(5);
 	for (var i = 0; i < 5; i++)
@@ -230,21 +230,17 @@ $(document).ready(function(){
 	// Keep track of time
 	var usertime = new Array(5);
 	for (var i = 0; i < 5; i++)
-		usertime[i] = new Array(20);
-	// Keep track of scales for axes
-	var allXScales = new Array(5);
-	var allYScales = new Array(5);
-	var allRScales = new Array(5);
+		usertime[i] = new Array(20);	
 
-	var texttweets = new Array();
-	var datetweets = new Array();	
-
+	//////////////// D3 ////////////////////
 	var converteddate = new Array();
     var seconddif = new Array();
-
     var finalArray = new Array(5);
     for (var i = 0; i < 5; i++)
 		finalArray[i] = new Array();
+	var scalingArray = new Array();
+	var maximum = new Array(0);
+	////////////////////////////////////////
 
     // Success function for API
 	var cb = function(data) {
@@ -297,6 +293,7 @@ $(document).ready(function(){
 			var coordi = new Array();
 			var seconds = new Date().getTime() / 1000;
 			coordi[0] = (seconds- seconddif[i]) /3600;
+			scalingArray.push(coordi[0]);
 			coordi[1] = i;
 			finalArray[whichToUse-1][i] = coordi;
 		}
@@ -306,16 +303,11 @@ $(document).ready(function(){
 		for (var i = tweets.length; i > 0; i--)
 		{
 			htmlstring += i;
-			//htmlstring += ". Time tweet made: ";
-			htmlstring += ". <a class='time'><img src='specific_images/glyphicons_054_clock.png'><a class='showtime'></a></a><br>";
-			//var manipulatedDate = changeDate(datetweets[i-1]); 
+			htmlstring += ". <a class='time'><img src='specific_images/glyphicons_054_clock.png'><a class='showtime'></a></a><br>"; 
 			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
 			htmlstring += manipulatedDate;
-			//htmlstring += "<br> Text of that tweet: '";
 			htmlstring += "<br>'";
-			//htmlstring += texttweets[i-1];
 			htmlstring += usertweets[whichToUse][i-1];
-
 			if(i == 1)
 				htmlstring += "' <br><br><p align=center><a href='#'>&uarr; back to top</a></p><br>";
 			else	
@@ -335,23 +327,19 @@ $(document).ready(function(){
 		$('#texts').show();
 
 		// START OF D3       
-	    var thelength = finalArray[whichToUse-1].length;
 
-	    var scalingArray = new Array(100);
-    	for (var j = 0; j < 20; j++)
-	    	scalingArray[j] = finalArray[0][j];
-	    for (var j = 20; j < 40; j++)
-	    	scalingArray[j] = finalArray[1][j-20];
-	    for (var j = 40; j < 60; j++)
-	    	scalingArray[j] = finalArray[2][j-40];
-	    for (var j = 60; j < 80; j++)
-	    	scalingArray[j] = finalArray[3][j-60];
-	    for (var j = 80; j < 100; j++)
-	    	scalingArray[j] = finalArray[4][j-80];
+	    maximum.push(findMax(scalingArray));
+	    var realMax = Math.max.apply(Math, maximum);
+		renderGraph(realMax);
+	};
+
+	function renderGraph(maxValue) {
+
+		var thelength = finalArray[whichToUse-1].length;
 
 		//Create scale functions
 		var xScale = d3.scale.linear()
-							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[0]; })])
+							 .domain([0, maxValue])
 							 .range([WIDTH-8*PADDING,0+PADDING]);
 
 		var yScale = d3.scale.linear()
@@ -380,52 +368,57 @@ $(document).ready(function(){
 					.attr("width", WIDTH)
 					.attr("height", HEIGHT);
 
-		svg.selectAll("circle")
-		   .data(finalArray[whichToUse-1])
+		for (var j = 1; j <= count; j++)
+			createCircles(svg, xScale, yScale, rScale, xAxis, yAxis, thelength, j);
+	}
+
+	function createCircles(data, x, y, r, xA, yA, l, j) {
+		data.selectAll("circle")
+		   .data(finalArray[j-1])
 		   .enter()
 		   .append("circle")
 		   .attr("cx", function(d) {
-		   		return xScale(d[0]);
+		   		return x(d[0]);
 		   })
 		   .attr("cy", function(d) {
-		   		return yScale(d[1]);
+		   		return y(d[1]);
 		   })
 		   .attr("r", function(d) {
-		   		return rScale(d[1]);
+		   		return r(d[1]);
 		   })
-		   .style('fill', COLORS[whichToUse-1]);
+		   .style('fill', COLORS[j-1]);
 
-		svg.selectAll("text")
-		   .data(finalArray[whichToUse-1])
+		data.selectAll("text")
+		   .data(finalArray[j-1])
 		   .enter()
 		   .append("text")
 		   .text(function(d) {
-		   		return "#"+(thelength-d[1]);
+		   		return "#"+(l-d[1]);
 		   })
 		   .attr("x", function(d) {
-		   		return xScale(d[0]) - 20;
+		   		return x(d[0]) - 20;
 		   })
 		   .attr("y", function(d) {
-		   		return yScale(d[1]) - 8;
+		   		return y(d[1]) - 8;
 		   })
 		   .attr("font-family", "sans-serif")
 		   .attr("font-size", "11px")
-		   .attr("fill", COLORS[whichToUse-1]);
+		   .attr("fill", COLORS[j-1]);
 
-	    svg.append("g")
+	    data.append("g")
 			.attr("class", "axis")
 			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-			.call(xAxis);
+			.call(xA);
 			
 		// text label for the x axis
-		svg.append("text")      
+		data.append("text")      
 			.attr("class", "x label")
 	        .attr("text-anchor", "end")
 	        .attr("x", WIDTH)
 	        .attr("y",  HEIGHT-6 )
 	        .text("Hours before Now (h)");
 
-	    svg.append("text")
+	    data.append("text")
 	        .attr("x", 120)            
 	        .attr("y", 12)
 	        .attr("text-anchor", "middle")  
@@ -436,19 +429,18 @@ $(document).ready(function(){
 	        .text("Number of Tweets Over Time");
 
 	    // Create graph lines
-		var linecolor = COLORS[whichToUse-1];
-	    for (var k = 0; k < finalArray[whichToUse-1].length; k++)
+		var linecolor = COLORS[j-1];
+	    for (var k = 0; k < finalArray[j-1].length; k++)
   		{
-	        svg.append('line')
-	        .attr('x1',xScale((finalArray[whichToUse-1][k])[0]))
-	        .attr('x2',xScale((finalArray[whichToUse-1][k+1])[0]))                                        
-	        .attr('y1',yScale((finalArray[whichToUse-1][k])[1]))
-	        .attr('y2',yScale((finalArray[whichToUse-1][k+1])[1]))                                     
+	        data.append('line')
+	        .attr('x1',x((finalArray[j-1][k])[0]))
+	        .attr('x2',x((finalArray[j-1][k+1])[0]))                                        
+	        .attr('y1',y((finalArray[j-1][k])[1]))
+	        .attr('y2',y((finalArray[j-1][k+1])[1]))                                     
 	        .attr("stroke-width", thickness)
 	        .attr("stroke", linecolor)
 		}
-	};
-
+	}
 
 	// Set counter variable for click function
 	var count = 0;
@@ -462,108 +454,6 @@ $(document).ready(function(){
 	// Keep track of input to make sure there are no duplicates
 	var enteredInput = new Array();
 	enteredInput[0], enteredInput[1], enteredInput[2], enteredInput[3], enteredInput[4] = '';
-
-	// Create Graph
-	/*function renderGraph() {
-
-		var svg = d3.select("#graphuser" + whichToUse)
-					.append("svg")
-					.attr("width", WIDTH)
-					.attr("height", HEIGHT);
-
-		var xMax = Math.max(allXScales);
-		var yMax = Math.max(allYScales);
-		var rMax = Math.max(allRScales);
-
-		//Define X axis
-		var xAxis = d3.svg.axis()
-						  .scale(xMax)
-						  .orient("bottom")
-						  .ticks(5);
-
-		//Define Y axis
-		var yAxis = d3.svg.axis()
-						  .scale(yMax)
-						  .orient("left")
-						  .ticks(5);
-
-		svg.selectAll("circle")
-		   .data(info)
-		   .enter()
-		   .append("circle")
-		   .attr("cx", function(d) {
-		   		return xMax(d[0]);
-		   })
-		   .attr("cy", function(d) {
-		   		return yMax(d[1]);
-		   })
-		   .attr("r", function(d) {
-		   		return rMax(d[1]);
-		   })
-		   .style('fill', COLORS[whichToUse-1]);
-
-		svg.selectAll("text")
-		   .data(info)
-		   .enter()
-		   .append("text")
-		   .text(function(d) {
-		   		return "#"+(thelength-d[1]);
-		   })
-		   .attr("x", function(d) {
-		   		return xMax(d[0]) - 20;
-		   })
-		   .attr("y", function(d) {
-		   		return yMax(d[1]) - 8;
-		   })
-		   .attr("font-family", "sans-serif")
-		   .attr("font-size", "11px")
-		   .attr("fill", COLORS[whichToUse-1]);
-
-	    svg.append("g")
-			.attr("class", "axis")
-			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-			.call(xAxis);
-			
-		// text label for the x axis
-		svg.append("text")      
-			.attr("class", "x label")
-	        .attr("text-anchor", "end")
-	        .attr("x", WIDTH)
-	        .attr("y",  HEIGHT-6 )
-	        .text("Hours before Now (h)");
-
-	    svg.append("text")
-	        .attr("x", 120)            
-	        .attr("y", 12)
-	        .attr("text-anchor", "middle")  
-	        .style("font-size", "16px") 
-	        .style("font-style", "oblique") 
-	        .style("color", "blue")
-	        .style("text-decoration", "underline")  
-	        .text("Number of Tweets Over Time");
-
-	    // Create graph lines
-		var linecolor = COLORS[whichToUse-1];
-	    for (var k = 0; k < dataset.length; k++)
-  		{
-
-	        svg.append('line')
-	        .attr('x1',xMax((finalArray[k])[0]))
-	        .attr('x2',xMax((finalArray[k+1])[0]))                                        
-	        .attr('y1',yMax((finalArray[k])[1]))
-	        .attr('y2',yMax((finalArray[k+1])[1]))                                     
-	        .attr("stroke-width", 2)
-	        .attr("stroke", linecolor)
-		}
-	}*/
-
-	$('.time').mouseover(function(){
-		$('.showtime').show();
-	});
-
-	$('.time').mouseout(function(){
-		$('.showtime').hide();
-	});
 
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
@@ -713,6 +603,14 @@ $(document).ready(function(){
 			// Run function to display results
 	        displayCheckboxes();
 	    }
+	});
+
+	$('.time').mouseover(function(){
+		$('.showtime').show();
+	});
+
+	$('.time').mouseout(function(){
+		$('.showtime').hide();
 	});
 
 	// Press update now key
