@@ -30,6 +30,8 @@ $(document).ready(function(){
 	var WIDTH = 900;
 	var HEIGHT = 575;
 	var PADDING = 20;
+	// Radius of Circles
+	var RADIUS = [2, 4, 6, 8, 10, 12];
 	// Line colors
 	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
 	// Intervals of follower numbers
@@ -257,17 +259,35 @@ $(document).ready(function(){
 
 		// Calculate thickness of line
 		if (numberOfFollowers < INTERVALS[0])
+		{
 			thickness = THICKNESS[0];
+			radius = RADIUS[0];
+		}	
 		else if (numberOfFollowers < INTERVALS[1])
+		{
 			thickness = THICKNESS[1];
+			radius = RADIUS[1];
+		}
 		else if (numberOfFollowers < INTERVALS[2])
+		{
 			thickness = THICKNESS[2];
+			radius = RADIUS[2];
+		}
 		else if (numberOfFollowers < INTERVALS[3])
+		{
 			thickness = THICKNESS[3];
+			radius = RADIUS[3];
+		}
 		else if (numberOfFollowers < INTERVALS[4])
+		{
 			thickness = THICKNESS[4];
+			radius = RADIUS[4];
+		}
 		else
+		{
 			thickness = THICKNESS[5];
+			radius = RADIUS[5];
+		}
 
 		if (tweets[0].user.url == null)
 			var URL = 'No Link on Twitter Page';
@@ -303,15 +323,14 @@ $(document).ready(function(){
 		for (var i = tweets.length; i > 0; i--)
 		{
 			htmlstring += i;
-			htmlstring += ". <a class='time'><img src='specific_images/glyphicons_054_clock.png'><a class='showtime'></a></a><br>"; 
+			htmlstring += ". <a class='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a class='showtime'></a><br>"; 
 			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
 			htmlstring += manipulatedDate;
 			htmlstring += "<br>'";
 			htmlstring += usertweets[whichToUse][i-1];
+			htmlstring += "' <br><br>";
 			if(i == 1)
-				htmlstring += "' <br><br><p align=center><a href='#'>&uarr; back to top</a></p><br>";
-			else	
-				htmlstring += "' <br><br>";
+				htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
 		}
 		$('#tweettext' + whichToUse).html(htmlstring);
 
@@ -326,8 +345,7 @@ $(document).ready(function(){
 		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 		$('#texts').show();
 
-		// START OF D3       
-
+		// D3       
 	    maximum.push(findMax(scalingArray));
 	    var realMax = Math.max.apply(Math, maximum);
 		renderGraph(realMax);
@@ -348,7 +366,7 @@ $(document).ready(function(){
 
 		var rScale = d3.scale.linear()
 							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[1]; })])
-							 .range([3, 3]);
+							 .range([radius, radius]);
 
 		//Define X axis
 		var xAxis = d3.svg.axis()
@@ -374,7 +392,7 @@ $(document).ready(function(){
 
 	function createCircles(data, x, y, r, xA, yA, l, j) {
 		data.selectAll("circle")
-		   .data(finalArray[j-1])
+		   .data(finalArray[whichToUse-1])
 		   .enter()
 		   .append("circle")
 		   .attr("cx", function(d) {
@@ -386,10 +404,10 @@ $(document).ready(function(){
 		   .attr("r", function(d) {
 		   		return r(d[1]);
 		   })
-		   .style('fill', COLORS[j-1]);
+		   .style('fill', COLORS[whichToUse-1]);
 
 		data.selectAll("text")
-		   .data(finalArray[j-1])
+		   .data(finalArray[whichToUse-1])
 		   .enter()
 		   .append("text")
 		   .text(function(d) {
@@ -403,7 +421,7 @@ $(document).ready(function(){
 		   })
 		   .attr("font-family", "sans-serif")
 		   .attr("font-size", "11px")
-		   .attr("fill", COLORS[j-1]);
+		   .attr("fill", COLORS[whichToUse-1]);
 
 	    data.append("g")
 			.attr("class", "axis")
@@ -429,14 +447,14 @@ $(document).ready(function(){
 	        .text("Number of Tweets Over Time");
 
 	    // Create graph lines
-		var linecolor = COLORS[j-1];
-	    for (var k = 0; k < finalArray[j-1].length; k++)
+		var linecolor = COLORS[whichToUse-1];
+	    for (var k = 0; k < finalArray[whichToUse-1].length; k++)
   		{
 	        data.append('line')
-	        .attr('x1',x((finalArray[j-1][k])[0]))
-	        .attr('x2',x((finalArray[j-1][k+1])[0]))                                        
-	        .attr('y1',y((finalArray[j-1][k])[1]))
-	        .attr('y2',y((finalArray[j-1][k+1])[1]))                                     
+	        .attr('x1',x((finalArray[whichToUse-1][k])[0]))
+	        .attr('x2',x((finalArray[whichToUse-1][k+1])[0]))                                        
+	        .attr('y1',y((finalArray[whichToUse-1][k])[1]))
+	        .attr('y2',y((finalArray[whichToUse-1][k+1])[1]))                                     
 	        .attr("stroke-width", thickness)
 	        .attr("stroke", linecolor)
 		}
