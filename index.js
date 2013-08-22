@@ -55,7 +55,7 @@ $(document).ready(function(){
 		$('.description').hide();
 		$('#descriptions').hide();
 		$('.tweettext').hide();
-		$('.showtime').hide();
+		$('#showtime').hide();
 		findTime();
 
 		// Older delete buttons
@@ -148,7 +148,7 @@ $(document).ready(function(){
 			x += 'A.M.';
 		else
 			x += 'P.M.';
-		$('.showtime').html(y+x);
+		$('#showtime').html(y+x);
 	}
 
 	function changeDate(date) {
@@ -323,7 +323,7 @@ $(document).ready(function(){
 		for (var i = tweets.length; i > 0; i--)
 		{
 			htmlstring += i;
-			htmlstring += ". <a class='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a class='showtime'></a><br>"; 
+			htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
 			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
 			htmlstring += manipulatedDate;
 			htmlstring += "<br>'";
@@ -344,6 +344,9 @@ $(document).ready(function(){
 		// Display tweettext for this user (button)
 		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 		$('#texts').show();
+
+		// Hide GMT/Local Time
+		$('#showtime').hide();
 
 		// D3       
 	    maximum.push(findMax(scalingArray));
@@ -623,12 +626,12 @@ $(document).ready(function(){
 	    }
 	});
 
-	$('.time').mouseover(function(){
-		$('.showtime').show();
+	$('#time').mouseover(function(){
+		$('#showtime').show();
 	});
 
-	$('.time').mouseout(function(){
-		$('.showtime').hide();
+	$('#time').mouseout(function(){
+		$('#showtime').hide();
 	});
 
 	// Press update now key
