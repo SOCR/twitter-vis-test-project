@@ -1,3 +1,160 @@
+#backtotop {
+    text-align: center;
+}
+
+#graph {
+    font-style: oblique;
+    font-size: 18px;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+            
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+#successfulSearch {
+	color: green;
+	font-style: oblique;
+}
+
+#failedSearch {
+	color: red;
+	font-style: oblique;
+}
+
+#protectedUser {
+    color: red;
+    font-style: oblique;
+}
+
+#none {
+    color: red;
+    font-style: oblique;
+}
+
+#tooMany{
+    color: red;
+    font-style: oblique;
+}
+
+#sameInput {
+    color: red;
+    font-style: oblique;
+}
+
+#enoughInput{
+    color: darkorange;
+    font-style: oblique;
+}
+
+#userInput{
+    font-style: italic;
+}
+
+#descriptions {
+    font-style: italic;
+    text-align: center;
+}
+
+#authors {
+    font-weight: bold;
+    font-style: oblique;
+    padding: 3px;
+    border-style: ridge;
+    border-width: 6px;
+    border-color: black;
+    text-align: center;
+}
+
+#graphInstructions {
+    font-style: italic;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#btn-group-wrap {
+    text-align: center;
+}
+
+#texts {
+    font-weight: bold;
+    font-style: oblique;
+    text-align: center;
+    font-size: 14px;
+}
+
+.description {
+    border-style: solid;
+    border-width: 3px;
+    padding: 3px;
+    font-weight: bold;
+}
+
+#description1 {
+    border-color: solid black;
+}
+
+#description2 {
+    border-color: red;
+}
+
+#description3 {
+    border-color: blue;
+}
+
+#description4 {
+    border-color: green;
+}
+
+#description5 {
+    border-color: purple;
+}
+
+.profilephoto {
+    height: 60px;
+    width: 60px;
+}
+
+.tweettext {
+    border-style: solid;
+    border-width: 3px;
+    padding: 3px;
+    font-weight: bold;
+}
+
+#tweettext1 {
+    border-color: solid black;
+}
+
+#tweettext2 {
+    border-color: red;
+}
+
+#tweettext3 {
+    border-color: blue;
+}
+
+#tweettext4 {
+    border-color: green;
+}
+
+#tweettext5 {
+    border-color: purple;
+}
+
+
+
+
+
+
 /*#gmttime {
     font-size: 14px;
     font-style: oblique;
@@ -112,148 +269,3 @@
 .time:hover .showtime{
     display:block;
 }*/
-#backtotop {
-    text-align: center;
-}
-
-#graph {
-    font-style: oblique;
-    font-size: 18px;
-}
-
-.axis path,
-.axis line {
-    fill: none;
-    stroke: black;
-    shape-rendering: crispEdges;
-}
-            
-.axis text {
-    font-family: sans-serif;
-    font-size: 11px;
-}
-
-#successfulSearch {
-	color: green;
-	font-style: oblique;
-}
-
-#failedSearch {
-	color: red;
-	font-style: oblique;
-}
-
-#protectedUser {
-    color: red;
-    font-style: oblique;
-}
-
-#none {
-    color: red;
-    font-style: oblique;
-}
-
-#tooMany{
-    color: red;
-    font-style: oblique;
-}
-
-#sameInput {
-    color: red;
-    font-style: oblique;
-}
-
-#enoughInput{
-    color: darkorange;
-    font-style: oblique;
-}
-
-#userInput{
-    font-style: italic;
-}
-
-#descriptions {
-    font-style: italic;
-    text-align: center;
-}
-
-#authors {
-    font-weight: bold;
-    font-style: oblique;
-    padding: 3px;
-    border-style: ridge;
-    border-width: 6px;
-    border-color: black;
-    text-align: center;
-}
-
-#graphInstructions {
-    font-style: italic;
-    text-align: center;
-    font-weight: bold;
-    font-size: 18px;
-}
-#texts {
-    font-weight: bold;
-    font-style: oblique;
-    text-align: center;
-}
-
-.description {
-    border-style: solid;
-    border-width: 3px;
-    padding: 3px;
-    font-weight: bold;
-}
-
-#description1 {
-    border-color: solid black;
-}
-
-#description2 {
-    border-color: red;
-}
-
-#description3 {
-    border-color: blue;
-}
-
-#description4 {
-    border-color: green;
-}
-
-#description5 {
-    border-color: purple;
-}
-
-.profilephoto {
-    height: 60px;
-    width: 60px;
-}
-
-.tweettext {
-    border-style: solid;
-    border-width: 3px;
-    padding: 3px;
-    font-weight: bold;
-}
-
-#tweettext1 {
-    border-color: solid black;
-}
-
-#tweettext2 {
-    border-color: red;
-}
-
-#tweettext3 {
-    border-color: blue;
-}
-
-#tweettext4 {
-    border-color: green;
-}
-
-#tweettext5 {
-    border-color: purple;
-}

@@ -6,7 +6,6 @@ Currently to do within current scope:
 Time scroll options: badges in navbar, show time in tweetboxes every ten tweets, mouseover effect, clock icon to right of number and mouseover shows gmt/local time above
 
 On hover over line, display last tweet text and time photo screen name
-1 graph
 Resizing issues everywhere (d3)
 
 New functionality:
@@ -16,10 +15,6 @@ Do auto refresh once above works (easy)
 Fix delete buttons
 
 Does twitter verify whether user exists?????
-
-Minor issues:
-1. search results dropping down after error message
-2. dropdown menu for stats metrics, types of d3 (cumulative, periodic)
 
 */
 
@@ -56,6 +51,7 @@ $(document).ready(function(){
 		$('#descriptions').hide();
 		$('.tweettext').hide();
 		$('#graphInstructions').hide();
+		$('.graphbutton').hide();
 		//findTime();
 
 		// Older delete buttons
@@ -74,7 +70,7 @@ $(document).ready(function(){
 	// Every one second, update gmt/local time
 	/* var intervalID = setInterval(function() {
         findTime();
-    }, 1000);*/
+    }, 1000);
 
 	function findTime() {
 
@@ -150,7 +146,7 @@ $(document).ready(function(){
 			x += 'P.M.';
 		//$('.hello').html(y+x);
 		return (y+x);
-	}
+	}*/
 
 	function changeDate(date) {
 		// Manipulate Twitter API date
@@ -212,7 +208,7 @@ $(document).ready(function(){
 		return returnedDate;
 	}	
 
-	function findMax(data) {
+	/*function findMax(data) {
 		var maximum = data[0];
 		for (var i = 1; i < data.length; i++)
 	    {
@@ -222,7 +218,7 @@ $(document).ready(function(){
 	    		maximum = data[i];
 	    }
 	    return maximum;
-	}
+	}*/
 
 	// Create new array for json parse
 	var tweets = new Array();
@@ -261,6 +257,17 @@ $(document).ready(function(){
 		// Set up description box
 		var screen_name = tweets[0].user.screen_name;
 		var numberOfFollowers = tweets[0].user.followers_count;
+		if (tweets[0].user.url == null)
+			var URL = 'No Link on Twitter Page';
+		else
+			var URL = tweets[0].user.url;
+		var numberOfStatuses = tweets[0].user.statuses_count;
+		var photo = tweets[0].user.profile_image_url;
+		var name = tweets[0].user.name;
+		$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+
+		// See if user is protected (if so, can't retrieve data)
+		var protection = tweets[0].user.protected;
 
 		// Calculate thickness of line and circle radius
 		if (numberOfFollowers < INTERVALS[0])
@@ -293,18 +300,6 @@ $(document).ready(function(){
 			thickness = THICKNESS[5];
 			radius = RADIUS[5];
 		}
-
-		if (tweets[0].user.url == null)
-			var URL = 'No Link on Twitter Page';
-		else
-			var URL = tweets[0].user.url;
-		var numberOfStatuses = tweets[0].user.statuses_count;
-		var photo = tweets[0].user.profile_image_url;
-		var name = tweets[0].user.name;
-		$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
-
-		// See if user is protected (if so, can't retrieve data)
-		var protection = tweets[0].user.protected;
 
 		// Set up text, dates, D3 variables
 		var finalArray = new Array();
@@ -359,22 +354,7 @@ $(document).ready(function(){
 			//htmlstring += '</style>';
 			/*htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
 			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
-			htmlstring += manipulatedDate;
-			ok thanks. what do you mean by no listener? I can't seem to figure this out, sorry I keep bugging you about it it's just driving me insane. so I changed the code
-
-The clock icon is wrapped like this
-<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>
-
-And my mouseover/mouseout functions are this, with the findTime() returning gmt and local time properly. I have tested them without hiding and stuff and they work, it's just the mouseover that's failing.
-
-$('.hello').mouseover(function(){
-	var newtime = findTime();
-	$('.hello').html(newtime);
-});
-
-$('.hello').mouseout(function(){
-	$('.hello').html("<img src='specific_images/glyphicons_054_clock.png'>");
-});*/
+			htmlstring += manipulatedDate;*/
 			htmlstring += ".&nbsp<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>";
 			var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
 			htmlstring += manipulatedDate;
@@ -396,6 +376,9 @@ $('.hello').mouseout(function(){
 		// Display tweettext for this user (button)
 		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 		$('#texts').show();
+
+		$('#sumbutton').show();
+		$('#button' + whichToUse).html('@' + screen_name).show();
 
 		// Hide GMT/Local Time
 		//$('#showtime').hide();
@@ -425,7 +408,7 @@ $('.hello').mouseout(function(){
 
 		var rScale = d3.scale.linear()
 							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
-							 .range([3, 3]);
+							 .range([radius, radius]);
 
 
 
@@ -462,7 +445,8 @@ $('.hello').mouseout(function(){
 		   })
 		   .attr("r", function(d) {
 		   		return rScale(d[1]);
-		   });
+		   })
+		   .style('fill', COLORS[whichToUse-1]);;
 
 		svg.selectAll("text")
 		   .data(dataset)
@@ -646,14 +630,14 @@ $('.hello').mouseout(function(){
 		}
 
 		// Create graph lines
-		var linecolor = "black";
+		/*var linecolor = "black";
 		switch (whichToUse)
 		{
 			case 2: linecolor = "red"; break;
 			case 3: linecolor = "blue"; break;
 			case 4: linecolor = "green"; break;
 			case 5: linecolor = "purple"; break;
-		}
+		}*/
 		
 		for (var k = 0; k < dataset.length; k++)
   		{
@@ -662,12 +646,12 @@ $('.hello').mouseout(function(){
 	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
 	        .attr('y1',yScale((finalArray[k])[1]))
 	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
-	        .attr("stroke-width", 2)
-	        .attr("stroke", linecolor);
+	        .attr("stroke-width", thickness)
+	        .attr("stroke", COLORS[whichToUse-1]);
 		}
 	};
 
-	function renderGraph(maxValue) {
+	/*function renderGraph(maxValue) {
 
 		var thelength = finalArray[whichToUse-1].length;
 
@@ -774,7 +758,7 @@ $('.hello').mouseout(function(){
 	        .attr("stroke-width", thickness)
 	        .attr("stroke", linecolor)
 		}
-	}
+	}*/
 
 	// Set counter variable for click function
 	var count = 0;
@@ -861,6 +845,7 @@ $('.hello').mouseout(function(){
 		// If valid, add to search list
 		if (/^@?(\w){1,15}$/.test(retrievedSearch))	
 		{
+
 			// Keep track of div tags
 			findDiv += whichToUse;
 
@@ -886,6 +871,9 @@ $('.hello').mouseout(function(){
 
 			// Hide all individual graphs
 			$('.individual').hide();
+
+			// Show summary graph
+			$('#summarygraph').show();
 
 			/*if (existence == false)
 				console.log('works');*/
@@ -943,14 +931,14 @@ $('.hello').mouseout(function(){
 	    }
 	});
 
-	$('.hello').mouseover(function(){
+	/*$('.hello').mouseover(function(){
 		var newtime = findTime();
 		$('.hello').html(newtime);
 	});
 
 	$('.hello').mouseout(function(){
 		$('.hello').html("<img src='specific_images/glyphicons_054_clock.png'>");
-	});
+	});*/
 
 	// Press update now key
 	$('#update').click(function(){
@@ -992,6 +980,43 @@ $('.hello').mouseout(function(){
 			}
 		}
 	})
+
+	// Buttons to display graphs
+
+	$('#sumbutton').click(function() {
+		$('.individual').hide();
+		$('#summarygraph').show();
+	});
+
+	$('#button1').click(function() {
+		$('#summarygraph').hide();
+		$('.individual').hide();
+		$('#graphuser1').show();
+	});
+
+	$('#button2').click(function() {
+		$('#summarygraph').hide();
+		$('.individual').hide();
+		$('#graphuser2').show();
+	});
+
+	$('#button3').click(function() {
+		$('#summarygraph').hide();
+		$('.individual').hide();
+		$('#graphuser3').show();
+	});
+
+	$('#button4').click(function() {
+		$('#summarygraph').hide();
+		$('.individual').hide();
+		$('#graphuser4').show();
+	});
+
+	$('#button5').click(function() {
+		$('#summarygraph').hide();
+		$('.individual').hide();
+		$('#graphuser5').show();
+	});
 
 	// Collapsible tweet text
 
