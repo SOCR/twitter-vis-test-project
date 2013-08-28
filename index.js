@@ -32,12 +32,12 @@ $(document).ready(function(){
 	var PADDING = 20;
 	// Radius of Circles
 	var RADIUS = [2, 4, 6, 8, 10, 12];
-	// Line colors
-	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
 	// Intervals of follower numbers
 	var INTERVALS = [100, 500, 100000, 1000000, 10000000];
 	// Options for thickness
 	var THICKNESS = [1, 2, 4, 6, 8, 10];
+	// Line colors
+	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
 	//////////////////////////////////////////////////////////////////
 
 	// Hide a lot of CSS stuff right after page load and let user display what they want
@@ -55,8 +55,8 @@ $(document).ready(function(){
 		$('.description').hide();
 		$('#descriptions').hide();
 		$('.tweettext').hide();
-		$('#showtime').hide();
-		findTime();
+		$('#graphInstructions').hide();
+		//findTime();
 
 		// Older delete buttons
 		//$('#searchOption1').hide();
@@ -72,9 +72,9 @@ $(document).ready(function(){
 	};
 
 	// Every one second, update gmt/local time
-	var intervalID = setInterval(function() {
+	/* var intervalID = setInterval(function() {
         findTime();
-    }, 1000);
+    }, 1000);*/
 
 	function findTime() {
 
@@ -108,7 +108,7 @@ $(document).ready(function(){
 		else
 			second = tempsecond;
 		//var y = "GMT time:<br> " + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
-		var y = "GMT time: " + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		var y = "&nbspGMT time: " + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
 			y += 'A.M.&nbsp&nbsp&nbsp';
 		else
@@ -148,7 +148,8 @@ $(document).ready(function(){
 			x += 'A.M.';
 		else
 			x += 'P.M.';
-		$('#showtime').html(y+x);
+		//$('.hello').html(y+x);
+		return (y+x);
 	}
 
 	function changeDate(date) {
@@ -237,11 +238,15 @@ $(document).ready(function(){
 	//////////////// D3 ////////////////////
 	var converteddate = new Array();
     var seconddif = new Array();
-    var finalArray = new Array(5);
+    /*var finalArray = new Array(5);
     for (var i = 0; i < 5; i++)
-		finalArray[i] = new Array();
+		finalArray[i] = new Array();*/
 	var scalingArray = new Array();
 	var maximum = new Array(0);
+	// Brian
+	var fakedataset = new Array();
+    var dataset = new Array();
+    var lengthall = new Array();
 	////////////////////////////////////////
 
     // Success function for API
@@ -257,7 +262,7 @@ $(document).ready(function(){
 		var screen_name = tweets[0].user.screen_name;
 		var numberOfFollowers = tweets[0].user.followers_count;
 
-		// Calculate thickness of line
+		// Calculate thickness of line and circle radius
 		if (numberOfFollowers < INTERVALS[0])
 		{
 			thickness = THICKNESS[0];
@@ -302,32 +307,79 @@ $(document).ready(function(){
 		var protection = tweets[0].user.protected;
 
 		// Set up text, dates, D3 variables
+		var finalArray = new Array();
+		var fakeArray = new Array();
+		var thenumber = 0;
 		var j = tweets.length - 1;
+		var coordi = 0;
 		for (var i = 0; i < tweets.length; i++)
 		{
-			usertweets[whichToUse][i] = tweets[j].text;
-			usertime[whichToUse][i] = tweets[j].created_at;;
+			usertweets[whichToUse-1][i] = tweets[j].text;
+			usertime[whichToUse-1][i] = tweets[j].created_at;;
 			j--;
 			converteddate[i] = new Date(tweets[i].created_at);
 			seconddif[i]= converteddate[i].getTime() /1000 ;
 			var coordi = new Array();
+			var coordj = new Array();
 			var seconds = new Date().getTime() / 1000;
 			coordi[0] = (seconds- seconddif[i]) /3600;
-			scalingArray.push(coordi[0]);
 			coordi[1] = i;
+			coordj[0] = (seconds- seconddif[i]) /3600;
+			coordj[1] = i+1;
+			finalArray[i] = coordi;
+			fakeArray[i] = coordj;
+
+			/*
+			//var coordi = new Array();
+			var seconds = new Date().getTime() / 1000;
+			//coordi[0] = (seconds- seconddif[i]) /3600;
+			coordi = (seconds- seconddif[i]) /3600;
+			//scalingArray.push(coordi[0]);
+			//coordi[1] = i;
+			//finalArray[whichToUse-1][i] = coordi;
+			// New Code Below
 			finalArray[whichToUse-1][i] = coordi;
+			scalingArray.push(coordi);*/
 		}
 
+		lengthall[whichToUse-1]=finalArray.length;
+		
+		for (var i = 0; i < whichToUse-1; i++)
+		 	thenumber += lengthall[i];
+		for (var i = 0; i < finalArray.length; i++)
+			finalArray[i][1] = finalArray.length - finalArray[i][1];
+
+		//<img class='click' src='specific_images/glyphicons_054_clock.png'><strong id='cursor'>Hi!</strong>
 		// Set up tweet text
 		var htmlstring = '';
 		for (var i = tweets.length; i > 0; i--)
 		{
+			//htmlstring += "<style = font-style:oblique; text-align:center>";
 			htmlstring += i;
-			htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
+			//htmlstring += '</style>';
+			/*htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
 			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
 			htmlstring += manipulatedDate;
-			htmlstring += "<br>'";
-			htmlstring += usertweets[whichToUse][i-1];
+			ok thanks. what do you mean by no listener? I can't seem to figure this out, sorry I keep bugging you about it it's just driving me insane. so I changed the code
+
+The clock icon is wrapped like this
+<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>
+
+And my mouseover/mouseout functions are this, with the findTime() returning gmt and local time properly. I have tested them without hiding and stuff and they work, it's just the mouseover that's failing.
+
+$('.hello').mouseover(function(){
+	var newtime = findTime();
+	$('.hello').html(newtime);
+});
+
+$('.hello').mouseout(function(){
+	$('.hello').html("<img src='specific_images/glyphicons_054_clock.png'>");
+});*/
+			htmlstring += ".&nbsp<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>";
+			var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
+			htmlstring += manipulatedDate;
+			htmlstring += "<br>";
+			htmlstring += usertweets[whichToUse-1][i-1];
 			htmlstring += "' <br><br>";
 			if(i == 1)
 				htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
@@ -346,12 +398,273 @@ $(document).ready(function(){
 		$('#texts').show();
 
 		// Hide GMT/Local Time
-		$('#showtime').hide();
+		//$('#showtime').hide();
 
 		// D3       
-	    maximum.push(findMax(scalingArray));
+	    /*maximum.push(findMax(scalingArray));
 	    var realMax = Math.max.apply(Math, maximum);
-		renderGraph(realMax);
+		renderGraph(realMax);*/
+
+		// START OF D3      
+
+	    var thelength = finalArray.length;
+	   
+
+		//var dataset = new Array();
+		fakedataset[whichToUse-1] = finalArray;
+		dataset = finalArray;
+
+		//Create scale functions
+		var xScale = d3.scale.linear()
+							 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
+							 .range([WIDTH-8*PADDING,0+PADDING ]);
+
+		var yScale = d3.scale.linear()
+							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+							 .range([HEIGHT-PADDING ,0+PADDING]);
+
+		var rScale = d3.scale.linear()
+							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+							 .range([3, 3]);
+
+
+
+		//Define X axis
+		var xAxis = d3.svg.axis()
+						  .scale(xScale)
+						  .orient("bottom")
+						  .ticks(5);
+
+		//Define Y axis
+		var yAxis = d3.svg.axis()
+						  .scale(yScale)
+						  .orient("left")
+						  .ticks(5);
+
+		//Create SVG element
+		// after select, was body
+		var svg = d3.select("#graphuser" + whichToUse)
+					.append("svg")
+					.attr("width", WIDTH)
+					.attr("height", HEIGHT);
+
+
+  
+		svg.selectAll("circle")
+		   .data(dataset)
+		   .enter()
+		   .append("circle")
+		   .attr("cx", function(d) {
+		   		return xScale(d[0]);
+		   })
+		   .attr("cy", function(d) {
+		   		return yScale(d[1]);
+		   })
+		   .attr("r", function(d) {
+		   		return rScale(d[1]);
+		   });
+
+		svg.selectAll("text")
+		   .data(dataset)
+		   .enter()
+		   .append("text")
+		   .text(function(d) {
+		   		return "#"+(d[1]);
+		   })
+		   .attr("x", function(d) {
+		   		return xScale(d[0]) - 20;
+		   })
+		   .attr("y", function(d) {
+		   		return yScale(d[1]) - 8;
+		   })
+		   .attr("font-family", "sans-serif")
+		   .attr("font-size", "11px")
+		   .attr("fill", "black");
+
+	    svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+			.call(xAxis);
+
+		// text label for the x axis
+		svg.append("text")      
+			.attr("class", "x label")
+	        .attr("text-anchor", "end")
+	        .attr("x", WIDTH)
+	        .attr("y",  HEIGHT-6 )
+	        .text("Hours before Now (h)");
+
+	    svg.append("text")
+	        .attr("x", 120)            
+	        .attr("y", 12)
+	        .attr("text-anchor", "middle")  
+	        .style("font-size", "16px") 
+	        .style("font-style", "oblique") 
+	        .style("color", "blue")
+	        .style("text-decoration", "underline")  
+	        .text("Number of Tweets Over Time");     
+
+    	var onegraohArray = new Array();
+		if(count == 5)
+		{
+	        for (var i =0 ; i < fakedataset[0].length; i++)
+				onegraohArray[i] = fakedataset[0][i];
+	        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+				onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+				onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
+				onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
+				onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
+
+			var xScaleall = d3.scale.linear()
+								 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
+								 .range([WIDTH-8*PADDING,0+PADDING ]);		 
+
+			var yScaleall = d3.scale.linear()
+								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
+								 .range([HEIGHT-PADDING,0+PADDING]);
+								 
+			var rScaleall = d3.scale.linear()
+								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
+								 .range([3, 3]);
+								  
+			var svgall = d3.select("#summarygraph")
+						.append("svg")
+						.attr("width", WIDTH)
+						.attr("height", HEIGHT);
+			
+			svgall.selectAll("circle")
+			   .data(onegraohArray)
+			   .enter()
+			   .append("circle")
+			   .attr("cx", function(d) {
+			   		return xScaleall(d[0]);
+			   })
+			   .attr("cy", function(d) {
+			   		return yScaleall(d[1]);
+			   })
+			   .attr("r", function(d) {
+			   		return rScaleall(d[1]);
+			   });
+
+			//Define X axis
+			var xAxis = d3.svg.axis()
+							  .scale(xScaleall)
+							  .orient("bottom")
+							  .ticks(5);
+
+			//Define Y axis
+			var yAxis = d3.svg.axis()
+							  .scale(yScaleall)
+							  .orient("left")
+							  .ticks(5);
+
+			/*svgall.selectAll("text")
+			   .data(onegraohArray)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return "#"+(d[1]);
+			   })
+			   .attr("x", function(d) {
+			   		return xScaleall(d[0]) - 20;
+			   })
+			   .attr("y", function(d) {
+			   		return yScaleall(d[1]) - 8;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "red");*/
+
+		    svgall.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+				.call(xAxis);
+
+			// text label for the x axis
+			svgall.append("text")      
+				.attr("class", "x label")
+		        .attr("text-anchor", "end")
+		        .attr("x", WIDTH)
+		        .attr("y",  HEIGHT-6 )
+		        .text("Hours before Now (h)");
+
+		    svgall.append("text")
+		        .attr("x", 120)            
+		        .attr("y", 12)
+		        .attr("text-anchor", "middle")  
+		        .style("font-size", "16px") 
+		        .style("font-style", "oblique") 
+		        .style("color", "blue")
+		        .style("text-decoration", "underline")  
+		        .text("Graph of All Tweets");
+
+		    for (var j = 0; j < fakedataset[0].length; j++)
+	  		{
+				svgall.append('line')
+		        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+		        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+		        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+		        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+		        .attr("stroke-width", 2)
+		        .attr("stroke", "black")
+
+		        svgall.append('line')
+		        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
+		        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
+		        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
+		        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
+		        .attr("stroke-width", 2)
+		        .attr("stroke", "red")
+
+		         svgall.append('line')
+		        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
+		        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
+		        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
+		        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
+		        .attr("stroke-width", 2)
+		        .attr("stroke", "blue")
+
+		         svgall.append('line')
+		        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
+		        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
+		        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
+		        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
+		        .attr("stroke-width", 2)
+		        .attr("stroke", "green")
+
+		         svgall.append('line')
+		        .attr('x1',xScaleall(((fakedataset[4])[j])[0]))
+		        .attr('x2',xScaleall(((fakedataset[4])[j+1])[0]))                                        
+		        .attr('y1',yScaleall(((fakedataset[4])[j])[1]))
+		        .attr('y2',yScaleall(((fakedataset[4])[j+1])[1]))                                     
+		        .attr("stroke-width", 2)
+		        .attr("stroke", "purple")
+			}
+		}
+
+		// Create graph lines
+		var linecolor = "black";
+		switch (whichToUse)
+		{
+			case 2: linecolor = "red"; break;
+			case 3: linecolor = "blue"; break;
+			case 4: linecolor = "green"; break;
+			case 5: linecolor = "purple"; break;
+		}
+		
+		for (var k = 0; k < dataset.length; k++)
+  		{
+			svg.append('line')
+	        .attr('x1',xScale((finalArray[k])[0]))
+	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
+	        .attr('y1',yScale((finalArray[k])[1]))
+	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
+	        .attr("stroke-width", 2)
+	        .attr("stroke", linecolor);
+		}
 	};
 
 	function renderGraph(maxValue) {
@@ -563,12 +876,16 @@ $(document).ready(function(){
 
 			$('.progress').show();
 			$('#graph').show();
+			$('#graphInstructions').show();
 
 			// Use Twitter API to retrieve data
 			$.ajax({
 		        url: searchURL,
 		        success: cb
 			});
+
+			// Hide all individual graphs
+			$('.individual').hide();
 
 			/*if (existence == false)
 				console.log('works');*/
@@ -626,12 +943,13 @@ $(document).ready(function(){
 	    }
 	});
 
-	$('#time').mouseover(function(){
-		$('#showtime').show();
+	$('.hello').mouseover(function(){
+		var newtime = findTime();
+		$('.hello').html(newtime);
 	});
 
-	$('#time').mouseout(function(){
-		$('#showtime').hide();
+	$('.hello').mouseout(function(){
+		$('.hello').html("<img src='specific_images/glyphicons_054_clock.png'>");
 	});
 
 	// Press update now key
