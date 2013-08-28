@@ -24,6 +24,11 @@
 	font-style: oblique;
 }
 
+#noExistence {
+    color: red;
+    font-style: oblique;
+}
+
 #failedSearch {
 	color: red;
 	font-style: oblique;

@@ -3,18 +3,17 @@
 TO BE DONE -
 
 Currently to do within current scope:
+Bootstrap conversion
 Time scroll options: badges in navbar, show time in tweetboxes every ten tweets, mouseover effect, clock icon to right of number and mouseover shows gmt/local time above
-
+Graph 5 individual doesn't add line
 On hover over line, display last tweet text and time photo screen name
 Resizing issues everywhere (d3)
+One graph for 1, 2, 3, 4 users
 
 New functionality:
-Update graph in real time, dont spit out a new graph on update now
-Update now does not graph right, uses wrong color
-Do auto refresh once above works (easy)
+Update now button (checkmarks tell which ones to include on summary graph)
+Do auto refresh once above works
 Fix delete buttons
-
-Does twitter verify whether user exists?????
 
 */
 
@@ -37,13 +36,7 @@ $(document).ready(function(){
 
 	// Hide a lot of CSS stuff right after page load and let user display what they want
 	window.onload = function(){
-		$('#successfulSearch').hide();
-		$('#failedSearch').hide();
-		$('#protectedUser').hide();
-		$('#tooMany').hide();
-		$('#none').hide();
-		$('#sameInput').hide();
-		$('#enoughInput').hide();
+		$('.searches').hide();
 		$('#graph').hide();
 		$('.progress').hide();
 		$('#texts').hide();
@@ -229,7 +222,8 @@ $(document).ready(function(){
 	// Keep track of time
 	var usertime = new Array(5);
 	for (var i = 0; i < 5; i++)
-		usertime[i] = new Array(20);	
+		usertime[i] = new Array(20);
+	//var existence = false;
 
 	//////////////// D3 ////////////////////
 	var converteddate = new Array();
@@ -252,330 +246,269 @@ $(document).ready(function(){
 		//finalArray = [whichToUse][];
 
 		// Parse data
-		tweets = JSON.parse(data.query.results.result);
+		var invalidTest = JSON.stringify(data.query.results);
+		//console.log(invalidTest);
+		var test = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
+		//console.log(test);
+		if (invalidTest != test) {
 
-		// Set up description box
-		var screen_name = tweets[0].user.screen_name;
-		var numberOfFollowers = tweets[0].user.followers_count;
-		if (tweets[0].user.url == null)
-			var URL = 'No Link on Twitter Page';
-		else
-			var URL = tweets[0].user.url;
-		var numberOfStatuses = tweets[0].user.statuses_count;
-		var photo = tweets[0].user.profile_image_url;
-		var name = tweets[0].user.name;
-		$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+			// User exists
+			//existence = true;
 
-		// See if user is protected (if so, can't retrieve data)
-		var protection = tweets[0].user.protected;
+			// Hide all individual graphs
+			$('.individual').hide();
 
-		// Calculate thickness of line and circle radius
-		if (numberOfFollowers < INTERVALS[0])
-		{
-			thickness = THICKNESS[0];
-			radius = RADIUS[0];
-		}	
-		else if (numberOfFollowers < INTERVALS[1])
-		{
-			thickness = THICKNESS[1];
-			radius = RADIUS[1];
-		}
-		else if (numberOfFollowers < INTERVALS[2])
-		{
-			thickness = THICKNESS[2];
-			radius = RADIUS[2];
-		}
-		else if (numberOfFollowers < INTERVALS[3])
-		{
-			thickness = THICKNESS[3];
-			radius = RADIUS[3];
-		}
-		else if (numberOfFollowers < INTERVALS[4])
-		{
-			thickness = THICKNESS[4];
-			radius = RADIUS[4];
-		}
-		else
-		{
-			thickness = THICKNESS[5];
-			radius = RADIUS[5];
-		}
+			// Show summary graph
+			$('#summarygraph').show();
 
-		// Set up text, dates, D3 variables
-		var finalArray = new Array();
-		var fakeArray = new Array();
-		var thenumber = 0;
-		var j = tweets.length - 1;
-		var coordi = 0;
-		for (var i = 0; i < tweets.length; i++)
-		{
-			usertweets[whichToUse-1][i] = tweets[j].text;
-			usertime[whichToUse-1][i] = tweets[j].created_at;;
-			j--;
-			converteddate[i] = new Date(tweets[i].created_at);
-			seconddif[i]= converteddate[i].getTime() /1000 ;
-			var coordi = new Array();
-			var coordj = new Array();
-			var seconds = new Date().getTime() / 1000;
-			coordi[0] = (seconds- seconddif[i]) /3600;
-			coordi[1] = i;
-			coordj[0] = (seconds- seconddif[i]) /3600;
-			coordj[1] = i+1;
-			finalArray[i] = coordi;
-			fakeArray[i] = coordj;
-
-			/*
-			//var coordi = new Array();
-			var seconds = new Date().getTime() / 1000;
-			//coordi[0] = (seconds- seconddif[i]) /3600;
-			coordi = (seconds- seconddif[i]) /3600;
-			//scalingArray.push(coordi[0]);
-			//coordi[1] = i;
-			//finalArray[whichToUse-1][i] = coordi;
-			// New Code Below
-			finalArray[whichToUse-1][i] = coordi;
-			scalingArray.push(coordi);*/
-		}
-
-		lengthall[whichToUse-1]=finalArray.length;
-		
-		for (var i = 0; i < whichToUse-1; i++)
-		 	thenumber += lengthall[i];
-		for (var i = 0; i < finalArray.length; i++)
-			finalArray[i][1] = finalArray.length - finalArray[i][1];
-
-		//<img class='click' src='specific_images/glyphicons_054_clock.png'><strong id='cursor'>Hi!</strong>
-		// Set up tweet text
-		var htmlstring = '';
-		for (var i = tweets.length; i > 0; i--)
-		{
-			//htmlstring += "<style = font-style:oblique; text-align:center>";
-			htmlstring += i;
-			//htmlstring += '</style>';
-			/*htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
-			var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
-			htmlstring += manipulatedDate;*/
-			htmlstring += ".&nbsp<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>";
-			var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
-			htmlstring += manipulatedDate;
-			htmlstring += "<br>";
-			htmlstring += usertweets[whichToUse-1][i-1];
-			htmlstring += "' <br><br>";
-			if(i == 1)
-				htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
-		}
-		$('#tweettext' + whichToUse).html(htmlstring);
-
-		// Get rid of progress bar since lag done
-		$('.progress').hide();
-		$('#graph').hide();
-
-		// Display description box for this user
-		$('#description' + whichToUse).show();	
-
-		// Display tweettext for this user (button)
-		$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
-		$('#texts').show();
-
-		$('#sumbutton').show();
-		$('#button' + whichToUse).html('@' + screen_name).show();
-
-		// Hide GMT/Local Time
-		//$('#showtime').hide();
-
-		// D3       
-	    /*maximum.push(findMax(scalingArray));
-	    var realMax = Math.max.apply(Math, maximum);
-		renderGraph(realMax);*/
-
-		// START OF D3      
-
-	    var thelength = finalArray.length;
-	   
-
-		//var dataset = new Array();
-		fakedataset[whichToUse-1] = finalArray;
-		dataset = finalArray;
-
-		//Create scale functions
-		var xScale = d3.scale.linear()
-							 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
-							 .range([WIDTH-8*PADDING,0+PADDING ]);
-
-		var yScale = d3.scale.linear()
-							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
-							 .range([HEIGHT-PADDING ,0+PADDING]);
-
-		var rScale = d3.scale.linear()
-							 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
-							 .range([radius, radius]);
-
-
-
-		//Define X axis
-		var xAxis = d3.svg.axis()
-						  .scale(xScale)
-						  .orient("bottom")
-						  .ticks(5);
-
-		//Define Y axis
-		var yAxis = d3.svg.axis()
-						  .scale(yScale)
-						  .orient("left")
-						  .ticks(5);
-
-		//Create SVG element
-		// after select, was body
-		var svg = d3.select("#graphuser" + whichToUse)
-					.append("svg")
-					.attr("width", WIDTH)
-					.attr("height", HEIGHT);
-
-
-  
-		svg.selectAll("circle")
-		   .data(dataset)
-		   .enter()
-		   .append("circle")
-		   .attr("cx", function(d) {
-		   		return xScale(d[0]);
-		   })
-		   .attr("cy", function(d) {
-		   		return yScale(d[1]);
-		   })
-		   .attr("r", function(d) {
-		   		return rScale(d[1]);
-		   })
-		   .style('fill', COLORS[whichToUse-1]);;
-
-		svg.selectAll("text")
-		   .data(dataset)
-		   .enter()
-		   .append("text")
-		   .text(function(d) {
-		   		return "#"+(d[1]);
-		   })
-		   .attr("x", function(d) {
-		   		return xScale(d[0]) - 20;
-		   })
-		   .attr("y", function(d) {
-		   		return yScale(d[1]) - 8;
-		   })
-		   .attr("font-family", "sans-serif")
-		   .attr("font-size", "11px")
-		   .attr("fill", "black");
-
-	    svg.append("g")
-			.attr("class", "axis")
-			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-			.call(xAxis);
-
-		// text label for the x axis
-		svg.append("text")      
-			.attr("class", "x label")
-	        .attr("text-anchor", "end")
-	        .attr("x", WIDTH)
-	        .attr("y",  HEIGHT-6 )
-	        .text("Hours before Now (h)");
-
-	    svg.append("text")
-	        .attr("x", 120)            
-	        .attr("y", 12)
-	        .attr("text-anchor", "middle")  
-	        .style("font-size", "16px") 
-	        .style("font-style", "oblique") 
-	        .style("color", "blue")
-	        .style("text-decoration", "underline")  
-	        .text("Number of Tweets Over Time");     
-
-    	var onegraohArray = new Array();
-		if(count == 5)
-		{
-	        for (var i =0 ; i < fakedataset[0].length; i++)
-				onegraohArray[i] = fakedataset[0][i];
-	        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
-				onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
-			for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
-				onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
-			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
-				onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
-			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
-				onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
-
-			var xScaleall = d3.scale.linear()
-								 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING ]);		 
-
-			var yScaleall = d3.scale.linear()
-								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
-								 .range([HEIGHT-PADDING,0+PADDING]);
-								 
-			var rScaleall = d3.scale.linear()
-								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
-								 .range([3, 3]);
-								  
-			var svgall = d3.select("#summarygraph")
-						.append("svg")
-						.attr("width", WIDTH)
-						.attr("height", HEIGHT);
+			// Display description information
+			$('#descriptions').fadeIn(500);
 			
-			svgall.selectAll("circle")
-			   .data(onegraohArray)
-			   .enter()
-			   .append("circle")
-			   .attr("cx", function(d) {
-			   		return xScaleall(d[0]);
-			   })
-			   .attr("cy", function(d) {
-			   		return yScaleall(d[1]);
-			   })
-			   .attr("r", function(d) {
-			   		return rScaleall(d[1]);
-			   });
+			// If five inputs display enough Input and hide search box
+			if(count == 5)
+			{
+				$('#enoughInput').show().delay(4000).fadeOut();
+				$('#userInput').attr('disabled', 'disabled');
+			}
+				
+			// Else display successful search
+			else
+				$('#successfulSearch').show().delay(1000).fadeOut();
+
+			// Display count of valid searches
+			$('.badge-info').html("Your number of valid searches is " + count + "!");
+
+			// Parse correct data
+			tweets = JSON.parse(data.query.results.result);
+
+			// Set up description box
+			var screen_name = tweets[0].user.screen_name;
+			var numberOfFollowers = tweets[0].user.followers_count;
+			if (tweets[0].user.url == null)
+				var URL = 'No Link on Twitter Page';
+			else
+				var URL = tweets[0].user.url;
+			var numberOfStatuses = tweets[0].user.statuses_count;
+			var photo = tweets[0].user.profile_image_url;
+			var name = tweets[0].user.name;
+			$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+
+			// Show input along with checkbox and delete button
+			$('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
+
+			// See if user is protected (if so, can't retrieve data)
+			var protection = tweets[0].user.protected;
+
+			// Calculate thickness of line and circle radius
+			if (numberOfFollowers < INTERVALS[0])
+			{
+				thickness = THICKNESS[0];
+				radius = RADIUS[0];
+			}	
+			else if (numberOfFollowers < INTERVALS[1])
+			{
+				thickness = THICKNESS[1];
+				radius = RADIUS[1];
+			}
+			else if (numberOfFollowers < INTERVALS[2])
+			{
+				thickness = THICKNESS[2];
+				radius = RADIUS[2];
+			}
+			else if (numberOfFollowers < INTERVALS[3])
+			{
+				thickness = THICKNESS[3];
+				radius = RADIUS[3];
+			}
+			else if (numberOfFollowers < INTERVALS[4])
+			{
+				thickness = THICKNESS[4];
+				radius = RADIUS[4];
+			}
+			else
+			{
+				thickness = THICKNESS[5];
+				radius = RADIUS[5];
+			}
+
+			// Set up text, dates, D3 variables
+			var finalArray = new Array();
+			var fakeArray = new Array();
+			var thenumber = 0;
+			var j = tweets.length - 1;
+			var coordi = 0;
+			for (var i = 0; i < tweets.length; i++)
+			{
+				usertweets[whichToUse-1][i] = tweets[j].text;
+				usertime[whichToUse-1][i] = tweets[j].created_at;;
+				j--;
+				converteddate[i] = new Date(tweets[i].created_at);
+				seconddif[i]= converteddate[i].getTime() /1000 ;
+				var coordi = new Array();
+				var coordj = new Array();
+				var seconds = new Date().getTime() / 1000;
+				coordi[0] = (seconds- seconddif[i]) /3600;
+				coordi[1] = i;
+				coordj[0] = (seconds- seconddif[i]) /3600;
+				coordj[1] = i+1;
+				finalArray[i] = coordi;
+				fakeArray[i] = coordj;
+
+				/*
+				//var coordi = new Array();
+				var seconds = new Date().getTime() / 1000;
+				//coordi[0] = (seconds- seconddif[i]) /3600;
+				coordi = (seconds- seconddif[i]) /3600;
+				//scalingArray.push(coordi[0]);
+				//coordi[1] = i;
+				//finalArray[whichToUse-1][i] = coordi;
+				// New Code Below
+				finalArray[whichToUse-1][i] = coordi;
+				scalingArray.push(coordi);*/
+			}
+
+			lengthall[whichToUse-1]=finalArray.length;
+			
+			for (var i = 0; i < whichToUse-1; i++)
+			 	thenumber += lengthall[i];
+			for (var i = 0; i < finalArray.length; i++)
+				finalArray[i][1] = finalArray.length - finalArray[i][1];
+
+			//<img class='click' src='specific_images/glyphicons_054_clock.png'><strong id='cursor'>Hi!</strong>
+			// Set up tweet text
+			var htmlstring = '';
+			for (var i = tweets.length; i > 0; i--)
+			{
+				//htmlstring += "<style = font-style:oblique; text-align:center>";
+				htmlstring += i;
+				//htmlstring += '</style>';
+				/*htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
+				var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
+				htmlstring += manipulatedDate;*/
+				htmlstring += ".&nbsp<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>";
+				var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
+				htmlstring += manipulatedDate;
+				htmlstring += "<br>";
+				htmlstring += usertweets[whichToUse-1][i-1];
+				htmlstring += "' <br><br>";
+				if(i == 1)
+					htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
+			}
+			$('#tweettext' + whichToUse).html(htmlstring);
+
+			// Get rid of progress bar since lag done
+			$('.progress').hide();
+			$('#graph').hide();
+
+			// Display description box for this user
+			$('#description' + whichToUse).show();	
+
+			// Display tweettext for this user (button)
+			$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
+			$('#texts').show();
+
+			$('#sumbutton').show();
+			$('#button' + whichToUse).html('@' + screen_name).show();
+
+			// Hide GMT/Local Time
+			//$('#showtime').hide();
+
+			// D3       
+		    /*maximum.push(findMax(scalingArray));
+		    var realMax = Math.max.apply(Math, maximum);
+			renderGraph(realMax);*/
+
+			// START OF D3      
+
+		    var thelength = finalArray.length;
+		   
+
+			//var dataset = new Array();
+			fakedataset[whichToUse-1] = finalArray;
+			dataset = finalArray;
+
+			//Create scale functions
+			var xScale = d3.scale.linear()
+								 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
+								 .range([WIDTH-8*PADDING,0+PADDING ]);
+
+			var yScale = d3.scale.linear()
+								 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+								 .range([HEIGHT-PADDING ,0+PADDING]);
+
+			var rScale = d3.scale.linear()
+								 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
+								 .range([radius, radius]);
+
+
 
 			//Define X axis
 			var xAxis = d3.svg.axis()
-							  .scale(xScaleall)
+							  .scale(xScale)
 							  .orient("bottom")
 							  .ticks(5);
 
 			//Define Y axis
 			var yAxis = d3.svg.axis()
-							  .scale(yScaleall)
+							  .scale(yScale)
 							  .orient("left")
 							  .ticks(5);
 
-			/*svgall.selectAll("text")
-			   .data(onegraohArray)
+			//Create SVG element
+			// after select, was body
+			var svg = d3.select("#graphuser" + whichToUse)
+						.append("svg")
+						.attr("width", WIDTH)
+						.attr("height", HEIGHT);
+
+
+	  
+			svg.selectAll("circle")
+			   .data(dataset)
+			   .enter()
+			   .append("circle")
+			   .attr("cx", function(d) {
+			   		return xScale(d[0]);
+			   })
+			   .attr("cy", function(d) {
+			   		return yScale(d[1]);
+			   })
+			   .attr("r", function(d) {
+			   		return rScale(d[1]);
+			   })
+			   .style('fill', COLORS[whichToUse-1]);;
+
+			svg.selectAll("text")
+			   .data(dataset)
 			   .enter()
 			   .append("text")
 			   .text(function(d) {
 			   		return "#"+(d[1]);
 			   })
 			   .attr("x", function(d) {
-			   		return xScaleall(d[0]) - 20;
+			   		return xScale(d[0]) - 20;
 			   })
 			   .attr("y", function(d) {
-			   		return yScaleall(d[1]) - 8;
+			   		return yScale(d[1]) - 8;
 			   })
 			   .attr("font-family", "sans-serif")
 			   .attr("font-size", "11px")
-			   .attr("fill", "red");*/
+			   .attr("fill", "black");
 
-		    svgall.append("g")
+		    svg.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
 				.call(xAxis);
 
 			// text label for the x axis
-			svgall.append("text")      
+			svg.append("text")      
 				.attr("class", "x label")
 		        .attr("text-anchor", "end")
 		        .attr("x", WIDTH)
 		        .attr("y",  HEIGHT-6 )
 		        .text("Hours before Now (h)");
 
-		    svgall.append("text")
+		    svg.append("text")
 		        .attr("x", 120)            
 		        .attr("y", 12)
 		        .attr("text-anchor", "middle")  
@@ -583,71 +516,179 @@ $(document).ready(function(){
 		        .style("font-style", "oblique") 
 		        .style("color", "blue")
 		        .style("text-decoration", "underline")  
-		        .text("Graph of All Tweets");
+		        .text("Number of Tweets Over Time");     
 
-		    for (var j = 0; j < fakedataset[0].length; j++)
+		    $('#graphInstructions').show();
+
+	    	var onegraohArray = new Array();
+			if(count == 5)
+			{
+		        for (var i =0 ; i < fakedataset[0].length; i++)
+					onegraohArray[i] = fakedataset[0][i];
+		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
+					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
+					onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
+
+				var xScaleall = d3.scale.linear()
+									 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
+									 .range([WIDTH-8*PADDING,0+PADDING ]);		 
+
+				var yScaleall = d3.scale.linear()
+									 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
+									 .range([HEIGHT-PADDING,0+PADDING]);
+									 
+				var rScaleall = d3.scale.linear()
+									 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
+									 .range([3, 3]);
+									  
+				var svgall = d3.select("#summarygraph")
+							.append("svg")
+							.attr("width", WIDTH)
+							.attr("height", HEIGHT);
+				
+				svgall.selectAll("circle")
+				   .data(onegraohArray)
+				   .enter()
+				   .append("circle")
+				   .attr("cx", function(d) {
+				   		return xScaleall(d[0]);
+				   })
+				   .attr("cy", function(d) {
+				   		return yScaleall(d[1]);
+				   })
+				   .attr("r", function(d) {
+				   		return rScaleall(d[1]);
+				   });
+
+				//Define X axis
+				var xAxis = d3.svg.axis()
+								  .scale(xScaleall)
+								  .orient("bottom")
+								  .ticks(5);
+
+				//Define Y axis
+				var yAxis = d3.svg.axis()
+								  .scale(yScaleall)
+								  .orient("left")
+								  .ticks(5);
+
+				/*svgall.selectAll("text")
+				   .data(onegraohArray)
+				   .enter()
+				   .append("text")
+				   .text(function(d) {
+				   		return "#"+(d[1]);
+				   })
+				   .attr("x", function(d) {
+				   		return xScaleall(d[0]) - 20;
+				   })
+				   .attr("y", function(d) {
+				   		return yScaleall(d[1]) - 8;
+				   })
+				   .attr("font-family", "sans-serif")
+				   .attr("font-size", "11px")
+				   .attr("fill", "red");*/
+
+			    svgall.append("g")
+					.attr("class", "axis")
+					.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+					.call(xAxis);
+
+				// text label for the x axis
+				svgall.append("text")      
+					.attr("class", "x label")
+			        .attr("text-anchor", "end")
+			        .attr("x", WIDTH)
+			        .attr("y",  HEIGHT-6 )
+			        .text("Hours before Now (h)");
+
+			    svgall.append("text")
+			        .attr("x", 120)            
+			        .attr("y", 12)
+			        .attr("text-anchor", "middle")  
+			        .style("font-size", "16px") 
+			        .style("font-style", "oblique") 
+			        .style("color", "blue")
+			        .style("text-decoration", "underline")  
+			        .text("Graph of All Tweets");
+
+			    for (var j = 0; j < fakedataset[0].length; j++)
+		  		{
+					svgall.append('line')
+			        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+			        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+			        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+			        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+			        .attr("stroke-width", 2)
+			        .attr("stroke", "black")
+
+			        svgall.append('line')
+			        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
+			        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
+			        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
+			        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
+			        .attr("stroke-width", 2)
+			        .attr("stroke", "red")
+
+			         svgall.append('line')
+			        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
+			        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
+			        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
+			        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
+			        .attr("stroke-width", 2)
+			        .attr("stroke", "blue")
+
+			         svgall.append('line')
+			        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
+			        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
+			        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
+			        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
+			        .attr("stroke-width", 2)
+			        .attr("stroke", "green")
+
+			         svgall.append('line')
+			        .attr('x1',xScaleall(((fakedataset[4])[j])[0]))
+			        .attr('x2',xScaleall(((fakedataset[4])[j+1])[0]))                                        
+			        .attr('y1',yScaleall(((fakedataset[4])[j])[1]))
+			        .attr('y2',yScaleall(((fakedataset[4])[j+1])[1]))                                     
+			        .attr("stroke-width", 2)
+			        .attr("stroke", "purple")
+				}
+			}
+
+			// Create graph lines
+			/*var linecolor = "black";
+			switch (whichToUse)
+			{
+				case 2: linecolor = "red"; break;
+				case 3: linecolor = "blue"; break;
+				case 4: linecolor = "green"; break;
+				case 5: linecolor = "purple"; break;
+			}*/
+			
+			for (var k = 0; k < dataset.length; k++)
 	  		{
-				svgall.append('line')
-		        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-		        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-		        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-		        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-		        .attr("stroke-width", 2)
-		        .attr("stroke", "black")
-
-		        svgall.append('line')
-		        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
-		        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
-		        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
-		        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
-		        .attr("stroke-width", 2)
-		        .attr("stroke", "red")
-
-		         svgall.append('line')
-		        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
-		        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
-		        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
-		        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
-		        .attr("stroke-width", 2)
-		        .attr("stroke", "blue")
-
-		         svgall.append('line')
-		        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
-		        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
-		        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
-		        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
-		        .attr("stroke-width", 2)
-		        .attr("stroke", "green")
-
-		         svgall.append('line')
-		        .attr('x1',xScaleall(((fakedataset[4])[j])[0]))
-		        .attr('x2',xScaleall(((fakedataset[4])[j+1])[0]))                                        
-		        .attr('y1',yScaleall(((fakedataset[4])[j])[1]))
-		        .attr('y2',yScaleall(((fakedataset[4])[j+1])[1]))                                     
-		        .attr("stroke-width", 2)
-		        .attr("stroke", "purple")
+				svg.append('line')
+		        .attr('x1',xScale((finalArray[k])[0]))
+		        .attr('x2',xScale((finalArray[k+1])[0]))                                        
+		        .attr('y1',yScale((finalArray[k])[1]))
+		        .attr('y2',yScale((finalArray[k+1])[1]))                                     
+		        .attr("stroke-width", thickness)
+		        .attr("stroke", COLORS[whichToUse-1]);
 			}
 		}
-
-		// Create graph lines
-		/*var linecolor = "black";
-		switch (whichToUse)
+		else
 		{
-			case 2: linecolor = "red"; break;
-			case 3: linecolor = "blue"; break;
-			case 4: linecolor = "green"; break;
-			case 5: linecolor = "purple"; break;
-		}*/
-		
-		for (var k = 0; k < dataset.length; k++)
-  		{
-			svg.append('line')
-	        .attr('x1',xScale((finalArray[k])[0]))
-	        .attr('x2',xScale((finalArray[k+1])[0]))                                        
-	        .attr('y1',yScale((finalArray[k])[1]))
-	        .attr('y2',yScale((finalArray[k+1])[1]))                                     
-	        .attr("stroke-width", thickness)
-	        .attr("stroke", COLORS[whichToUse-1]);
+			//existence = false;
+			count--;
+			$('#noExistence').show().delay(2500).fadeOut();
+			$('.progress').hide();
+			$('#graph').hide();
 		}
 	};
 
@@ -776,6 +817,9 @@ $(document).ready(function(){
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
 
+		// If anything lingering on screen, clear
+		$('.searches').hide();
+
 		// Button is clicked, increment counter; cannot exceed 5 inputs
 		count++;
 
@@ -847,7 +891,7 @@ $(document).ready(function(){
 		{
 
 			// Keep track of div tags
-			findDiv += whichToUse;
+			//findDiv += whichToUse;
 
 			// Keep track of input to check duplicates
 			enteredInput[whichToUse-1] = retrievedSearch;
@@ -861,7 +905,6 @@ $(document).ready(function(){
 
 			$('.progress').show();
 			$('#graph').show();
-			$('#graphInstructions').show();
 
 			// Use Twitter API to retrieve data
 			$.ajax({
@@ -869,15 +912,7 @@ $(document).ready(function(){
 		        success: cb
 			});
 
-			// Hide all individual graphs
-			$('.individual').hide();
-
-			// Show summary graph
-			$('#summarygraph').show();
-
-			/*if (existence == false)
-				console.log('works');*/
-
+			
 			// Check for whether user is protected
 			/*if (protection == true)
 			{
@@ -885,25 +920,6 @@ $(document).ready(function(){
 				$('#protectedUser').show().delay(5000).fadeOut();
 				return;
 			}*/
-
-			// Display description information
-			$('#descriptions').fadeIn(500);
-
-			//$('#description').fadeIn(500);
-
-			// Show input along with checkbox and delete button
-			$(findDiv).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp" + retrievedSearch + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
-
-			// If five inputs display enough Input and hide search box
-			if(count == 5)
-			{
-				$('#enoughInput').show().delay(4000).fadeOut();
-				$('#userInput').attr('disabled', 'disabled');
-			}
-				
-			// Else display successful search
-			else
-				$('#successfulSearch').show().delay(1000).fadeOut();
 		}
 
 		// Else display error message, decrement count
@@ -912,9 +928,6 @@ $(document).ready(function(){
 			count--;
 			$('#failedSearch').show().delay(6000).fadeOut();
 		}
-
-		// Display count of valid searches
-		$('.badge-info').html("Your number of valid searches is " + count + "!");
 	}
 
 	// Add button clicked
