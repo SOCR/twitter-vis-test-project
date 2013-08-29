@@ -29,8 +29,6 @@
 		<div class="navbar-inner">
 		    <div class="container-fluid">
 		    	<a class="brand" href="#">SOCR: Real-Time Tweets Visualization</a>
-		    	<!--<a href='#'><span class='badge badge-success gmttime'></span></a>&nbsp
-		    	<a href="#"><span class="badge badge-info localtime"></span></a>-->
 		    	<ul class="nav pull-right">
 		    		<li class="active"><a href="http://www.socr.ucla.edu/htmls/SOCR_Team.html" target="_blank">Developers:</a></li>
 		    		<li><a href="https://github.com/ajfoglia" target="_blank">Andrew Foglia</a></li>
@@ -41,22 +39,11 @@
 		</div>
 	</div>
 	<div class="container-fluid">
-		<!--<div class='row-fluid'>
-			<div class="span2 offset2">
-			<div id='gmttime'></div></div>
-			<div class='span2 offset4'>
-			<div id='localtime'></div></div>
-		</div>-->
 		<div class="row-fluid">
 			<!-- Insert graph and descriptions onto the left three quarters of the page -->
 			<div class="span12">
 				<div class="span1">
 					<p align=center><a href='http://www.socr.ucla.edu/' target='_blank' id='focusHere'><img src='specific_images/glyphicons_020_home.png'></a></p>
-					<!--<div id='gmttime'></div><br><br><br>
-					<div id='localtime'></div>
-					<div class="back-to-top">
-		                <a href="#">&uarr; back to top</a>
-		            </div>-->
 				</div>
 				<div class="span7">
 					<div class="row-fluid">
@@ -128,10 +115,9 @@
 					<div class='searches' id="successfulSearch"><strong><i class='icon-ok-circle'></i> Found them!</strong></div>
 					<div class='searches' id="noExistence"><strong><i class='icon-ban-circle'></i> This username does not exist! Please try again.</strong></div>
 					<div class='searches' id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Only search for a combination of letters, numbers, and underscores.</strong></div>
-					<div class='searches' id="protectedUser"><strong><i class='icon-warning-sign'></i> This user has made their Twitter account protected so we cannot retrieve anything from their account. Please try another username.</strong></div>
 					<div class='searches' id='none'><strong><i class='icon-question-sign'></i> Please enter something.</strong></div>
 					<div class='searches' id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 usernames. Please delete one and try again.</strong></div>
-					<div class='searches' id="sameInput"><strong><i class='icon-ban-circle'></i> That username has already been processed. Please try another username.</strong></div>
+					<div class='searches' id="sameInput"><strong><i class='icon-warning-sign'></i> That username has already been processed. Please try another username.</strong></div>
 					<div class='searches' id="enoughInput"><strong><i class='icon-flag'></i> Successful search, but that's five usernames now. Please delete before making your next query.</strong></div>
 					<br><p align=left><i class='icon-info-sign'></i></p>
 					<h6>1. Valid username expressions consist of only numbers, letters, and underscores.<br> 2. You may enter up to 5 usernames to track. After typing in one username, press 'Add' below so you may type in another.<br>3. You may graph any selection of usernames below by marking the checkboxes and pressing 'Update Now'.<br>4. You may delete any of the entered usernames below at any given time by clicking the red 'X' to the right of that search.<br></h6>
@@ -153,9 +139,6 @@
 					  <input type='checkbox' class="btn btn-large" value='1'> Auto-update
 					  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
 					</p>
-					<p align=center>** Please note that all times used in the graphs are using GMT times **</p>
-					<!--<div id='gmttime'></div>
-					<div id='localtime'></div>-->
 				</div>
 			</div>
 		</div>

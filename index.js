@@ -4,6 +4,7 @@ TO BE DONE -
 
 Currently to do within current scope:
 Bootstrap conversion
+Protection
 Time scroll options: badges in navbar, show time in tweetboxes every ten tweets, mouseover effect, clock icon to right of number and mouseover shows gmt/local time above
 Graph 5 individual doesn't add line
 On hover over line, display last tweet text and time photo screen name
@@ -19,7 +20,7 @@ Fix delete buttons
 
 $(document).ready(function(){
 
-	/////////////////////// GLOBALS //////////////////////////////////
+	/////////////////////// GLOBAL CONSTANTS //////////////////////////////////
 	// Width, height, padding
 	var WIDTH = 900;
 	var HEIGHT = 575;
@@ -45,7 +46,6 @@ $(document).ready(function(){
 		$('.tweettext').hide();
 		$('#graphInstructions').hide();
 		$('.graphbutton').hide();
-		//findTime();
 
 		// Older delete buttons
 		//$('#searchOption1').hide();
@@ -61,7 +61,7 @@ $(document).ready(function(){
 	};
 
 	// Every one second, update gmt/local time
-	/* var intervalID = setInterval(function() {
+	var intervalID = setInterval(function() {
         findTime();
     }, 1000);
 
@@ -96,7 +96,6 @@ $(document).ready(function(){
 			second += tempsecond;
 		else
 			second = tempsecond;
-		//var y = "GMT time:<br> " + month + '/' + day + '/' + year + '<br> ' + hour + ':' + minute + ':' + second + ' ';
 		var y = "&nbspGMT time: " + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
 		if (morning)
 			y += 'A.M.&nbsp&nbsp&nbsp';
@@ -137,9 +136,8 @@ $(document).ready(function(){
 			x += 'A.M.';
 		else
 			x += 'P.M.';
-		//$('.hello').html(y+x);
-		return (y+x);
-	}*/
+		$('.gmtlocaltime').html(y+x);
+	}
 
 	function changeDate(date) {
 		// Manipulate Twitter API date
@@ -245,15 +243,12 @@ $(document).ready(function(){
 		// Clear array contents so graphs don't copy at all on accident
 		//finalArray = [whichToUse][];
 
-		// Parse data
+		// Parse data and identify whether user exists
 		var invalidTest = JSON.stringify(data.query.results);
-		//console.log(invalidTest);
 		var test = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
-		//console.log(test);
-		if (invalidTest != test) {
 
-			// User exists
-			//existence = true;
+		// If user exists
+		if (invalidTest != test) {
 
 			// Hide all individual graphs
 			$('.individual').hide();
@@ -296,7 +291,7 @@ $(document).ready(function(){
 			// Show input along with checkbox and delete button
 			$('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
 
-			// See if user is protected (if so, can't retrieve data)
+			// See if user is protected (if so, can't retrieve text)
 			var protection = tweets[0].user.protected;
 
 			// Calculate thickness of line and circle radius
@@ -374,25 +369,42 @@ $(document).ready(function(){
 			for (var i = 0; i < finalArray.length; i++)
 				finalArray[i][1] = finalArray.length - finalArray[i][1];
 
-			//<img class='click' src='specific_images/glyphicons_054_clock.png'><strong id='cursor'>Hi!</strong>
-			// Set up tweet text
+			// Set up tweet text boxes
 			var htmlstring = '';
-			for (var i = tweets.length; i > 0; i--)
+			if (protection)
 			{
-				//htmlstring += "<style = font-style:oblique; text-align:center>";
-				htmlstring += i;
-				//htmlstring += '</style>';
-				/*htmlstring += ". <a id='time'><img src='specific_images/glyphicons_054_clock.png'></a>&nbsp<a id='showtime'></a><br>"; 
-				var manipulatedDate = changeDate(usertime[whichToUse][i-1]);
-				htmlstring += manipulatedDate;*/
-				htmlstring += ".&nbsp<div class='hello'><img src='specific_images/glyphicons_054_clock.png'></div>";
-				var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
-				htmlstring += manipulatedDate;
-				htmlstring += "<br>";
-				htmlstring += usertweets[whichToUse-1][i-1];
-				htmlstring += "' <br><br>";
-				if(i == 1)
-					htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
+				htmlstring += "<p align=center>This user is a protected user, meaning that SOCR cannot display the text of any of their tweets.<br>However we can still obtain the times of their tweets, so the times are shown below and correspond to the graphs appropriately.</p>"
+				htmlstring += "<p align=center><img src='specific_images/glyphicons_054_clock.png'>&nbsp<div class='gmtlocaltime' align=center></div>";
+				findTime();
+				htmlstring += "</p><div class='timewarning'>Please note that the above times are current. All the times below are in GMT since it is a universal time, not your local time. Take into account the time difference.</div><br>";
+				for (var i = tweets.length; i > 0; i--)
+				{
+					var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
+					htmlstring += i;
+					htmlstring += '.&nbsp';
+					htmlstring += manipulatedDate;
+					htmlstring += "<br>";
+					if(i == 1)
+						htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
+				}	
+			}
+			else
+			{
+				htmlstring += "<p align=center><img src='specific_images/glyphicons_054_clock.png'>&nbsp<div class='gmtlocaltime' align=center></div>";
+				findTime();
+				htmlstring += "</p><div class='timewarning'>Please note that the above times are current. All the times below are in GMT since it is a universal time, not your local time. Take into account the time difference.</div><br>";
+				for (var i = tweets.length; i > 0; i--)
+				{
+					htmlstring += i;
+					htmlstring += ".&nbsp";
+					var manipulatedDate = changeDate(usertime[whichToUse-1][i-1]);
+					htmlstring += manipulatedDate;
+					htmlstring += "<br>'";
+					htmlstring += usertweets[whichToUse-1][i-1];
+					htmlstring += "'<br><br>";
+					if(i == 1)
+						htmlstring += "<p align=center><a href='#'>&uarr; back to top</a></p><br>";
+				}
 			}
 			$('#tweettext' + whichToUse).html(htmlstring);
 
@@ -407,11 +419,9 @@ $(document).ready(function(){
 			$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 			$('#texts').show();
 
+			// Show the summary graph and the buttons for individual graphs
 			$('#sumbutton').show();
 			$('#button' + whichToUse).html('@' + screen_name).show();
-
-			// Hide GMT/Local Time
-			//$('#showtime').hide();
 
 			// D3       
 		    /*maximum.push(findMax(scalingArray));
@@ -682,9 +692,9 @@ $(document).ready(function(){
 		        .attr("stroke", COLORS[whichToUse-1]);
 			}
 		}
+		// User does not exist
 		else
 		{
-			//existence = false;
 			count--;
 			$('#noExistence').show().delay(2500).fadeOut();
 			$('.progress').hide();
@@ -871,9 +881,6 @@ $(document).ready(function(){
 			}
 		}
 
-		// Helps to keep track of div tags
-		var findDiv = '#searchOption';
-
 		// If delete was pressed, make sure to put new input in old spot of where the one was deleted
 		if(deletePressed)
 		{
@@ -889,10 +896,6 @@ $(document).ready(function(){
 		// If valid, add to search list
 		if (/^@?(\w){1,15}$/.test(retrievedSearch))	
 		{
-
-			// Keep track of div tags
-			//findDiv += whichToUse;
-
 			// Keep track of input to check duplicates
 			enteredInput[whichToUse-1] = retrievedSearch;
 
@@ -911,15 +914,6 @@ $(document).ready(function(){
 		        url: searchURL,
 		        success: cb
 			});
-
-			
-			// Check for whether user is protected
-			/*if (protection == true)
-			{
-				count--;
-				$('#protectedUser').show().delay(5000).fadeOut();
-				return;
-			}*/
 		}
 
 		// Else display error message, decrement count
@@ -943,15 +937,6 @@ $(document).ready(function(){
 	        displayCheckboxes();
 	    }
 	});
-
-	/*$('.hello').mouseover(function(){
-		var newtime = findTime();
-		$('.hello').html(newtime);
-	});
-
-	$('.hello').mouseout(function(){
-		$('.hello').html("<img src='specific_images/glyphicons_054_clock.png'>");
-	});*/
 
 	// Press update now key
 	$('#update').click(function(){
@@ -995,36 +980,30 @@ $(document).ready(function(){
 	})
 
 	// Buttons to display graphs
-
 	$('#sumbutton').click(function() {
 		$('.individual').hide();
 		$('#summarygraph').show();
 	});
-
 	$('#button1').click(function() {
 		$('#summarygraph').hide();
 		$('.individual').hide();
 		$('#graphuser1').show();
 	});
-
 	$('#button2').click(function() {
 		$('#summarygraph').hide();
 		$('.individual').hide();
 		$('#graphuser2').show();
 	});
-
 	$('#button3').click(function() {
 		$('#summarygraph').hide();
 		$('.individual').hide();
 		$('#graphuser3').show();
 	});
-
 	$('#button4').click(function() {
 		$('#summarygraph').hide();
 		$('.individual').hide();
 		$('#graphuser4').show();
 	});
-
 	$('#button5').click(function() {
 		$('#summarygraph').hide();
 		$('.individual').hide();
@@ -1032,31 +1011,26 @@ $(document).ready(function(){
 	});
 
 	// Collapsible tweet text
-
 	$('#user1').toggle(function(){
 		$('#tweettext1').slideDown(200);
 	}, function() {
 		$('#tweettext1').slideUp(200);
 	});
-
 	$('#user2').toggle(function(){
 		$('#tweettext2').slideDown(200);
 	}, function() {
 		$('#tweettext2').slideUp(200);
 	});
-
 	$('#user3').toggle(function(){
 		$('#tweettext3').slideDown(200);
 	}, function() {
 		$('#tweettext3').slideUp(200);
 	});
-
 	$('#user4').toggle(function(){
 		$('#tweettext4').slideDown(200);
 	}, function() {
 		$('#tweettext4').slideUp(200);
 	});
-
 	$('#user5').toggle(function(){
 		$('#tweettext5').slideDown(200);
 	}, function() {

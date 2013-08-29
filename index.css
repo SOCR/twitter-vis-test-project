@@ -19,6 +19,12 @@
     font-size: 11px;
 }
 
+.timewarning {
+    text-align: center;
+    color: blue;
+    font-style: italic;
+}
+
 #successfulSearch {
 	color: green;
 	font-style: oblique;
@@ -32,11 +38,6 @@
 #failedSearch {
 	color: red;
 	font-style: oblique;
-}
-
-#protectedUser {
-    color: red;
-    font-style: oblique;
 }
 
 #none {
