@@ -39,6 +39,9 @@ $(document).ready(function(){
 	var PADDING = 20;
 	// Bootstrap Button Classes
 	var BUTTONS = ['btn-inverse', 'btn-danger', 'btn-primary', 'btn-success', 'btn-custom'];
+	// Bad Twitter API Results
+	var ERROR1 = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
+	var ERROR2 = "{\"result\":\"[]\\n\"}";
 	// Radius of Circles
 	var RADIUS = [2, 4, 6, 8, 10, 12];
 	// Intervals of follower numbers
@@ -149,14 +152,10 @@ $(document).ready(function(){
 		//finalArray = [whichToUse][];
 
 		// Parse data and identify whether user exists
-		var invalidTest = JSON.stringify(data.query.results);
-		var test = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
-		/*var unknownerror = "{\"result\":\"[]\n\"}";
-		var unknownerror = '{\"result\":\"[]\"' + "n" + "\"}";
-		console.log(unknownerror);
-		console.log(invalidTest);*/
+		var test = JSON.stringify(data.query.results);
+		
 		// If user exists
-		if (invalidTest != test) {
+		if ((test != ERROR1) && (test != ERROR2)) {
 
 			// Hide all individual graphs
 			$('.individual').hide();
