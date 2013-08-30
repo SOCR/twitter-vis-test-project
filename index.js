@@ -3,24 +3,23 @@
 TO BE DONE -
 
 Currently to do within current scope:
-circle sizes on summary graph
 Resizing issues everywhere (d3), width intervalid2
 text on individual graphs off
 if rtvisulization is third user, first two users only get first three points connected on summary graph
 KYLEANDERSON4 error messages (account for all them)
 timer on ajax call to time out if no success
+control panel: logarithmic scale, grid on back of graph, numbered tweets
+IDEA: eliminate auto update and just do it every 1 minute by default, no checkboxes, update now only does control panel, delete buttons work
+logarithmic shooting off page
 
 Questions:
 Bootstrap conversion, inclusion files?
 What should we do for checked boxes, display those graphs?
-Home page to umich or ucla
 Update now displays only checked graphs?
 Resizing okay
 range for log scale
 # of tweet on summary graph
 no text on summary graph
-thickness working, but should we do small circles for the mouseover
-
 
 New functionality:
 On hover over line, display last tweet text and time photo screen name
@@ -35,9 +34,11 @@ $(document).ready(function(){
 
 	/////////////////////// GLOBAL CONSTANTS //////////////////////////////////
 	// Width, height, padding
-	var WIDTH = 900;
+	var WIDTH = 890;
 	var HEIGHT = 575;
 	var PADDING = 20;
+	// Bootstrap Button Classes
+	var BUTTONS = ['btn-inverse', 'btn-danger', 'btn-primary', 'btn-success', 'btn-custom'];
 	// Radius of Circles
 	var RADIUS = [2, 4, 6, 8, 10, 12];
 	// Intervals of follower numbers
@@ -74,9 +75,9 @@ $(document).ready(function(){
 		$('.description').hide();
 		$('#descriptions').hide();
 		$('.tweettext').hide();
-		$('#graphInstructions').hide();
+		$('.graphInstructions').hide();
 		$('.graphbutton').hide();
-
+		$('#statistics').hide();
 		// Older delete buttons
 		//$('#searchOption1').hide();
 		//$('.delete1').hide();
@@ -149,9 +150,11 @@ $(document).ready(function(){
 
 		// Parse data and identify whether user exists
 		var invalidTest = JSON.stringify(data.query.results);
-		//alert(invalidTest);
 		var test = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
-
+		/*var unknownerror = "{\"result\":\"[]\n\"}";
+		var unknownerror = '{\"result\":\"[]\"' + "n" + "\"}";
+		console.log(unknownerror);
+		console.log(invalidTest);*/
 		// If user exists
 		if (invalidTest != test) {
 
@@ -326,7 +329,8 @@ $(document).ready(function(){
 			$('#description' + whichToUse).show();	
 
 			// Display tweettext for this user (button)
-			$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
+			//$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
+			$('#user' + whichToUse).html("<br><p align=center><button class='btn " + BUTTONS[whichToUse-1] + "'>@" + screen_name + "</button></p>");
 			$('#texts').show();
 
 			// Show the summary graph and the buttons for individual graphs
@@ -351,7 +355,7 @@ $(document).ready(function(){
 			// Linear scale for frequent user
 			var xScale = d3.scale.linear()
 								 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING ]);
+								 .range([WIDTH-8*PADDING,0+PADDING]);
 			// Log scale for infrequent user
 			/*var xScale = d3.scale.log()
 								 .domain([1, d3.max(dataset, function(d) { return d[0]; })])
@@ -435,7 +439,7 @@ $(document).ready(function(){
 		        .attr("text-anchor", "end")
 		        .attr("x", WIDTH)
 		        .attr("y",  HEIGHT-6 )
-		        .text("Hours before Now (h)");
+		        .text("Hours before Now");
 
 		    svg.append("text")
 		        .attr("x", 120)            
@@ -447,155 +451,28 @@ $(document).ready(function(){
 		        .style("text-decoration", "underline")  
 		        .text("Number of Tweets Over Time");     
 
-		    $('#graphInstructions').show();
+		    $('.graphInstructions').show();	
 
-			if (count == 1)
-			{
-				for (var i = 0; i < fakedataset[0].length; i++)
-					onegraohArray[i] = fakedataset[0][i];
-			}
-			else if (count == 2)
-			{
-				for (var i = 0; i < fakedataset[0].length; i++)
-					onegraohArray[i] = fakedataset[0][i];
-		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
-					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
-			}
-			else if (count == 3)
-			{
-				for (var i = 0; i < fakedataset[0].length; i++)
-					onegraohArray[i] = fakedataset[0][i];
-		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
-					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
-					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
-			}
-			else if (count == 4)
-			{
-				for (var i = 0; i < fakedataset[0].length; i++)
-					onegraohArray[i] = fakedataset[0][i];
-		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
-					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
-					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
-					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
-			}
-			else if (count == 5)
-			{
-				for (var i = 0; i < fakedataset[0].length; i++)
-					onegraohArray[i] = fakedataset[0][i];
-		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
-					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
-					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
-					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
-					onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
-				
-			}
-
-			var xScaleall = d3.scale.linear()
-								 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING ]);
-
-			/*var xScaleall = d3.scale.log()
-								 .domain([1, d3.max(onegraohArray, function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING ]);*/
-
-			var yScaleall = d3.scale.linear()
-								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
-								 .range([HEIGHT-PADDING,0+PADDING]);
-								 
-			var rScaleall = d3.scale.linear()
-								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
-								 .range([3, 3]);
-
-			$('#summarygraph').empty();					  
-			
-			svgall = d3.select("#summarygraph")
-						.append("svg")
-						.attr("width", WIDTH)
-						.attr("height", HEIGHT);
-			
-			svgall.selectAll("circle")
-			   .data(onegraohArray)
-			   .enter()
-			   .append("circle")
-			   .attr("cx", function(d) {
-			   		return xScaleall(d[0]);
-			   })
-			   .attr("cy", function(d) {
-			   		return yScaleall(d[1]);
-			   })
-			   .attr("r", function(d) {
-			   		return rScaleall(d[1]);
-			   });
-
-			//Define X axis
-			var xAxisall = d3.svg.axis()
-							  .scale(xScaleall)
-							  .orient("bottom")
-							  .ticks(5);
-
-			/*var xAxis = d3.svg.axis().scale(xScaleall).tickFormat(function (d) {return xScaleall.tickFormat(4,d3.format(",d"))(d)})*/
-
-			//Define Y axis
-			var yAxisall = d3.svg.axis()
-							  .scale(yScaleall)
-							  .orient("left")
-							  .ticks(5);
-
-			/*svgall.selectAll("text")
-			   .data(onegraohArray)
-			   .enter()
-			   .append("text")
-			   .text(function(d) {
-			   		return "#"+(d[1]);
-			   })
-			   .attr("x", function(d) {
-			   		return xScaleall(d[0]) - 20;
-			   })
-			   .attr("y", function(d) {
-			   		return yScaleall(d[1]) - 8;
-			   })
-			   .attr("font-family", "sans-serif")
-			   .attr("font-size", "11px")
-			   .attr("fill", "red");*/
-
-		    svgall.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-				.call(xAxisall);
-
-			// text label for the x axis
-			svgall.append("text")      
-				.attr("class", "x label")
-		        .attr("text-anchor", "end")
-		        .attr("x", WIDTH)
-		        .attr("y",  HEIGHT-6 )
-		        .text("Hours before Now (h)");
-
-		    svgall.append("text")
-		        .attr("x", 120)            
-		        .attr("y", 12)
-		        .attr("text-anchor", "middle")  
-		        .style("font-size", "16px") 
-		        .style("font-style", "oblique") 
-		        .style("color", "blue")
-		        .style("text-decoration", "underline")  
-		        .text("Graph of All Tweets");
+		    // Collect all user data
+		    fillSummaryData();
+		    // Get xscale for all users entered
+		    var x = getXScaleAll();
+		    // Get yscale for all users entered
+		    var y = getYScaleAll();
+		    // Get rscale for all users entered
+		    var r = getRScaleAll();
+		    // Plot final graph
+		    plotSummaryGraph(x, y, r);
 
 		    for (var j = 0; j < fakedataset[0].length; j++)
 	  		{
 	  			for (var i = 0; i < count; i++)
 	  			{
 	  				svgall.append('line')
-	  				.attr('x1',xScaleall(((fakedataset[i])[j])[0]))
-			        .attr('x2',xScaleall(((fakedataset[i])[j+1])[0]))                                        
-			        .attr('y1',yScaleall(((fakedataset[i])[j])[1]))
-			        .attr('y2',yScaleall(((fakedataset[i])[j+1])[1]))                                     
+	  				.attr('x1',x(((fakedataset[i])[j])[0]))
+			        .attr('x2',x(((fakedataset[i])[j+1])[0]))                                        
+			        .attr('y1',y(((fakedataset[i])[j])[1]))
+			        .attr('y2',y(((fakedataset[i])[j+1])[1]))                                     
 			        .attr("stroke-width", combinedthickness[i])
 			        .attr("stroke", COLORS[i])
 			        .style("stroke-opacity", 0.6);
@@ -747,15 +624,42 @@ $(document).ready(function(){
 	    }
 	});
 
-	// Press update now key
 	$('#update').click(function(){
+		var x = getXScaleAll();
+	    // Get yscale for all users entered
+	    var y = getYScaleAll();
+	    // Get rscale for all users entered
+	    var r = getRScaleAll();
+	    // Plot final graph
+	    plotSummaryGraph(x, y, r);
+	    // Connect lines
+	    for (var j = 0; j < fakedataset[0].length; j++)
+  		{
+  			for (var i = 0; i < count; i++)
+  			{
+  				svgall.append('line')
+  				.attr('x1',x(((fakedataset[i])[j])[0]))
+		        .attr('x2',x(((fakedataset[i])[j+1])[0]))                                        
+		        .attr('y1',y(((fakedataset[i])[j])[1]))
+		        .attr('y2',y(((fakedataset[i])[j+1])[1]))                                     
+		        .attr("stroke-width", combinedthickness[i])
+		        .attr("stroke", COLORS[i])
+		        .style("stroke-opacity", 0.6);
+  			}
+		}
+	});
+		    
+
+		    
+	// Press update now key
+	/*$('#update').click(function(){
 		// Make the checkmarks exist so it is easier to run graph
 		for (var i = count + 1; i < 6; i++)
 		{
 			$('#searchOption' + i).html("<input type='checkbox' id='box" + i + "'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + i +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>").hide();
 		}
 		// Make array of checked boxes
-		/*var checks = new Array();
+		var checks = new Array();
 		for (var i = 1; i < 6; i++)
 		{
 			var x = '#box' + i;
@@ -771,7 +675,7 @@ $(document).ready(function(){
 			else
 				y += ', ';
 		}
-		$('#toGraph').html(y);*/
+		$('#toGraph').html(y);
 
 		// Make ajax calls to refresh graphs
 		for (var i = 1; i < 6; i++)
@@ -786,7 +690,7 @@ $(document).ready(function(){
 				});
 			}
 		}
-	})
+	})*/
 
 	// Buttons to display graphs
 	$('#sumbutton').click(function() {
@@ -819,6 +723,13 @@ $(document).ready(function(){
 		$('#graphuser5').show();
 	});
 
+	// Statistics Button
+	$('#statsbutton').toggle(function(){
+		$('#statistics').slideDown(200);
+	}, function() {
+		$('#statistics').slideUp(200);
+	});
+
 	// Collapsible tweet text
 	$('#user1').toggle(function(){
 		$('#tweettext1').slideDown(200);
@@ -845,6 +756,149 @@ $(document).ready(function(){
 	}, function() {
 		$('#tweettext5').slideUp(200);
 	});
+
+	function fillSummaryData() {
+		if (count == 1)
+		{
+			for (var i = 0; i < fakedataset[0].length; i++)
+				onegraohArray[i] = fakedataset[0][i];
+		}
+		else if (count == 2)
+		{
+			for (var i = 0; i < fakedataset[0].length; i++)
+				onegraohArray[i] = fakedataset[0][i];
+	        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+				onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+		}
+		else if (count == 3)
+		{
+			for (var i = 0; i < fakedataset[0].length; i++)
+				onegraohArray[i] = fakedataset[0][i];
+	        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+				onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+				onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+		}
+		else if (count == 4)
+		{
+			for (var i = 0; i < fakedataset[0].length; i++)
+				onegraohArray[i] = fakedataset[0][i];
+	        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+				onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+				onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
+				onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
+		}
+		else if (count == 5)
+		{
+			for (var i = 0; i < fakedataset[0].length; i++)
+				onegraohArray[i] = fakedataset[0][i];
+	        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+				onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+				onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
+				onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
+			for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
+				onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
+			
+		}
+	};
+	
+	function getXScaleAll() {
+
+		if (document.getElementById('linear').checked)
+		{
+			var xScaleall = d3.scale.linear()
+							.domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
+							.range([WIDTH-8*PADDING,0+PADDING ]);
+		}
+		else
+		{
+			var xScaleall = d3.scale.log()
+							.clamp(true)
+							.domain([1, d3.max(onegraohArray, function(d) { return d[0]; })])
+							.range([WIDTH-8*PADDING,0+PADDING ]);
+		}
+		return xScaleall;
+	};
+
+	function getYScaleAll() {
+		var yScaleall = d3.scale.linear().domain([0, d3.max(onegraohArray, function(d) { return d[1]; })]).range([HEIGHT-PADDING,0+PADDING]);
+		return yScaleall;
+	}
+
+	function getRScaleAll() {
+		var rScaleall = d3.scale.linear().domain([0, d3.max(onegraohArray, function(d) { return d[1]; })]).range([4, 4]);
+		return rScaleall;
+	}
+
+	function plotSummaryGraph(xs, ys, rs) {
+	
+			$('#summarygraph').empty();					  
+			
+			svgall = d3.select("#summarygraph")
+						.append("svg")
+						.attr("width", WIDTH)
+						.attr("height", HEIGHT);
+			
+			svgall.selectAll("circle")
+			   .data(onegraohArray)
+			   .enter()
+			   .append("circle")
+			   .attr("cx", function(d) {
+			   		return xs(d[0]);
+			   })
+			   .attr("cy", function(d) {
+			   		return ys(d[1]);
+			   })
+			   .attr("r", function(d) {
+			   		return rs(d[1]);
+			   });
+
+			//Define X axis
+			if (document.getElementById('linear').checked)
+			{
+				var xAxisall = d3.svg.axis()
+							  .scale(xs)
+							  .orient("bottom")
+							  .ticks(5);
+			}
+			else
+			{
+				var xAxisall = d3.svg.axis().scale(xs).tickFormat(function (d) {return xs.tickFormat(4,d3.format(",d"))(d)})
+			}
+
+			//Define Y axis
+			var yAxisall = d3.svg.axis()
+							  .scale(ys)
+							  .orient("left")
+							  .ticks(5);
+
+		    svgall.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+				.call(xAxisall);
+
+			// text label for the x axis
+			svgall.append("text")      
+				.attr("class", "x label")
+		        .attr("text-anchor", "end")
+		        .attr("x", WIDTH)
+		        .attr("y",  HEIGHT-6 )
+		        .text("Hours before Now");
+
+		    svgall.append("text")
+		        .attr("x", 120)            
+		        .attr("y", 12)
+		        .attr("text-anchor", "middle")  
+		        .style("font-size", "16px") 
+		        .style("font-style", "oblique") 
+		        .style("color", "blue")
+		        .style("text-decoration", "underline")  
+		        .text("Graph of All Tweets");
+	}
 
 	function findTime() {
 

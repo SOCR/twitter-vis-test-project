@@ -40,7 +40,7 @@
 		    <div class="container-fluid">
 		    	<a class="brand" href="#">SOCR: Real-Time Tweets Visualization</a>
 		    	<ul class="nav pull-right">
-		    		<li class="active"><a href="http://www.socr.ucla.edu/htmls/SOCR_Team.html" target="_blank">Developers:</a></li>
+		    		<li class="active"><a href="http://socr.umich.edu/people/" target="_blank">Developers:</a></li>
 		    		<li><a href="https://github.com/ajfoglia" target="_blank">Andrew Foglia</a></li>
 		    		<li><a href="https://github.com/BrianZhang93228" target="_blank">Brian Zhang</a></li>
 		    		<li><a href="https://github.com/achowdhury91" target="_blank">Abhishek Chowdhury</a></li>
@@ -53,7 +53,7 @@
 			<!-- Insert graph and descriptions onto the left three quarters of the page -->
 			<div class="span12">
 				<div class="span1">
-					<p align=center><a href='http://www.socr.ucla.edu/' target='_blank' id='focusHere'><img src='specific_images/glyphicons_020_home.png'></a></p>
+					<p align=center><a href='http://www.socr.umich.edu/' target='_blank' id='focusHere'><img src='specific_images/glyphicons_020_home.png'></a></p>
 				</div>
 				<div class="span7">
 					<div class="row-fluid">
@@ -88,17 +88,23 @@
 					<div class="progress progress-striped active">
 					 	<div class="bar" style="width: 66%"></div>
 					</div>
-					<div id='graphInstructions'>The graph of all tweets is below. Need an individual graph? Click their button below!</div><br>
+					<div class='graphInstructions'>Check out some statistics!<br><br>
+						<button class="btn btn-custom3" id='statsbutton'>Statistics</button>
+					</div>
+					<br><div id='statistics'>Here we will display some basic statistics like correlation measures, tweet 'explosions', and event prediction.</div><br>
+					<div class='graphInstructions'>The graph of all tweets is below. Need an individual graph? Click their button below!</div><br>
 					<div id='btn-group-wrap'>	
 						<div class="btn-group">
-							<button class="btn btn-success graphbutton" id='sumbutton'>All Users</button>
-							<button class="btn btn-success graphbutton" id='button1'></button>
-							<button class="btn btn-success graphbutton" id='button2'></button>
-							<button class="btn btn-success graphbutton" id='button3'></button>
+							<button class="btn btn-inverse graphbutton" id='button1'></button>
+							<button class="btn btn-danger graphbutton" id='button2'></button>
+							<button class="btn btn-primary graphbutton" id='button3'></button>
 							<button class="btn btn-success graphbutton" id='button4'></button>
-							<button class="btn btn-success graphbutton" id='button5'></button>
+							<button class="btn btn-custom graphbutton" id='button5'></button>
 						</div>
 					</div><br><br>
+					<div class='graphInstructions'>Or go back to the default graph of all the tweets!<br><br>
+						<button class="btn btn-custom2 graphbutton" id='sumbutton'>All Users</button><br><br>
+					</div>
 					<div id='summarygraph'></div>
 					<div class='individual' id='graphuser1'></div>
 					<div class='individual' id='graphuser2'></div>
@@ -149,6 +155,28 @@
 					  <input type='checkbox' class="btn btn-large" value='1'> Auto-update
 					  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
 					</p>
+					<div id='panel'>
+						<fieldset>
+							<legend id='paneltitle'>Controls for the User:</legend>
+							After setting your desired options, please click the 'Update Now' button above to refresh the graphs.<br><br>
+							<fieldset>
+								<legend>Time Scale:</legend>
+								Note: Default scale is Linear<br>
+								<input type="radio" style="margin-top: -4px;" name="timescale" value="Linear" id='linear' checked>&nbspLinear<br>
+								<input type="radio" style="margin-top: -4px;" name="timescale" value="Logarithmic" id='log'>&nbspLogarithmic (more advantageous for infrequent users)<br><br>
+							</fieldset>
+							<fieldset>
+								<legend>Graph Background Grid:</legend>
+								Note: Default setting is no grid<br>
+								<input type='checkbox' style="margin-top: -4px;" name='grid' value='backgroundgrid'>&nbspShow Grid<br><br>
+							</fieldset>
+							<fieldset>
+								<legend>Tweet Numbering (For All Users):</legend>
+								Note: Default setting is no text<br>
+								<input type='checkbox' style="margin-top: -4px;" name='graphtext' value='gtext'>&nbspShow Tweet Numbering<br><br>
+							</fieldset>
+						</fieldset>
+					</div>
 				</div>
 			</div>
 		</div>
