@@ -4,12 +4,12 @@ TO BE DONE -
 
 Currently to do within current scope:
 Bootstrap conversion
-Protection
 Time scroll options: badges in navbar, show time in tweetboxes every ten tweets, mouseover effect, clock icon to right of number and mouseover shows gmt/local time above
 Graph 5 individual doesn't add line
 On hover over line, display last tweet text and time photo screen name
 Resizing issues everywhere (d3)
 One graph for 1, 2, 3, 4 users
+KYLEANDERSON4
 
 New functionality:
 Update now button (checkmarks tell which ones to include on summary graph)
@@ -64,6 +64,11 @@ $(document).ready(function(){
 	var intervalID = setInterval(function() {
         findTime();
     }, 1000);
+
+	/*var intervalID2 = setInterval(function() {
+		var width = document.getElementById('graphuser1').offsetWidth;
+		alert(width);
+	}, 8000);*/
 
 	function findTime() {
 
@@ -221,7 +226,6 @@ $(document).ready(function(){
 	var usertime = new Array(5);
 	for (var i = 0; i < 5; i++)
 		usertime[i] = new Array(20);
-	//var existence = false;
 
 	//////////////// D3 ////////////////////
 	var converteddate = new Array();
@@ -235,6 +239,8 @@ $(document).ready(function(){
 	var fakedataset = new Array();
     var dataset = new Array();
     var lengthall = new Array();
+    var onegraohArray = new Array();
+    var svgall;
 	////////////////////////////////////////
 
     // Success function for API
@@ -245,6 +251,7 @@ $(document).ready(function(){
 
 		// Parse data and identify whether user exists
 		var invalidTest = JSON.stringify(data.query.results);
+		//alert(invalidTest);
 		var test = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
 
 		// If user exists
@@ -442,6 +449,10 @@ $(document).ready(function(){
 								 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
 								 .range([WIDTH-8*PADDING,0+PADDING ]);
 
+			/*var xScale = d3.scale.log()
+								 .domain([1, d3.max(dataset, function(d) { return d[0]; })])
+								 .range([WIDTH-8*PADDING,0+PADDING ]);*/
+
 			var yScale = d3.scale.linear()
 								 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
 								 .range([HEIGHT-PADDING ,0+PADDING]);
@@ -471,6 +482,7 @@ $(document).ready(function(){
 						.attr("width", WIDTH)
 						.attr("height", HEIGHT);
 
+			//svg.selection.remove();
 
 	  
 			svg.selectAll("circle")
@@ -530,10 +542,11 @@ $(document).ready(function(){
 
 		    $('#graphInstructions').show();
 
-	    	var onegraohArray = new Array();
-			if(count == 5)
-			{
-		        for (var i =0 ; i < fakedataset[0].length; i++)
+	    	
+			//if(count == 5)
+			//{
+				/*
+		        for (var i = 0; i < fakedataset[0].length; i++)
 					onegraohArray[i] = fakedataset[0][i];
 		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
 					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
@@ -543,6 +556,54 @@ $(document).ready(function(){
 					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
 				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
 					onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
+				*/
+
+			if (count == 1)
+			{
+				for (var i = 0; i < fakedataset[0].length; i++)
+					onegraohArray[i] = fakedataset[0][i];
+			}
+			else if (count == 2)
+			{
+				for (var i = 0; i < fakedataset[0].length; i++)
+					onegraohArray[i] = fakedataset[0][i];
+		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+			}
+			else if (count == 3)
+			{
+				for (var i = 0; i < fakedataset[0].length; i++)
+					onegraohArray[i] = fakedataset[0][i];
+		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+			}
+			else if (count == 4)
+			{
+				for (var i = 0; i < fakedataset[0].length; i++)
+					onegraohArray[i] = fakedataset[0][i];
+		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
+					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
+			}
+			else if (count == 5)
+			{
+				for (var i = 0; i < fakedataset[0].length; i++)
+					onegraohArray[i] = fakedataset[0][i];
+		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
+					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
+					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
+					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
+				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
+					onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
+				
+			}
 
 				var xScaleall = d3.scale.linear()
 									 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
@@ -555,8 +616,10 @@ $(document).ready(function(){
 				var rScaleall = d3.scale.linear()
 									 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
 									 .range([3, 3]);
-									  
-				var svgall = d3.select("#summarygraph")
+				
+				// DID NOT WORK d3.select("svgall").remove();					  
+				
+				svgall = d3.select("#summarygraph")
 							.append("svg")
 							.attr("width", WIDTH)
 							.attr("height", HEIGHT);
@@ -629,47 +692,128 @@ $(document).ready(function(){
 
 			    for (var j = 0; j < fakedataset[0].length; j++)
 		  		{
-					svgall.append('line')
-			        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-			        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-			        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-			        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-			        .attr("stroke-width", 2)
-			        .attr("stroke", "black")
-
-			        svgall.append('line')
-			        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
-			        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
-			        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
-			        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
-			        .attr("stroke-width", 2)
-			        .attr("stroke", "red")
-
-			         svgall.append('line')
-			        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
-			        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
-			        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
-			        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
-			        .attr("stroke-width", 2)
-			        .attr("stroke", "blue")
-
-			         svgall.append('line')
-			        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
-			        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
-			        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
-			        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
-			        .attr("stroke-width", 2)
-			        .attr("stroke", "green")
-
-			         svgall.append('line')
-			        .attr('x1',xScaleall(((fakedataset[4])[j])[0]))
-			        .attr('x2',xScaleall(((fakedataset[4])[j+1])[0]))                                        
-			        .attr('y1',yScaleall(((fakedataset[4])[j])[1]))
-			        .attr('y2',yScaleall(((fakedataset[4])[j+1])[1]))                                     
-			        .attr("stroke-width", 2)
-			        .attr("stroke", "purple")
+		  			if (count == 1)
+		  			{
+		  				svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "black")
+		  			}
+		  			else if (count == 2)
+		  			{
+		  				svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "black")
+		  				svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "red")
+		  			}
+			        else if (count == 3)
+			        {
+			        	svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "black")
+		  				svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "red")
+			        	svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "blue")
+			        }
+			        else if (count == 4)
+			        {
+			        	svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "black")
+		  				svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "red")
+			        	svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "blue")
+				        svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "green")
+			        }
+			        else if (count == 5)
+			        {
+			        	svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "black")
+		  				svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "red")
+			        	svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "blue")
+				        svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "green")
+				        svgall.append('line')
+				        .attr('x1',xScaleall(((fakedataset[4])[j])[0]))
+				        .attr('x2',xScaleall(((fakedataset[4])[j+1])[0]))                                        
+				        .attr('y1',yScaleall(((fakedataset[4])[j])[1]))
+				        .attr('y2',yScaleall(((fakedataset[4])[j+1])[1]))                                     
+				        .attr("stroke-width", 2)
+				        .attr("stroke", "purple")
+			        }
 				}
-			}
+			//}
 
 			// Create graph lines
 			/*var linecolor = "black";
