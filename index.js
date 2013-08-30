@@ -3,17 +3,31 @@
 TO BE DONE -
 
 Currently to do within current scope:
-Bootstrap conversion
-gmt time within 
-individual doesn't add line
-On hover over line, display last tweet text and time photo screen name
+circle sizes on summary graph
 Resizing issues everywhere (d3), width intervalid2
-KYLEANDERSON4
+text on individual graphs off
+if rtvisulization is third user, first two users only get first three points connected on summary graph
+KYLEANDERSON4 error messages (account for all them)
+timer on ajax call to time out if no success
+
+Questions:
+Bootstrap conversion, inclusion files?
+What should we do for checked boxes, display those graphs?
+Home page to umich or ucla
+Update now displays only checked graphs?
+Resizing okay
+range for log scale
+# of tweet on summary graph
+no text on summary graph
+thickness working, but should we do small circles for the mouseover
+
 
 New functionality:
+On hover over line, display last tweet text and time photo screen name
 Update now button (checkmarks tell which ones to include on summary graph)
 Do auto refresh once above works
 Fix delete buttons
+Animated summary graph
 
 */
 
@@ -33,6 +47,23 @@ $(document).ready(function(){
 	// Line colors
 	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
 	//////////////////////////////////////////////////////////////////
+
+	/*var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;  
+
+	function updateWindow(svg){
+    x = w.innerWidth || e.clientWidth || g.clientWidth;
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+
+    svg.attr("width", x).attr("height", y);
+	}
+
+	window.onresize = updateWindow(svgall);*/
+
 
 	// Hide a lot of CSS stuff right after page load and let user display what they want
 	window.onload = function(){
@@ -69,139 +100,7 @@ $(document).ready(function(){
 		alert(width);
 	}, 8000);*/
 
-	function findTime() {
-
-		// Get gmt time for user
-		var d = new Date();
-		var month = d.getUTCMonth();
-		month++;
-		var day = d.getUTCDate();
-		var year = d.getUTCFullYear();
-		var hour = d.getUTCHours();
-		var morning = true;
-		if (hour > 12)
-		{
-			morning = false;
-			hour -= 12;
-		}
-		else if (hour == 0)
-			hour = 12;
-		var tempmin = d.getUTCMinutes();
-		var minute = '0';
-		if (tempmin < 10)
-		{
-			minute += tempmin;
-		}
-		else
-			minute = tempmin;
-		var tempsecond = d.getUTCSeconds();
-		var second = '0';
-		if (tempsecond < 10)
-			second += tempsecond;
-		else
-			second = tempsecond;
-		var y = "&nbspGMT time: " + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
-		if (morning)
-			y += 'A.M.&nbsp&nbsp&nbsp';
-		else
-			y += 'P.M.&nbsp&nbsp&nbsp';
 		
-		// Get Local Time
-		var l = new Date();
-		var month = l.getMonth();
-		month++;
-		var day = l.getDate();
-		var year = l.getFullYear();
-		var hour = l.getHours();
-		var morning = true;
-		if (hour > 12)
-		{
-			morning = false;
-			hour -= 12;
-		}
-		else if (hour == 0)
-			hour = 12;
-		var tempmin = l.getUTCMinutes();
-		var minute = '0';
-		if (tempmin < 10)
-		{
-			minute += tempmin;
-		}
-		else
-			minute = tempmin;
-		var tempsecond = d.getUTCSeconds();
-		var second = '0';
-		if (tempsecond < 10)
-			second += tempsecond;
-		else
-			second = tempsecond;
-		var x = 'Local time: ' + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
-		if (morning)
-			x += 'A.M.';
-		else
-			x += 'P.M.';
-		$('.gmtlocaltime').html(y+x);
-	}
-
-	function changeDate(date) {
-		// Manipulate Twitter API date
-		var tweetWeekday = date[0] + date[1] + date[2];
-		switch (tweetWeekday)
-		{	
-			case "Tue":
-				tweetWeekday += 'sday';
-				break;
-			case "Wed":
-				tweetWeekday += 'nesday';
-				break;
-			case "Thu":
-				tweetWeekday += 'rsday';
-				break;
-			case 'Sat':
-				tweetWeekday += 'urday';
-				break;
-			default:
-				tweetWeekday += 'day';
-				break;
-		}
-		var tweetMonth = date[4] + date[5] + date[6];
-		switch (tweetMonth)
-		{
-			case 'Jan': tweetMonth = '01'; break;
-			case 'Feb': tweetMonth = '02'; break;
-			case 'Mar': tweetMonth = '03'; break;
-			case 'Apr': tweetMonth = '04'; break;
-			case 'May': tweetMonth = '05'; break;
-			case 'Jun': tweetMonth = '06'; break;
-			case 'Jul': tweetMonth = '07'; break;
-			case 'Aug': tweetMonth = '08'; break;
-			case 'Sep': tweetMonth = '09'; break;
-			case 'Oct': tweetMonth = '10'; break;
-			case 'Nov': tweetMonth = '11'; break;
-			case 'Dec': tweetMonth = '12'; break;
-		}
-		var tweetDate = date[8] + date[9];
-		var tweetHour = date[11] + date[12];
-		var morning = true;
-		if (tweetHour > 12)
-		{
-			morning = false;
-			tweetHour -= 12;
-			if (tweetHour < 10)
-				tweetHour = '0' + tweetHour;
-		}
-		else if (tweetHour == 0)
-			tweetHour = 12;
-		var tweetMinute = date[14] + date[15];
-		var tweetSecond = date[17] + date[18];
-		var tweetYear = date[28] + date[29];
-		var returnedDate = tweetWeekday + ' ' + tweetMonth + '/' + tweetDate + '/' + tweetYear + ' ' + '@ ' + tweetHour + ':' + tweetMinute + ':' + tweetSecond + ' ';
-		if (morning)
-			returnedDate += 'A.M.';
-		else
-			returnedDate += 'P.M.';
-		return returnedDate;
-	}	
 
 	/*function findMax(data) {
 		var maximum = data[0];
@@ -234,7 +133,6 @@ $(document).ready(function(){
 		finalArray[i] = new Array();*/
 	var scalingArray = new Array();
 	var maximum = new Array(0);
-	// Brian
 	var fakedataset = new Array();
     var dataset = new Array();
     var lengthall = new Array();
@@ -361,7 +259,6 @@ $(document).ready(function(){
 				coordj[1] = i+1;
 				finalArray[i] = coordi;
 				fakeArray[i] = coordj;
-
 				/*
 				//var coordi = new Array();
 				var seconds = new Date().getTime() / 1000;
@@ -441,7 +338,7 @@ $(document).ready(function(){
 		    var realMax = Math.max.apply(Math, maximum);
 			renderGraph(realMax);*/
 
-			// START OF D3      
+			// START OF D3 
 
 		    var thelength = finalArray.length;
 		   
@@ -450,15 +347,17 @@ $(document).ready(function(){
 			fakedataset[whichToUse-1] = finalArray;
 			dataset = finalArray;
 
-			//Create scale functions
+			// Create x scale functions
+			// Linear scale for frequent user
 			var xScale = d3.scale.linear()
 								 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
 								 .range([WIDTH-8*PADDING,0+PADDING ]);
-
+			// Log scale for infrequent user
 			/*var xScale = d3.scale.log()
 								 .domain([1, d3.max(dataset, function(d) { return d[0]; })])
 								 .range([WIDTH-8*PADDING,0+PADDING ]);*/
 
+			// Create y and circle scales
 			var yScale = d3.scale.linear()
 								 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
 								 .range([HEIGHT-PADDING ,0+PADDING]);
@@ -469,11 +368,16 @@ $(document).ready(function(){
 
 
 
-			//Define X axis
+			// Define X axis
+			// Linear scale for frequent user
 			var xAxis = d3.svg.axis()
 							  .scale(xScale)
 							  .orient("bottom")
 							  .ticks(5);
+			// Log scale for infrequent user
+			/*var xAxis = d3.svg.axis().scale(xScale).tickFormat(function (d) {return xScale.tickFormat(4,d3.format(",d"))(d)})*/
+
+
 
 			//Define Y axis
 			var yAxis = d3.svg.axis()
@@ -482,15 +386,12 @@ $(document).ready(function(){
 							  .ticks(5);
 
 			//Create SVG element
-			// after select, was body
 			var svg = d3.select("#graphuser" + whichToUse)
 						.append("svg")
 						.attr("width", WIDTH)
 						.attr("height", HEIGHT);
 
-			//svg.selection.remove();
-
-	  
+			
 			svg.selectAll("circle")
 			   .data(dataset)
 			   .enter()
@@ -514,10 +415,10 @@ $(document).ready(function(){
 			   		return "#"+(d[1]);
 			   })
 			   .attr("x", function(d) {
-			   		return xScale(d[0]) - 20;
+			   		return xScale(d[0]) - 24;
 			   })
 			   .attr("y", function(d) {
-			   		return yScale(d[1]) - 8;
+			   		return yScale(d[1]) - 12;
 			   })
 			   .attr("font-family", "sans-serif")
 			   .attr("font-size", "11px")
@@ -597,7 +498,11 @@ $(document).ready(function(){
 
 			var xScaleall = d3.scale.linear()
 								 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING ]);		 
+								 .range([WIDTH-8*PADDING,0+PADDING ]);
+
+			/*var xScaleall = d3.scale.log()
+								 .domain([1, d3.max(onegraohArray, function(d) { return d[0]; })])
+								 .range([WIDTH-8*PADDING,0+PADDING ]);*/
 
 			var yScaleall = d3.scale.linear()
 								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
@@ -629,13 +534,15 @@ $(document).ready(function(){
 			   });
 
 			//Define X axis
-			var xAxis = d3.svg.axis()
+			var xAxisall = d3.svg.axis()
 							  .scale(xScaleall)
 							  .orient("bottom")
 							  .ticks(5);
 
+			/*var xAxis = d3.svg.axis().scale(xScaleall).tickFormat(function (d) {return xScaleall.tickFormat(4,d3.format(",d"))(d)})*/
+
 			//Define Y axis
-			var yAxis = d3.svg.axis()
+			var yAxisall = d3.svg.axis()
 							  .scale(yScaleall)
 							  .orient("left")
 							  .ticks(5);
@@ -660,7 +567,7 @@ $(document).ready(function(){
 		    svgall.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-				.call(xAxis);
+				.call(xAxisall);
 
 			// text label for the x axis
 			svgall.append("text")      
@@ -685,24 +592,22 @@ $(document).ready(function(){
 	  			for (var i = 0; i < count; i++)
 	  			{
 	  				svgall.append('line')
-			        .attr('x1',xScaleall(((fakedataset[i])[j])[0]))
+	  				.attr('x1',xScaleall(((fakedataset[i])[j])[0]))
 			        .attr('x2',xScaleall(((fakedataset[i])[j+1])[0]))                                        
 			        .attr('y1',yScaleall(((fakedataset[i])[j])[1]))
 			        .attr('y2',yScaleall(((fakedataset[i])[j+1])[1]))                                     
 			        .attr("stroke-width", combinedthickness[i])
-			        .attr("stroke", COLORS[i])	
+			        .attr("stroke", COLORS[i])
+			        .style("stroke-opacity", 0.6);
+
+			        svg.append('line')
+			        .attr('x1',xScale((finalArray[j])[0]))
+			        .attr('x2',xScale((finalArray[j+1])[0]))                                        
+			        .attr('y1',yScale((finalArray[j])[1]))
+			        .attr('y2',yScale((finalArray[j+1])[1]))                                     
+			        .attr("stroke-width", thickness)
+			        .attr("stroke", COLORS[whichToUse-1])
 	  			}
-			}
-			
-			for (var k = 0; k < dataset.length; k++)
-	  		{
-				svg.append('line')
-		        .attr('x1',xScale((finalArray[k])[0]))
-		        .attr('x2',xScale((finalArray[k+1])[0]))                                        
-		        .attr('y1',yScale((finalArray[k])[1]))
-		        .attr('y2',yScale((finalArray[k+1])[1]))                                     
-		        .attr("stroke-width", thickness)
-		        .attr("stroke", COLORS[whichToUse-1]);
 			}
 		}
 		// User does not exist
@@ -940,6 +845,140 @@ $(document).ready(function(){
 	}, function() {
 		$('#tweettext5').slideUp(200);
 	});
+
+	function findTime() {
+
+		// Get gmt time for user
+		var d = new Date();
+		var month = d.getUTCMonth();
+		month++;
+		var day = d.getUTCDate();
+		var year = d.getUTCFullYear();
+		var hour = d.getUTCHours();
+		var morning = true;
+		if (hour > 12)
+		{
+			morning = false;
+			hour -= 12;
+		}
+		else if (hour == 0)
+			hour = 12;
+		var tempmin = d.getUTCMinutes();
+		var minute = '0';
+		if (tempmin < 10)
+		{
+			minute += tempmin;
+		}
+		else
+			minute = tempmin;
+		var tempsecond = d.getUTCSeconds();
+		var second = '0';
+		if (tempsecond < 10)
+			second += tempsecond;
+		else
+			second = tempsecond;
+		var y = "&nbspGMT time: " + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		if (morning)
+			y += 'A.M.&nbsp&nbsp&nbsp';
+		else
+			y += 'P.M.&nbsp&nbsp&nbsp';
+		
+		// Get Local Time
+		var l = new Date();
+		var month = l.getMonth();
+		month++;
+		var day = l.getDate();
+		var year = l.getFullYear();
+		var hour = l.getHours();
+		var morning = true;
+		if (hour > 12)
+		{
+			morning = false;
+			hour -= 12;
+		}
+		else if (hour == 0)
+			hour = 12;
+		var tempmin = l.getUTCMinutes();
+		var minute = '0';
+		if (tempmin < 10)
+		{
+			minute += tempmin;
+		}
+		else
+			minute = tempmin;
+		var tempsecond = d.getUTCSeconds();
+		var second = '0';
+		if (tempsecond < 10)
+			second += tempsecond;
+		else
+			second = tempsecond;
+		var x = 'Local time: ' + month + '/' + day + '/' + year + ' ' + hour + ':' + minute + ':' + second + ' ';
+		if (morning)
+			x += 'A.M.';
+		else
+			x += 'P.M.';
+		$('.gmtlocaltime').html(y+x);
+	}
+
+	function changeDate(date) {
+		// Manipulate Twitter API date
+		var tweetWeekday = date[0] + date[1] + date[2];
+		switch (tweetWeekday)
+		{	
+			case "Tue":
+				tweetWeekday += 'sday';
+				break;
+			case "Wed":
+				tweetWeekday += 'nesday';
+				break;
+			case "Thu":
+				tweetWeekday += 'rsday';
+				break;
+			case 'Sat':
+				tweetWeekday += 'urday';
+				break;
+			default:
+				tweetWeekday += 'day';
+				break;
+		}
+		var tweetMonth = date[4] + date[5] + date[6];
+		switch (tweetMonth)
+		{
+			case 'Jan': tweetMonth = '01'; break;
+			case 'Feb': tweetMonth = '02'; break;
+			case 'Mar': tweetMonth = '03'; break;
+			case 'Apr': tweetMonth = '04'; break;
+			case 'May': tweetMonth = '05'; break;
+			case 'Jun': tweetMonth = '06'; break;
+			case 'Jul': tweetMonth = '07'; break;
+			case 'Aug': tweetMonth = '08'; break;
+			case 'Sep': tweetMonth = '09'; break;
+			case 'Oct': tweetMonth = '10'; break;
+			case 'Nov': tweetMonth = '11'; break;
+			case 'Dec': tweetMonth = '12'; break;
+		}
+		var tweetDate = date[8] + date[9];
+		var tweetHour = date[11] + date[12];
+		var morning = true;
+		if (tweetHour > 12)
+		{
+			morning = false;
+			tweetHour -= 12;
+			if (tweetHour < 10)
+				tweetHour = '0' + tweetHour;
+		}
+		else if (tweetHour == 0)
+			tweetHour = 12;
+		var tweetMinute = date[14] + date[15];
+		var tweetSecond = date[17] + date[18];
+		var tweetYear = date[28] + date[29];
+		var returnedDate = tweetWeekday + ' ' + tweetMonth + '/' + tweetDate + '/' + tweetYear + ' ' + '@ ' + tweetHour + ':' + tweetMinute + ':' + tweetSecond + ' ';
+		if (morning)
+			returnedDate += 'A.M.';
+		else
+			returnedDate += 'P.M.';
+		return returnedDate;
+	}
 
 /*
 	Delete buttons
