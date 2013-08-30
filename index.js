@@ -4,11 +4,10 @@ TO BE DONE -
 
 Currently to do within current scope:
 Bootstrap conversion
-Time scroll options: badges in navbar, show time in tweetboxes every ten tweets, mouseover effect, clock icon to right of number and mouseover shows gmt/local time above
-Graph 5 individual doesn't add line
+gmt time within 
+individual doesn't add line
 On hover over line, display last tweet text and time photo screen name
-Resizing issues everywhere (d3)
-One graph for 1, 2, 3, 4 users
+Resizing issues everywhere (d3), width intervalid2
 KYLEANDERSON4
 
 New functionality:
@@ -241,6 +240,7 @@ $(document).ready(function(){
     var lengthall = new Array();
     var onegraohArray = new Array();
     var svgall;
+    var combinedthickness = new Array(5);
 	////////////////////////////////////////
 
     // Success function for API
@@ -304,31 +304,37 @@ $(document).ready(function(){
 			// Calculate thickness of line and circle radius
 			if (numberOfFollowers < INTERVALS[0])
 			{
+				combinedthickness[whichToUse-1] = THICKNESS[0];
 				thickness = THICKNESS[0];
 				radius = RADIUS[0];
 			}	
 			else if (numberOfFollowers < INTERVALS[1])
 			{
+				combinedthickness[whichToUse-1] = THICKNESS[1];
 				thickness = THICKNESS[1];
 				radius = RADIUS[1];
 			}
 			else if (numberOfFollowers < INTERVALS[2])
 			{
+				combinedthickness[whichToUse-1] = THICKNESS[2];
 				thickness = THICKNESS[2];
 				radius = RADIUS[2];
 			}
 			else if (numberOfFollowers < INTERVALS[3])
 			{
+				combinedthickness[whichToUse-1] = THICKNESS[3];
 				thickness = THICKNESS[3];
 				radius = RADIUS[3];
 			}
 			else if (numberOfFollowers < INTERVALS[4])
 			{
+				combinedthickness[whichToUse-1] = THICKNESS[4];
 				thickness = THICKNESS[4];
 				radius = RADIUS[4];
 			}
 			else
 			{
+				combinedthickness[whichToUse-1] = THICKNESS[5];
 				thickness = THICKNESS[5];
 				radius = RADIUS[5];
 			}
@@ -542,22 +548,6 @@ $(document).ready(function(){
 
 		    $('#graphInstructions').show();
 
-	    	
-			//if(count == 5)
-			//{
-				/*
-		        for (var i = 0; i < fakedataset[0].length; i++)
-					onegraohArray[i] = fakedataset[0][i];
-		        for (var i = fakedataset[0].length ; i < fakedataset[0].length+fakedataset[1].length; i++)
-					onegraohArray[i] = fakedataset[1][i-(fakedataset[0].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length; i++)
-					onegraohArray[i] = fakedataset[2][i-(fakedataset[0].length+fakedataset[1].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length; i++)
-					onegraohArray[i] = fakedataset[3][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length)];
-				for (var i = fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length ; i < fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length+fakedataset[4].length; i++)
-					onegraohArray[i] = fakedataset[4][i-(fakedataset[0].length+fakedataset[1].length+fakedataset[2].length+fakedataset[3].length)];
-				*/
-
 			if (count == 1)
 			{
 				for (var i = 0; i < fakedataset[0].length; i++)
@@ -605,225 +595,104 @@ $(document).ready(function(){
 				
 			}
 
-				var xScaleall = d3.scale.linear()
-									 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
-									 .range([WIDTH-8*PADDING,0+PADDING ]);		 
+			var xScaleall = d3.scale.linear()
+								 .domain([0, d3.max(onegraohArray,function(d) { return d[0]; })])
+								 .range([WIDTH-8*PADDING,0+PADDING ]);		 
 
-				var yScaleall = d3.scale.linear()
-									 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
-									 .range([HEIGHT-PADDING,0+PADDING]);
-									 
-				var rScaleall = d3.scale.linear()
-									 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
-									 .range([3, 3]);
-				
-				// DID NOT WORK d3.select("svgall").remove();					  
-				
-				svgall = d3.select("#summarygraph")
-							.append("svg")
-							.attr("width", WIDTH)
-							.attr("height", HEIGHT);
-				
-				svgall.selectAll("circle")
-				   .data(onegraohArray)
-				   .enter()
-				   .append("circle")
-				   .attr("cx", function(d) {
-				   		return xScaleall(d[0]);
-				   })
-				   .attr("cy", function(d) {
-				   		return yScaleall(d[1]);
-				   })
-				   .attr("r", function(d) {
-				   		return rScaleall(d[1]);
-				   });
+			var yScaleall = d3.scale.linear()
+								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
+								 .range([HEIGHT-PADDING,0+PADDING]);
+								 
+			var rScaleall = d3.scale.linear()
+								 .domain([0, d3.max(onegraohArray, function(d) { return d[1]; })])
+								 .range([3, 3]);
 
-				//Define X axis
-				var xAxis = d3.svg.axis()
-								  .scale(xScaleall)
-								  .orient("bottom")
-								  .ticks(5);
+			$('#summarygraph').empty();					  
+			
+			svgall = d3.select("#summarygraph")
+						.append("svg")
+						.attr("width", WIDTH)
+						.attr("height", HEIGHT);
+			
+			svgall.selectAll("circle")
+			   .data(onegraohArray)
+			   .enter()
+			   .append("circle")
+			   .attr("cx", function(d) {
+			   		return xScaleall(d[0]);
+			   })
+			   .attr("cy", function(d) {
+			   		return yScaleall(d[1]);
+			   })
+			   .attr("r", function(d) {
+			   		return rScaleall(d[1]);
+			   });
 
-				//Define Y axis
-				var yAxis = d3.svg.axis()
-								  .scale(yScaleall)
-								  .orient("left")
-								  .ticks(5);
+			//Define X axis
+			var xAxis = d3.svg.axis()
+							  .scale(xScaleall)
+							  .orient("bottom")
+							  .ticks(5);
 
-				/*svgall.selectAll("text")
-				   .data(onegraohArray)
-				   .enter()
-				   .append("text")
-				   .text(function(d) {
-				   		return "#"+(d[1]);
-				   })
-				   .attr("x", function(d) {
-				   		return xScaleall(d[0]) - 20;
-				   })
-				   .attr("y", function(d) {
-				   		return yScaleall(d[1]) - 8;
-				   })
-				   .attr("font-family", "sans-serif")
-				   .attr("font-size", "11px")
-				   .attr("fill", "red");*/
+			//Define Y axis
+			var yAxis = d3.svg.axis()
+							  .scale(yScaleall)
+							  .orient("left")
+							  .ticks(5);
 
-			    svgall.append("g")
-					.attr("class", "axis")
-					.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-					.call(xAxis);
+			/*svgall.selectAll("text")
+			   .data(onegraohArray)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return "#"+(d[1]);
+			   })
+			   .attr("x", function(d) {
+			   		return xScaleall(d[0]) - 20;
+			   })
+			   .attr("y", function(d) {
+			   		return yScaleall(d[1]) - 8;
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "red");*/
 
-				// text label for the x axis
-				svgall.append("text")      
-					.attr("class", "x label")
-			        .attr("text-anchor", "end")
-			        .attr("x", WIDTH)
-			        .attr("y",  HEIGHT-6 )
-			        .text("Hours before Now (h)");
+		    svgall.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+				.call(xAxis);
 
-			    svgall.append("text")
-			        .attr("x", 120)            
-			        .attr("y", 12)
-			        .attr("text-anchor", "middle")  
-			        .style("font-size", "16px") 
-			        .style("font-style", "oblique") 
-			        .style("color", "blue")
-			        .style("text-decoration", "underline")  
-			        .text("Graph of All Tweets");
+			// text label for the x axis
+			svgall.append("text")      
+				.attr("class", "x label")
+		        .attr("text-anchor", "end")
+		        .attr("x", WIDTH)
+		        .attr("y",  HEIGHT-6 )
+		        .text("Hours before Now (h)");
 
-			    for (var j = 0; j < fakedataset[0].length; j++)
-		  		{
-		  			if (count == 1)
-		  			{
-		  				svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "black")
-		  			}
-		  			else if (count == 2)
-		  			{
-		  				svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "black")
-		  				svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "red")
-		  			}
-			        else if (count == 3)
-			        {
-			        	svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "black")
-		  				svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "red")
-			        	svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "blue")
-			        }
-			        else if (count == 4)
-			        {
-			        	svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "black")
-		  				svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "red")
-			        	svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "blue")
-				        svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "green")
-			        }
-			        else if (count == 5)
-			        {
-			        	svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[0])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[0])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[0])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[0])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "black")
-		  				svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[1])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[1])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[1])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[1])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "red")
-			        	svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[2])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[2])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[2])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[2])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "blue")
-				        svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[3])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[3])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[3])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[3])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "green")
-				        svgall.append('line')
-				        .attr('x1',xScaleall(((fakedataset[4])[j])[0]))
-				        .attr('x2',xScaleall(((fakedataset[4])[j+1])[0]))                                        
-				        .attr('y1',yScaleall(((fakedataset[4])[j])[1]))
-				        .attr('y2',yScaleall(((fakedataset[4])[j+1])[1]))                                     
-				        .attr("stroke-width", 2)
-				        .attr("stroke", "purple")
-			        }
-				}
-			//}
+		    svgall.append("text")
+		        .attr("x", 120)            
+		        .attr("y", 12)
+		        .attr("text-anchor", "middle")  
+		        .style("font-size", "16px") 
+		        .style("font-style", "oblique") 
+		        .style("color", "blue")
+		        .style("text-decoration", "underline")  
+		        .text("Graph of All Tweets");
 
-			// Create graph lines
-			/*var linecolor = "black";
-			switch (whichToUse)
-			{
-				case 2: linecolor = "red"; break;
-				case 3: linecolor = "blue"; break;
-				case 4: linecolor = "green"; break;
-				case 5: linecolor = "purple"; break;
-			}*/
+		    for (var j = 0; j < fakedataset[0].length; j++)
+	  		{
+	  			for (var i = 0; i < count; i++)
+	  			{
+	  				svgall.append('line')
+			        .attr('x1',xScaleall(((fakedataset[i])[j])[0]))
+			        .attr('x2',xScaleall(((fakedataset[i])[j+1])[0]))                                        
+			        .attr('y1',yScaleall(((fakedataset[i])[j])[1]))
+			        .attr('y2',yScaleall(((fakedataset[i])[j+1])[1]))                                     
+			        .attr("stroke-width", combinedthickness[i])
+			        .attr("stroke", COLORS[i])	
+	  			}
+			}
 			
 			for (var k = 0; k < dataset.length; k++)
 	  		{
@@ -845,115 +714,6 @@ $(document).ready(function(){
 			$('#graph').hide();
 		}
 	};
-
-	/*function renderGraph(maxValue) {
-
-		var thelength = finalArray[whichToUse-1].length;
-
-		//Create scale functions
-		var xScale = d3.scale.linear()
-							 .domain([0, maxValue])
-							 .range([WIDTH-8*PADDING,0+PADDING]);
-
-		var yScale = d3.scale.linear()
-							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[1]; })])
-							 .range([ 0+PADDING, HEIGHT-PADDING]);
-
-		var rScale = d3.scale.linear()
-							 .domain([0, d3.max(finalArray[whichToUse-1], function(d) { return d[1]; })])
-							 .range([radius, radius]);
-
-		//Define X axis
-		var xAxis = d3.svg.axis()
-						  .scale(xScale)
-						  .orient("bottom")
-						  .ticks(5);
-
-		//Define Y axis
-		var yAxis = d3.svg.axis()
-						  .scale(yScale)
-						  .orient("left")
-						  .ticks(5);
-		
-		//Create SVG element
-		var svg = d3.select("#graphuser" + whichToUse)
-					.append("svg")
-					.attr("width", WIDTH)
-					.attr("height", HEIGHT);
-
-		for (var j = 1; j <= count; j++)
-			createCircles(svg, xScale, yScale, rScale, xAxis, yAxis, thelength, j);
-	}
-
-	function createCircles(data, x, y, r, xA, yA, l, j) {
-		data.selectAll("circle")
-		   .data(finalArray[whichToUse-1])
-		   .enter()
-		   .append("circle")
-		   .attr("cx", function(d) {
-		   		return x(d[0]);
-		   })
-		   .attr("cy", function(d) {
-		   		return y(d[1]);
-		   })
-		   .attr("r", function(d) {
-		   		return r(d[1]);
-		   })
-		   .style('fill', COLORS[whichToUse-1]);
-
-		data.selectAll("text")
-		   .data(finalArray[whichToUse-1])
-		   .enter()
-		   .append("text")
-		   .text(function(d) {
-		   		return "#"+(l-d[1]);
-		   })
-		   .attr("x", function(d) {
-		   		return x(d[0]) - 20;
-		   })
-		   .attr("y", function(d) {
-		   		return y(d[1]) - 8;
-		   })
-		   .attr("font-family", "sans-serif")
-		   .attr("font-size", "11px")
-		   .attr("fill", COLORS[whichToUse-1]);
-
-	    data.append("g")
-			.attr("class", "axis")
-			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-			.call(xA);
-			
-		// text label for the x axis
-		data.append("text")      
-			.attr("class", "x label")
-	        .attr("text-anchor", "end")
-	        .attr("x", WIDTH)
-	        .attr("y",  HEIGHT-6 )
-	        .text("Hours before Now (h)");
-
-	    data.append("text")
-	        .attr("x", 120)            
-	        .attr("y", 12)
-	        .attr("text-anchor", "middle")  
-	        .style("font-size", "16px") 
-	        .style("font-style", "oblique") 
-	        .style("color", "blue")
-	        .style("text-decoration", "underline")  
-	        .text("Number of Tweets Over Time");
-
-	    // Create graph lines
-		var linecolor = COLORS[whichToUse-1];
-	    for (var k = 0; k < finalArray[whichToUse-1].length; k++)
-  		{
-	        data.append('line')
-	        .attr('x1',x((finalArray[whichToUse-1][k])[0]))
-	        .attr('x2',x((finalArray[whichToUse-1][k+1])[0]))                                        
-	        .attr('y1',y((finalArray[whichToUse-1][k])[1]))
-	        .attr('y2',y((finalArray[whichToUse-1][k+1])[1]))                                     
-	        .attr("stroke-width", thickness)
-	        .attr("stroke", linecolor)
-		}
-	}*/
 
 	// Set counter variable for click function
 	var count = 0;
