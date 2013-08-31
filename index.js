@@ -3,29 +3,25 @@
 TO BE DONE -
 
 Currently to do within current scope:
-Resizing issues everywhere (d3), width intervalid2
-text on individual graphs off
-if rtvisulization is third user, first two users only get first three points connected on summary graph
-KYLEANDERSON4 error messages (account for all them)
-timer on ajax call to time out if no success
-control panel: logarithmic scale, grid on back of graph, numbered tweets
-IDEA: eliminate auto update and just do it every 1 minute by default, no checkboxes, update now only does control panel, delete buttons work
-logarithmic shooting off page
+Resize screen on browser change
+Control panel for individual graphs: Text, logarithmic, grid
+Issue with users with less than 20 tweets (if rtvisulization is third user, first two users only get first three points connected on summary graph)
+timer on ajax call to time out if no success?
+logarithmic shooting off page for tweet between 0 and 1 hour ago
+Bootstrap conversion
+Statistics
+Fix delete buttons: summary graph only one messing up, tweettext box doesnt hide if present before new user entered
+
+NEW IDEA: eliminate auto update and just do it every 1 minute by default, no checkboxes, update now only does control panel, delete buttons work
 
 Questions:
-Bootstrap conversion, inclusion files?
 What should we do for checked boxes, display those graphs?
 Update now displays only checked graphs?
-Resizing okay
-range for log scale
-# of tweet on summary graph
-no text on summary graph
 
-New functionality:
-On hover over line, display last tweet text and time photo screen name
+Possible new functionality:
+On hover over line, display last tweet text and time photo screen name (or all tweets)
 Update now button (checkmarks tell which ones to include on summary graph)
 Do auto refresh once above works
-Fix delete buttons
 Animated summary graph
 
 */
@@ -52,23 +48,6 @@ $(document).ready(function(){
 	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
 	//////////////////////////////////////////////////////////////////
 
-	/*var w = window,
-		    d = document,
-		    e = d.documentElement,
-		    g = d.getElementsByTagName('body')[0],
-		    x = w.innerWidth || e.clientWidth || g.clientWidth,
-		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;  
-
-	function updateWindow(svg){
-    x = w.innerWidth || e.clientWidth || g.clientWidth;
-    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
-
-    svg.attr("width", x).attr("height", y);
-	}
-
-	window.onresize = updateWindow(svgall);*/
-
-
 	// Hide a lot of CSS stuff right after page load and let user display what they want
 	window.onload = function(){
 		$('.searches').hide();
@@ -81,6 +60,9 @@ $(document).ready(function(){
 		$('.graphInstructions').hide();
 		$('.graphbutton').hide();
 		$('#statistics').hide();
+		$('.deletebuttons').hide();
+		//$('Andy').insertAfter('#searchOption1');
+		//$('#searchOption1').html('Andy');
 		// Older delete buttons
 		//$('#searchOption1').hide();
 		//$('.delete1').hide();
@@ -98,25 +80,6 @@ $(document).ready(function(){
 	var intervalID = setInterval(function() {
         findTime();
     }, 1000);
-
-	/*var intervalID2 = setInterval(function() {
-		var width = document.getElementById('graphuser1').offsetWidth;
-		alert(width);
-	}, 8000);*/
-
-		
-
-	/*function findMax(data) {
-		var maximum = data[0];
-		for (var i = 1; i < data.length; i++)
-	    {
-	    	if (isNaN(data[i]))
-	    		continue;
-	    	if (data[i] >= data[i-1])
-	    		maximum = data[i];
-	    }
-	    return maximum;
-	}*/
 
 	// Create new array for json parse
 	var tweets = new Array();
@@ -196,7 +159,11 @@ $(document).ready(function(){
 			$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
 
 			// Show input along with checkbox and delete button
-			$('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
+			// $('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
+			//$('#searchOption' + whichToUse).html("<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button>&nbsp&nbsp&nbsp@" + screen_name + "<br><br>")
+			var htmlForUserDelete = "<span id='content" + whichToUse + "'>&nbsp&nbsp&nbsp@";
+			$(htmlForUserDelete + screen_name + '</span>').insertAfter("#searchOption" + whichToUse);
+			$('#searchOption' + whichToUse).show();
 
 			// See if user is protected (if so, can't retrieve text)
 			var protection = tweets[0].user.protected;
@@ -329,8 +296,9 @@ $(document).ready(function(){
 
 			// Display tweettext for this user (button)
 			//$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
-			$('#user' + whichToUse).html("<br><p align=center><button class='btn " + BUTTONS[whichToUse-1] + "'>@" + screen_name + "</button></p>");
+			$('#user' + whichToUse).html("<br><p align=center><button class='btn " + BUTTONS[whichToUse-1] + "'>@" + screen_name + "</button></p>").show();
 			$('#texts').show();
+			$('#deletett' + whichToUse).show();
 
 			// Show the summary graph and the buttons for individual graphs
 			$('#sumbutton').show();
@@ -344,125 +312,26 @@ $(document).ready(function(){
 			// START OF D3 
 
 		    var thelength = finalArray.length;
-		   
-
-			//var dataset = new Array();
 			fakedataset[whichToUse-1] = finalArray;
 			dataset = finalArray;
 
-			// Create x scale functions
-			// Linear scale for frequent user
-			var xScale = d3.scale.linear()
-								 .domain([0, d3.max(dataset, function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING]);
-			// Log scale for infrequent user
-			/*var xScale = d3.scale.log()
-								 .domain([1, d3.max(dataset, function(d) { return d[0]; })])
-								 .range([WIDTH-8*PADDING,0+PADDING ]);*/
+			// Create individual plot
+			var xind = getXScale(dataset);
+			var yind = getYScale(dataset);
+			var rind = getRScale(radius, dataset);
+			var newGraph = createIndividualGraph(dataset, xind, yind, rind);    
 
-			// Create y and circle scales
-			var yScale = d3.scale.linear()
-								 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
-								 .range([HEIGHT-PADDING ,0+PADDING]);
-
-			var rScale = d3.scale.linear()
-								 .domain([0, d3.max(dataset, function(d) { return d[1]; })])
-								 .range([radius, radius]);
-
-
-
-			// Define X axis
-			// Linear scale for frequent user
-			var xAxis = d3.svg.axis()
-							  .scale(xScale)
-							  .orient("bottom")
-							  .ticks(5);
-			// Log scale for infrequent user
-			/*var xAxis = d3.svg.axis().scale(xScale).tickFormat(function (d) {return xScale.tickFormat(4,d3.format(",d"))(d)})*/
-
-
-
-			//Define Y axis
-			var yAxis = d3.svg.axis()
-							  .scale(yScale)
-							  .orient("left")
-							  .ticks(5);
-
-			//Create SVG element
-			var svg = d3.select("#graphuser" + whichToUse)
-						.append("svg")
-						.attr("width", WIDTH)
-						.attr("height", HEIGHT);
-
-			
-			svg.selectAll("circle")
-			   .data(dataset)
-			   .enter()
-			   .append("circle")
-			   .attr("cx", function(d) {
-			   		return xScale(d[0]);
-			   })
-			   .attr("cy", function(d) {
-			   		return yScale(d[1]);
-			   })
-			   .attr("r", function(d) {
-			   		return rScale(d[1]);
-			   })
-			   .style('fill', COLORS[whichToUse-1]);;
-
-			svg.selectAll("text")
-			   .data(dataset)
-			   .enter()
-			   .append("text")
-			   .text(function(d) {
-			   		return "#"+(d[1]);
-			   })
-			   .attr("x", function(d) {
-			   		return xScale(d[0]) - 24;
-			   })
-			   .attr("y", function(d) {
-			   		return yScale(d[1]) - 12;
-			   })
-			   .attr("font-family", "sans-serif")
-			   .attr("font-size", "11px")
-			   .attr("fill", "black");
-
-		    svg.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-				.call(xAxis);
-
-			// text label for the x axis
-			svg.append("text")      
-				.attr("class", "x label")
-		        .attr("text-anchor", "end")
-		        .attr("x", WIDTH)
-		        .attr("y",  HEIGHT-6 )
-		        .text("Hours before Now");
-
-		    svg.append("text")
-		        .attr("x", 120)            
-		        .attr("y", 12)
-		        .attr("text-anchor", "middle")  
-		        .style("font-size", "16px") 
-		        .style("font-style", "oblique") 
-		        .style("color", "blue")
-		        .style("text-decoration", "underline")  
-		        .text("Number of Tweets Over Time");     
-
+			// Show graphing instructions after created
 		    $('.graphInstructions').show();	
 
-		    // Collect all user data
+		    // Create summary plot
 		    fillSummaryData();
-		    // Get xscale for all users entered
 		    var x = getXScaleAll();
-		    // Get yscale for all users entered
 		    var y = getYScaleAll();
-		    // Get rscale for all users entered
 		    var r = getRScaleAll();
-		    // Plot final graph
 		    plotSummaryGraph(x, y, r);
 
+		    // Draw all lines
 		    for (var j = 0; j < fakedataset[0].length; j++)
 	  		{
 	  			for (var i = 0; i < count; i++)
@@ -476,11 +345,11 @@ $(document).ready(function(){
 			        .attr("stroke", COLORS[i])
 			        .style("stroke-opacity", 0.6);
 
-			        svg.append('line')
-			        .attr('x1',xScale((finalArray[j])[0]))
-			        .attr('x2',xScale((finalArray[j+1])[0]))                                        
-			        .attr('y1',yScale((finalArray[j])[1]))
-			        .attr('y2',yScale((finalArray[j+1])[1]))                                     
+			        newGraph.append('line')
+			        .attr('x1',xind((finalArray[j])[0]))
+			        .attr('x2',xind((finalArray[j+1])[0]))                                        
+			        .attr('y1',yind((finalArray[j])[1]))
+			        .attr('y2',yind((finalArray[j+1])[1]))                                     
 			        .attr("stroke-width", thickness)
 			        .attr("stroke", COLORS[whichToUse-1])
 	  			}
@@ -647,49 +516,6 @@ $(document).ready(function(){
   			}
 		}
 	});
-		    
-
-		    
-	// Press update now key
-	/*$('#update').click(function(){
-		// Make the checkmarks exist so it is easier to run graph
-		for (var i = count + 1; i < 6; i++)
-		{
-			$('#searchOption' + i).html("<input type='checkbox' id='box" + i + "'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + i +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>").hide();
-		}
-		// Make array of checked boxes
-		var checks = new Array();
-		for (var i = 1; i < 6; i++)
-		{
-			var x = '#box' + i;
-			if($(x).prop('checked'))
-				checks.push(i);
-		}
-		var y = "SOCR will graph the tweets for the following users: ";
-		for (var i = 0; i < checks.length; i++)
-		{
-			y += checks[i];
-			if (i == (checks.length - 1))
-				y += '.';
-			else
-				y += ', ';
-		}
-		$('#toGraph').html(y);
-
-		// Make ajax calls to refresh graphs
-		for (var i = 1; i < 6; i++)
-		{
-			var x = '#box' + i;
-			if($(x).prop('checked'))
-			{
-				searchURL = first + enteredInput[i-1] + second;
-				$.ajax({
-			        url: searchURL,
-			        success: cb
-				});
-			}
-		}
-	})*/
 
 	// Buttons to display graphs
 	$('#sumbutton').click(function() {
@@ -755,6 +581,127 @@ $(document).ready(function(){
 	}, function() {
 		$('#tweettext5').slideUp(200);
 	});
+
+	function getXScale(data) {
+		var xScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) { return d[0]; })])
+							 .range([WIDTH-8*PADDING,0+PADDING]);
+		// Log scale for infrequent user
+		/*var xScale = d3.scale.log()
+							 .domain([1, d3.max(data, function(d) { return d[0]; })])
+							 .range([WIDTH-8*PADDING,0+PADDING ]);*/
+		return xScale;
+	}
+
+	function getYScale(data) {
+		// Create y and circle scales
+		var yScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) { return d[1]; })])
+							 .range([HEIGHT-PADDING ,0+PADDING]);
+		return yScale;
+	}
+
+	function getRScale(rad, data) {
+		var rScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) { return d[1]; })])
+							 .range([rad, rad]);
+		return rScale;
+	}
+
+	function createIndividualGraph(data, xi, yi, ri) {
+		function make_x_axis() {        
+		    return d3.svg.axis()
+		        .scale(xi)
+		         .orient("bottom")
+		         .ticks(5)
+		}
+
+		// Define X axis
+		// Linear scale for frequent user
+		var xAxis = d3.svg.axis()
+						  .scale(xi)
+						  .orient("bottom")
+						  .ticks(5);
+		// Log scale for infrequent user
+		/*var xAxis = d3.svg.axis().scale(xScale).tickFormat(function (d) {return xScale.tickFormat(4,d3.format(",d"))(d)})*/
+
+		//Define Y axis
+		var yAxis = d3.svg.axis()
+						  .scale(yi)
+						  .orient("left")
+						  .ticks(5);
+
+		//Create SVG element
+		var svg = d3.select("#graphuser" + whichToUse)
+					.append("svg")
+					.attr("width", WIDTH)
+					.attr("height", HEIGHT);
+	
+		svg.selectAll("circle")
+		   .data(data)
+		   .enter()
+		   .append("circle")
+		   .attr("cx", function(d) {
+		   		return xi(d[0]);
+		   })
+		   .attr("cy", function(d) {
+		   		return yi(d[1]);
+		   })
+		   .attr("r", function(d) {
+		   		return ri(d[1]);
+		   })
+		   .style('fill', COLORS[whichToUse-1]);;
+
+		svg.selectAll("text")
+		   .data(data)
+		   .enter()
+		   .append("text")
+		   .text(function(d) {
+		   		return "#"+(d[1]);
+		   })
+		   .attr("x", function(d) {
+		   		return xi(d[0]) - 24;
+		   })
+		   .attr("y", function(d) {
+		   		return yi(d[1]) - 12;
+		   })
+		   .attr("font-family", "sans-serif")
+		   .attr("font-size", "11px")
+		   .attr("fill", "black");
+
+	    svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+			.call(xAxis);
+
+		// text label for the x axis
+		svg.append("text")      
+			.attr("class", "x label")
+	        .attr("text-anchor", "end")
+	        .attr("x", WIDTH)
+	        .attr("y",  HEIGHT-6 )
+	        .text("Hours before Now");
+
+	    svg.append("g")         
+	        .attr("class", "grid")
+	        .attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+	        .call(make_x_axis()
+	            .tickSize(-HEIGHT, 0, 0)
+	            .tickFormat("")
+	  		)
+
+	    svg.append("text")
+	        .attr("x", 120)            
+	        .attr("y", 12)
+	        .attr("text-anchor", "middle")  
+	        .style("font-size", "16px") 
+	        .style("font-style", "oblique") 
+	        .style("color", "blue")
+	        .style("text-decoration", "underline")  
+	        .text("Number of Tweets Over Time"); 
+
+	    return svg;
+	}
 
 	function fillSummaryData() {
 		if (count == 1)
@@ -834,70 +781,203 @@ $(document).ready(function(){
 	}
 
 	function plotSummaryGraph(xs, ys, rs) {
+		function make_xall_axis() {        
+		    return d3.svg.axis()
+		        .scale(xs)
+		         .orient("bottom")
+		         .ticks(5)
+		}
 	
-			$('#summarygraph').empty();					  
-			
-			svgall = d3.select("#summarygraph")
-						.append("svg")
-						.attr("width", WIDTH)
-						.attr("height", HEIGHT);
-			
-			svgall.selectAll("circle")
-			   .data(onegraohArray)
-			   .enter()
-			   .append("circle")
-			   .attr("cx", function(d) {
-			   		return xs(d[0]);
-			   })
-			   .attr("cy", function(d) {
-			   		return ys(d[1]);
-			   })
-			   .attr("r", function(d) {
-			   		return rs(d[1]);
-			   });
+		$('#summarygraph').empty();					  
+		
+		svgall = d3.select("#summarygraph")
+					.append("svg")
+					.attr("width", WIDTH)
+					.attr("height", HEIGHT);
+		
+		svgall.selectAll("circle")
+		   .data(onegraohArray)
+		   .enter()
+		   .append("circle")
+		   .attr("cx", function(d) {
+		   		return xs(d[0]);
+		   })
+		   .attr("cy", function(d) {
+		   		return ys(d[1]);
+		   })
+		   .attr("r", function(d) {
+		   		return rs(d[1]);
+		   });
 
-			//Define X axis
-			if (document.getElementById('linear').checked)
-			{
-				var xAxisall = d3.svg.axis()
-							  .scale(xs)
-							  .orient("bottom")
-							  .ticks(5);
-			}
-			else
-			{
-				var xAxisall = d3.svg.axis().scale(xs).tickFormat(function (d) {return xs.tickFormat(4,d3.format(",d"))(d)})
-			}
+		//Define X axis
+		if (document.getElementById('linear').checked)
+		{
+			var xAxisall = d3.svg.axis()
+						  .scale(xs)
+						  .orient("bottom")
+						  .ticks(5);
+		}
+		else
+		{
+			var xAxisall = d3.svg.axis().scale(xs).tickFormat(function (d) {return xs.tickFormat(4,d3.format(",d"))(d)})
+		}
 
-			//Define Y axis
-			var yAxisall = d3.svg.axis()
-							  .scale(ys)
-							  .orient("left")
-							  .ticks(5);
+		//Define Y axis
+		var yAxisall = d3.svg.axis()
+						  .scale(ys)
+						  .orient("left")
+						  .ticks(5);
 
-		    svgall.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
-				.call(xAxisall);
+	    svgall.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+			.call(xAxisall);
 
-			// text label for the x axis
-			svgall.append("text")      
-				.attr("class", "x label")
-		        .attr("text-anchor", "end")
-		        .attr("x", WIDTH)
-		        .attr("y",  HEIGHT-6 )
-		        .text("Hours before Now");
+		// text label for the x axis
+		svgall.append("text")      
+			.attr("class", "x label")
+	        .attr("text-anchor", "end")
+	        .attr("x", WIDTH)
+	        .attr("y",  HEIGHT-6 )
+	        .text("Hours before Now");
 
-		    svgall.append("text")
-		        .attr("x", 120)            
-		        .attr("y", 12)
-		        .attr("text-anchor", "middle")  
-		        .style("font-size", "16px") 
-		        .style("font-style", "oblique") 
-		        .style("color", "blue")
-		        .style("text-decoration", "underline")  
-		        .text("Graph of All Tweets");
+	    if (document.getElementById('Grid').checked)
+		    svgall.append("g")         
+	        .attr("class", "grid")
+	        .attr("transform", "translate(0," + (HEIGHT - PADDING) + ")")
+	        .call(make_xall_axis()
+	            .tickSize(-HEIGHT, 0, 0)
+	            .tickFormat("")
+  		)
+
+	    svgall.append("text")
+	        .attr("x", 120)            
+	        .attr("y", 12)
+	        .attr("text-anchor", "middle")  
+	        .style("font-size", "16px") 
+	        .style("font-style", "oblique") 
+	        .style("color", "blue")
+	        .style("text-decoration", "underline")  
+	        .text("Graph of All Tweets");
 	}
+
+	// Delete buttons
+	// If any delete pressed
+	$('.deletebuttons').click(function() {
+		if (count == 1)
+		{
+			$('.graphInstructions').hide();
+			$('#texts').hide();
+			$('#summarygraph').hide();
+		}
+		// Decrement count
+		count--;
+		// Set deletepressed to true
+		deletePressed = true;
+		// Enable text input
+		$('#userInput').removeAttr('disabled');
+	});
+	// First user deleted
+	$('.delete1').click(function(){
+		// Set some variable to be 1
+		whichButton = 1;
+		// delete entered input from the duplicate array
+		enteredInput[0] = '';
+		// Hide the checkbox
+		$('#searchOption1').hide();
+		// Hide description box
+		$('#description1').hide();
+		// Hide the tweettext
+		$('#user1').hide();
+		$('#deletett1').hide();
+		// Hide the graphing button
+		$('#button1').hide();
+		// Kill individual graph
+		$('#graphuser1').empty();
+		// Kill username text in search box
+		$('#content1').empty();
+	});
+	// Second user deleted
+	$('.delete2').click(function(){
+		// Set some variable to be 2
+		whichButton = 2;
+		// delete entered input from the duplicate array
+		enteredInput[1] = '';
+		// Hide the checkbox
+		$('#searchOption2').hide();
+		// Hide description box
+		$('#description2').hide();
+		// Hide the tweettext
+		$('#user2').hide();
+		$('#deletett2').hide();
+		// Hide the graphing button
+		$('#button2').hide();
+		// Kill individual graph
+		$('#graphuser2').empty();
+		// Kill username text in search box
+		$('#content2').empty();
+	});
+	// Third user deleted
+	$('.delete3').click(function(){
+		// Set some variable to be 3
+		whichButton = 3;
+		// delete entered input from the duplicate array
+		enteredInput[2] = '';
+		// Hide the checkbox
+		$('#searchOption3').hide();
+		// Hide description box
+		$('#description3').hide();
+		// Hide the tweettext
+		$('#user3').hide();
+		$('#deletett3').hide();
+		// Hide the graphing button
+		$('#button3').hide();
+		// Kill individual graph
+		$('#graphuser3').empty();
+		// Kill username text in search box
+		$('#content3').empty();
+	});
+	// Fourth user deleted
+	$('.delete4').click(function(){
+		// Set some variable to be 4
+		whichButton = 4;
+		// delete entered input from the duplicate array
+		enteredInput[3] = '';
+		// Hide the checkbox
+		$('#searchOption4').hide();
+		// Hide description box
+		$('#description4').hide();
+		// Hide the tweettext
+		$('#user4').hide();
+		$('#deletett4').hide();
+		// Hide the graphing button
+		$('#button4').hide();
+		// Kill individual graph
+		$('#graphuser4').empty();
+		// Kill username text in search box
+		$('#content4').empty();
+	});
+	// Fifth user deleted
+	$('.delete5').click(function(){
+		// Set some variable to be 1
+		whichButton = 5;
+		// delete entered input from the duplicate array
+		enteredInput[4] = '';
+		// Hide the checkbox
+		$('#searchOption5').hide();
+		// Hide description box
+		$('#description5').hide();
+		// Hide the tweettext
+		$('#user5').hide();
+		$('#deletett5').hide();
+		// Hide the graphing button
+		$('#button5').hide();
+		// Kill individual graph
+		$('#graphuser5').empty();
+		// Kill username text in search box
+		$('#content5').empty();
+	});
+
 
 	function findTime() {
 
@@ -1033,98 +1113,79 @@ $(document).ready(function(){
 		return returnedDate;
 	}
 
-/*
-	Delete buttons
+	/*var intervalID2 = setInterval(function() {
+		var width = document.getElementById('graphuser1').offsetWidth;
+		alert(width);
+	}, 8000);*/
 
-	$('.delete1').click(function(){
-		// Decrement count
-		count--;
-		// Set some variable to be 1
-		whichButton = 1;
-		// delete entered input from the duplicate array
-		enteredInput[0] = '';
-		// Set deletepressed to true
-		deletePressed = true;
-		// Hide the checkbox
-		$('#searchOption1').hide();
-		// Hide description box
-		$('#description1').hide();
-		// Hide the tweettext
-		$('#tweettext1').hide();
-		// Enable text input
-		$('#userInput').removeAttr('disabled');
-	});
+		
 
-	$('.delete2').click(function(){
-		// Decrement count
-		count--;
-		// Set some variable to be 1
-		whichButton = 2;
-		// delete entered input from the duplicate array
-		enteredInput[1] = '';
-		// Set deletepressed to true
-		deletePressed = true;
-		// Hide the checkbox
-		$('#searchOption2').hide();
-		// Hide description box
-		$('#description2').hide();
-		// Enable text input
-		$('#userInput').removeAttr('disabled');
-		$('#tweettext2').hide();
-	});
+	/*function findMax(data) {
+		var maximum = data[0];
+		for (var i = 1; i < data.length; i++)
+	    {
+	    	if (isNaN(data[i]))
+	    		continue;
+	    	if (data[i] >= data[i-1])
+	    		maximum = data[i];
+	    }
+	    return maximum;
+	}*/
 
-	$('.delete3').click(function(){
-		// Decrement count
-		count--;
-		// Set some variable to be 1
-		whichButton = 3;
-		// delete entered input from the duplicate array
-		enteredInput[2] = '';
-		// Set deletepressed to true
-		deletePressed = true;
-		// Hide the checkbox
-		$('#searchOption3').hide();
-		// Hide description box
-		$('#description3').hide();
-		// Enable text input
-		$('#userInput').removeAttr('disabled');
-		$('#tweettext3').hide();
-	});
+	/*var w = window,
+		    d = document,
+		    e = d.documentElement,
+		    g = d.getElementsByTagName('body')[0],
+		    x = w.innerWidth || e.clientWidth || g.clientWidth,
+		    y = w.innerHeight|| e.clientHeight|| g.clientHeight;  
 
-	$('.delete4').click(function(){
-		// Decrement count
-		count--;
-		// Set some variable to be 1
-		whichButton = 4;
-		// delete entered input from the duplicate array
-		enteredInput[3] = '';
-		// Set deletepressed to true
-		deletePressed = true;
-		// Hide the checkbox
-		$('#searchOption4').hide();
-		// Hide description box
-		$('#description4').hide();
-		// Enable text input
-		$('#userInput').removeAttr('disabled');
-		$('#tweettext4').hide();
-	});
+	function updateWindow(svg){
+    x = w.innerWidth || e.clientWidth || g.clientWidth;
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-	$('.delete5').click(function(){
-		// Decrement count
-		count--;
-		// Set some variable to be 1
-		whichButton = 5;
-		// delete entered input from the duplicate array
-		enteredInput[4] = '';
-		// Set deletepressed to true
-		deletePressed = true;
-		// Hide the checkbox
-		$('#searchOption5').hide();
-		// Hide description box
-		$('#description5').hide();
-		// Enable text input
-		$('#userInput').removeAttr('disabled');
-		$('#tweettext5').hide();
-	});
-*/
+    svg.attr("width", x).attr("height", y);
+	}
+
+	window.onresize = updateWindow(svgall);*/
+
+	// Press update now key
+	/*$('#update').click(function(){
+		// Make the checkmarks exist so it is easier to run graph
+		for (var i = count + 1; i < 6; i++)
+		{
+			$('#searchOption' + i).html("<input type='checkbox' id='box" + i + "'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + i +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>").hide();
+		}
+		// Make array of checked boxes
+		var checks = new Array();
+		for (var i = 1; i < 6; i++)
+		{
+			var x = '#box' + i;
+			if($(x).prop('checked'))
+				checks.push(i);
+		}
+		var y = "SOCR will graph the tweets for the following users: ";
+		for (var i = 0; i < checks.length; i++)
+		{
+			y += checks[i];
+			if (i == (checks.length - 1))
+				y += '.';
+			else
+				y += ', ';
+		}
+		$('#toGraph').html(y);
+
+		// Make ajax calls to refresh graphs
+		for (var i = 1; i < 6; i++)
+		{
+			var x = '#box' + i;
+			if($(x).prop('checked'))
+			{
+				searchURL = first + enteredInput[i-1] + second;
+				$.ajax({
+			        url: searchURL,
+			        success: cb
+				});
+			}
+		}
+	})*/
 }); // end ready

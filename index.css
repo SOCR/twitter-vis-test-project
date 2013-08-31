@@ -93,22 +93,12 @@
     font-size: 11px;
 }
 
-.rules line, .rules path {
-  shape-rendering: crispEdges;
-  stroke: #000;
-}
- 
-.rules .tick {
-}
-.rules .minor {
-  stroke: #BBB;
-}
-.rules .domain {
-  fill: none;
-}
- 
 .grid .tick {
-  stroke: #CCC;
+    stroke: grey;
+    opacity: 0.7;
+}
+.grid path {
+      stroke-width: 1;
 }
 
 .timewarning {
@@ -247,11 +237,6 @@
 #tweettext5 {
     border-color: purple;
 }
-
-
-
-
-
 
 /*#gmttime {
     font-size: 14px;
