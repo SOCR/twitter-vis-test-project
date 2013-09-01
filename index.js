@@ -5,12 +5,12 @@ TO BE DONE -
 Currently to do within current scope:
 Resize screen on browser change
 Control panel for individual graphs: Text, logarithmic, grid
-Issue with users with less than 20 tweets (if rtvisulization is third user, first two users only get first three points connected on summary graph)
-timer on ajax call to time out if no success?
-logarithmic shooting off page for tweet between 0 and 1 hour ago
+Issue with users with less than 20 tweets (if rtvisulization is third user, first two users only get first three points connected on summary graph and individual graphs)
+logarithmic shooting off page for tweet between 0 and 1 hour ago (for now, clamp solves)
 Bootstrap conversion
 Statistics
-Fix delete buttons: summary graph only one messing up, tweettext box doesnt hide if present before new user entered
+Links on info above search box
+Fix delete buttons: summary graph only one messing up (needs to update automatically with new user)
 
 NEW IDEA: eliminate auto update and just do it every 1 minute by default, no checkboxes, update now only does control panel, delete buttons work
 
@@ -38,6 +38,10 @@ $(document).ready(function(){
 	// Bad Twitter API Results
 	var ERROR1 = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
 	var ERROR2 = "{\"result\":\"[]\\n\"}";
+	// Set a threshold to prompt user on an infrequent user
+	var TOOBIG = 1000;
+	// Twitter can only return 20 tweets max
+	var MAXAPI = 20;
 	// Radius of Circles
 	var RADIUS = [2, 4, 6, 8, 10, 12];
 	// Intervals of follower numbers
@@ -93,13 +97,8 @@ $(document).ready(function(){
 		usertime[i] = new Array(20);
 
 	//////////////// D3 ////////////////////
-	var converteddate = new Array();
-    var seconddif = new Array();
-    /*var finalArray = new Array(5);
-    for (var i = 0; i < 5; i++)
-		finalArray[i] = new Array();*/
-	var scalingArray = new Array();
-	var maximum = new Array(0);
+	/*var scalingArray = new Array();
+	var maximum = new Array(0);*/
 	var fakedataset = new Array();
     var dataset = new Array();
     var lengthall = new Array();
@@ -120,31 +119,71 @@ $(document).ready(function(){
 		// If user exists
 		if ((test != ERROR1) && (test != ERROR2)) {
 
-			// Hide all individual graphs
-			$('.individual').hide();
-
-			// Show summary graph
-			$('#summarygraph').show();
-
-			// Display description information
-			$('#descriptions').fadeIn(500);
-			
-			// If five inputs display enough Input and hide search box
-			if(count == 5)
-			{
-				$('#enoughInput').show().delay(4000).fadeOut();
-				$('#userInput').attr('disabled', 'disabled');
-			}
-				
-			// Else display successful search
-			else
-				$('#successfulSearch').show().delay(1000).fadeOut();
-
-			// Display count of valid searches
-			$('.badge-info').html("Your number of valid searches is " + count + "!");
-
 			// Parse correct data
 			tweets = JSON.parse(data.query.results.result);
+
+			// Set up text, dates, D3 variables
+			var finalArray = new Array();
+			var fakeArray = new Array();
+			var converteddate = new Array();
+    		var seconddif = new Array();
+			var thenumber = 0;
+			var j = tweets.length - 1;
+			var coordi = 0;
+			for (var i = 0; i < tweets.length; i++)
+			{
+				usertweets[whichToUse-1][i] = tweets[j].text;
+				usertime[whichToUse-1][i] = tweets[j].created_at;;
+				j--;
+				converteddate[i] = new Date(tweets[i].created_at);
+				seconddif[i]= converteddate[i].getTime() /1000 ;
+				var coordi = new Array();
+				var coordj = new Array();
+				var seconds = new Date().getTime() / 1000;
+				coordi[0] = (seconds- seconddif[i]) /3600;
+				coordi[1] = i;
+				coordj[0] = (seconds- seconddif[i]) /3600;
+				coordj[1] = i+1;
+				finalArray[i] = coordi;
+				fakeArray[i] = coordj;
+				/*
+				//var coordi = new Array();
+				var seconds = new Date().getTime() / 1000;
+				//coordi[0] = (seconds- seconddif[i]) /3600;
+				coordi = (seconds- seconddif[i]) /3600;
+				//scalingArray.push(coordi[0]);
+				//coordi[1] = i;
+				//finalArray[whichToUse-1][i] = coordi;
+				// New Code Below
+				finalArray[whichToUse-1][i] = coordi;
+				scalingArray.push(coordi);*/
+			}
+
+			// If user has not tweeted in awhile, prompt user
+			if (((finalArray[0])[0]) > TOOBIG)
+			{
+				var r = confirm("The username you have entered has not tweeted in over " + (Math.floor(((finalArray[0])[0]))) + " hours. Continue with this username?");
+				if (r == false)
+				{
+					count--;
+					$('.progress').hide();
+					$('#graph').hide();
+					return;
+				}
+			}
+
+			// If user does not even have 20 tweets (Twitter max API), prompt user
+			if (finalArray.length < MAXAPI)
+			{
+				var r = confirm("The username you have entered has only " + finalArray.length + " tweets in their lifetime. Continue with this username?");
+				if (r == false)
+				{
+					count--;
+					$('.progress').hide();
+					$('#graph').hide();
+					return;
+				}
+			}
 
 			// Set up description box
 			var screen_name = tweets[0].user.screen_name;
@@ -156,14 +195,6 @@ $(document).ready(function(){
 			var numberOfStatuses = tweets[0].user.statuses_count;
 			var photo = tweets[0].user.profile_image_url;
 			var name = tweets[0].user.name;
-			$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
-
-			// Show input along with checkbox and delete button
-			// $('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
-			//$('#searchOption' + whichToUse).html("<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button>&nbsp&nbsp&nbsp@" + screen_name + "<br><br>")
-			var htmlForUserDelete = "<span id='content" + whichToUse + "'>&nbsp&nbsp&nbsp@";
-			$(htmlForUserDelete + screen_name + '</span>').insertAfter("#searchOption" + whichToUse);
-			$('#searchOption' + whichToUse).show();
 
 			// See if user is protected (if so, can't retrieve text)
 			var protection = tweets[0].user.protected;
@@ -206,47 +237,37 @@ $(document).ready(function(){
 				radius = RADIUS[5];
 			}
 
-			// Set up text, dates, D3 variables
-			var finalArray = new Array();
-			var fakeArray = new Array();
-			var thenumber = 0;
-			var j = tweets.length - 1;
-			var coordi = 0;
-			for (var i = 0; i < tweets.length; i++)
-			{
-				usertweets[whichToUse-1][i] = tweets[j].text;
-				usertime[whichToUse-1][i] = tweets[j].created_at;;
-				j--;
-				converteddate[i] = new Date(tweets[i].created_at);
-				seconddif[i]= converteddate[i].getTime() /1000 ;
-				var coordi = new Array();
-				var coordj = new Array();
-				var seconds = new Date().getTime() / 1000;
-				coordi[0] = (seconds- seconddif[i]) /3600;
-				coordi[1] = i;
-				coordj[0] = (seconds- seconddif[i]) /3600;
-				coordj[1] = i+1;
-				finalArray[i] = coordi;
-				fakeArray[i] = coordj;
-				/*
-				//var coordi = new Array();
-				var seconds = new Date().getTime() / 1000;
-				//coordi[0] = (seconds- seconddif[i]) /3600;
-				coordi = (seconds- seconddif[i]) /3600;
-				//scalingArray.push(coordi[0]);
-				//coordi[1] = i;
-				//finalArray[whichToUse-1][i] = coordi;
-				// New Code Below
-				finalArray[whichToUse-1][i] = coordi;
-				scalingArray.push(coordi);*/
-			}
+			// Hide all individual graphs
+			$('.individual').hide();
 
-			lengthall[whichToUse-1]=finalArray.length;
+			// Show summary graph
+			$('#summarygraph').show();
+
+			// Display description information
+			$('#descriptions').fadeIn(500);
 			
-			for (var i = 0; i < whichToUse-1; i++)
-			 	thenumber += lengthall[i];
-			for (var i = 0; i < finalArray.length; i++)
-				finalArray[i][1] = finalArray.length - finalArray[i][1];
+			// If five inputs display enough Input and hide search box
+			if(count == 5)
+			{
+				$('#enoughInput').show().delay(4000).fadeOut();
+				$('#userInput').attr('disabled', 'disabled');
+			}
+				
+			// Else display successful search
+			else
+				$('#successfulSearch').show().delay(1000).fadeOut();
+
+			// Display count of valid searches
+			$('.badge-info').html("Your number of valid searches is " + count + "!").show();
+
+			$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
+
+			// Show input along with checkbox and delete button
+			// $('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
+			//$('#searchOption' + whichToUse).html("<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button>&nbsp&nbsp&nbsp@" + screen_name + "<br><br>")
+			var htmlForUserDelete = "<span id='content" + whichToUse + "'>&nbsp&nbsp&nbsp@";
+			$(htmlForUserDelete + screen_name + '</span>').insertAfter("#searchOption" + whichToUse);
+			$('#searchOption' + whichToUse).show();
 
 			// Set up tweet text boxes
 			var htmlstring = '';
@@ -311,6 +332,13 @@ $(document).ready(function(){
 
 			// START OF D3 
 
+			lengthall[whichToUse-1]=finalArray.length;
+			
+			for (var i = 0; i < whichToUse-1; i++)
+			 	thenumber += lengthall[i];
+			for (var i = 0; i < finalArray.length; i++)
+				finalArray[i][1] = finalArray.length - finalArray[i][1];
+
 		    var thelength = finalArray.length;
 			fakedataset[whichToUse-1] = finalArray;
 			dataset = finalArray;
@@ -331,7 +359,25 @@ $(document).ready(function(){
 		    var r = getRScaleAll();
 		    plotSummaryGraph(x, y, r);
 
-		    // Draw all lines
+		    /*// Draw all lines
+		    var countLines = 0;
+		    // Repeat up to count
+		    for (var j = 0; j < count; j++)
+		    {
+		    	for(var i = 0; i < fakedataset[j].length; i++)
+		    	{
+		    		svgall.append('line')
+		  				.attr('x1',x(((fakedataset[j])[i])[0]))
+				        .attr('x2',x(((fakedataset[j])[i+1])[0]))                                        
+				        .attr('y1',y(((fakedataset[j])[i])[1]))
+				        .attr('y2',y(((fakedataset[j])[i+1])[1]))                                     
+				        .attr("stroke-width", combinedthickness[j])
+				        .attr("stroke", COLORS[j])
+				        .style("stroke-opacity", 0.6);
+		    	}
+		    	
+		    }*/
+
 		    for (var j = 0; j < fakedataset[0].length; j++)
 	  		{
 	  			for (var i = 0; i < count; i++)
@@ -367,12 +413,10 @@ $(document).ready(function(){
 
 	// Set counter variable for click function
 	var count = 0;
-	// Set counter variable to figure out which button was deleted
-	var whichButton = 0;
 	// Set number of input to verify
 	var whichToUse = 0;
-	// Delete button pressed
-	var deletePressed = false;
+	// Set up queue for delete buttons
+	var queue = [];
 
 	// Keep track of input to make sure there are no duplicates
 	var enteredInput = new Array();
@@ -381,6 +425,12 @@ $(document).ready(function(){
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
 
+		// Set focus onto home button to keep description boxes in view, also clears search form easier
+		$('#focusHere').focus();
+
+		//$('#userInput').attr('disabled', 'disabled');
+		//$('#usersearch').hide();
+		
 		// If anything lingering on screen, clear
 		$('.searches').hide();
 
@@ -435,16 +485,12 @@ $(document).ready(function(){
 			}
 		}
 
-		// If delete was pressed, make sure to put new input in old spot of where the one was deleted
-		if(deletePressed)
-		{
-			whichToUse = whichButton;
-			deletePressed = false;
-		}
-
-		// Else no delete pressed used the normal numbers
-		else
+		// If queue empty, use count
+		if (queue.length == 0)
 			whichToUse = count;
+		// If queue not empty, shift out first value that was deleted and use that
+		else
+			whichToUse = queue.shift();
 
 		// Scan tweet for anything other than numbers, letters, and underscores
 		// If valid, add to search list
@@ -476,6 +522,12 @@ $(document).ready(function(){
 			count--;
 			$('#failedSearch').show().delay(6000).fadeOut();
 		}
+
+		// Allow new input
+	    //$('#userInput').removeAttr('disabled');
+		//$('#usersearch').show();
+
+		
 	}
 
 	// Add button clicked
@@ -484,9 +536,7 @@ $(document).ready(function(){
 	// Enter key pressed equivalent to add button
 	$('#userInput').keyup(function(event) {
 	    var keycode = (event.keyCode ? event.keyCode : event.which);
-	    if(keycode == '13') {
-	    	// Set focus onto home button to keep description boxes in view, also clears search form easier
-			$('#focusHere').focus();
+	    if(keycode == '13') {	
 			// Run function to display results
 	        displayCheckboxes();
 	    }
@@ -764,7 +814,7 @@ $(document).ready(function(){
 		{
 			var xScaleall = d3.scale.log()
 							.clamp(true)
-							.domain([1, d3.max(onegraohArray, function(d) { return d[0]; })])
+							.domain([.1, d3.max(onegraohArray, function(d) { return d[0]; })])
 							.range([WIDTH-8*PADDING,0+PADDING ]);
 		}
 		return xScaleall;
@@ -819,7 +869,7 @@ $(document).ready(function(){
 		}
 		else
 		{
-			var xAxisall = d3.svg.axis().scale(xs).tickFormat(function (d) {return xs.tickFormat(4,d3.format(",d"))(d)})
+			var xAxisall = d3.svg.axis().scale(xs).tickFormat(function (d) {return xs.tickFormat(5,d3.format(",d"))(d)});
 		}
 
 		//Define Y axis
@@ -862,120 +912,58 @@ $(document).ready(function(){
 	}
 
 	// Delete buttons
-	// If any delete pressed
-	$('.deletebuttons').click(function() {
+	// Function for delete buttons
+	function deleteButtonDuties(number) {
 		if (count == 1)
 		{
 			$('.graphInstructions').hide();
 			$('#texts').hide();
 			$('#summarygraph').hide();
+			$('.badge-info').hide();
 		}
 		// Decrement count
 		count--;
-		// Set deletepressed to true
-		deletePressed = true;
+		// Change badge info for user
+		$('.badge-info').html("Your number of valid searches is " + count + "!");
 		// Enable text input
 		$('#userInput').removeAttr('disabled');
-	});
+		// delete entered input from the duplicate array
+		enteredInput[number-1] = '';
+		// Hide the checkbox
+		$('#searchOption' + number).hide();
+		// Hide description box
+		$('#description' + number).hide();
+		// Hide the tweettext
+		$('#user' + number).hide();
+		$('#tweettext' + number).slideUp(200);
+		// Hide the graphing button
+		$('#button' + number).hide();
+		// Kill individual graph
+		$('#graphuser' + number).empty();
+		// Kill username text in search box
+		$('#content' + number).empty();
+		// Push that deleted entry into a queue so we can replace
+		queue.push(number);
+	}
 	// First user deleted
 	$('.delete1').click(function(){
-		// Set some variable to be 1
-		whichButton = 1;
-		// delete entered input from the duplicate array
-		enteredInput[0] = '';
-		// Hide the checkbox
-		$('#searchOption1').hide();
-		// Hide description box
-		$('#description1').hide();
-		// Hide the tweettext
-		$('#user1').hide();
-		$('#deletett1').hide();
-		// Hide the graphing button
-		$('#button1').hide();
-		// Kill individual graph
-		$('#graphuser1').empty();
-		// Kill username text in search box
-		$('#content1').empty();
+		deleteButtonDuties(1);
 	});
 	// Second user deleted
 	$('.delete2').click(function(){
-		// Set some variable to be 2
-		whichButton = 2;
-		// delete entered input from the duplicate array
-		enteredInput[1] = '';
-		// Hide the checkbox
-		$('#searchOption2').hide();
-		// Hide description box
-		$('#description2').hide();
-		// Hide the tweettext
-		$('#user2').hide();
-		$('#deletett2').hide();
-		// Hide the graphing button
-		$('#button2').hide();
-		// Kill individual graph
-		$('#graphuser2').empty();
-		// Kill username text in search box
-		$('#content2').empty();
+		deleteButtonDuties(2);
 	});
 	// Third user deleted
 	$('.delete3').click(function(){
-		// Set some variable to be 3
-		whichButton = 3;
-		// delete entered input from the duplicate array
-		enteredInput[2] = '';
-		// Hide the checkbox
-		$('#searchOption3').hide();
-		// Hide description box
-		$('#description3').hide();
-		// Hide the tweettext
-		$('#user3').hide();
-		$('#deletett3').hide();
-		// Hide the graphing button
-		$('#button3').hide();
-		// Kill individual graph
-		$('#graphuser3').empty();
-		// Kill username text in search box
-		$('#content3').empty();
+		deleteButtonDuties(3);
 	});
 	// Fourth user deleted
 	$('.delete4').click(function(){
-		// Set some variable to be 4
-		whichButton = 4;
-		// delete entered input from the duplicate array
-		enteredInput[3] = '';
-		// Hide the checkbox
-		$('#searchOption4').hide();
-		// Hide description box
-		$('#description4').hide();
-		// Hide the tweettext
-		$('#user4').hide();
-		$('#deletett4').hide();
-		// Hide the graphing button
-		$('#button4').hide();
-		// Kill individual graph
-		$('#graphuser4').empty();
-		// Kill username text in search box
-		$('#content4').empty();
+		deleteButtonDuties(4);
 	});
 	// Fifth user deleted
 	$('.delete5').click(function(){
-		// Set some variable to be 1
-		whichButton = 5;
-		// delete entered input from the duplicate array
-		enteredInput[4] = '';
-		// Hide the checkbox
-		$('#searchOption5').hide();
-		// Hide description box
-		$('#description5').hide();
-		// Hide the tweettext
-		$('#user5').hide();
-		$('#deletett5').hide();
-		// Hide the graphing button
-		$('#button5').hide();
-		// Kill individual graph
-		$('#graphuser5').empty();
-		// Kill username text in search box
-		$('#content5').empty();
+		deleteButtonDuties(5);
 	});
 
 

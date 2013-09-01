@@ -113,20 +113,27 @@
 					<div class='individual' id='graphuser5'></div><br><br>
 					<div id='texts'>View last 20 tweets:</div>
 					<div id='user1'></div>
-					<div id = 'deletett1'><div class= "tweettext" id='tweettext1'></div></div>
+					<div class= "tweettext" id='tweettext1'></div>
 					<div id='user2'></div>
-					<div id = 'deletett2'><div class= "tweettext" id='tweettext2'></div></div>
+					<div class= "tweettext" id='tweettext2'></div>
 					<div id='user3'></div>
-					<div id = 'deletett3'><div class= "tweettext" id='tweettext3'></div></div>
+					<div class= "tweettext" id='tweettext3'></div>
 					<div id='user4'></div>
-					<div id = 'deletett4'><div class= "tweettext" id='tweettext4'></div></div>
+					<div class= "tweettext" id='tweettext4'></div>
 					<div id='user5'></div>
-					<div id = 'deletett5'><div class= "tweettext" id='tweettext5'></div></div>
+					<div class= "tweettext" id='tweettext5'></div>
 				</div>
 				<!-- Insert search query, graphing options on right quarter of page -->
 				<div class="span3 offset1">
-					<h5>Search for any Twitter username! SOCR will display their user information at the top of the page, number of tweets over any specified period of time in a graph below, and their exact tweet text at the bottom of the page.</h5>
-					<input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'><br>
+					<h5>Search for any Twitter username! SOCR will display:</h5>
+					<ul id='infoAboveSearch'>
+						<li>User information</li>
+						<li>When selected users are tweeting</li>
+						<li>Graphical user comparisons of tweet patterns</li>
+						<li>Exact tweet text</li>
+						<li>Important statistics to note</li>
+					</ul>
+					<div id='usersearch'><input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'></div><br>
 					<p align=right><span class="badge badge-info"></span></p>			
 					<div class='searches' id="successfulSearch"><strong><i class='icon-ok-circle'></i> Found them!</strong></div>
 					<div class='searches' id="noExistence"><strong><i class='icon-ban-circle'></i> This username does not exist! Please try again.</strong></div>
