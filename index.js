@@ -8,11 +8,10 @@ Control panel for individual graphs: Text, logarithmic, grid
 Issue with users with less than 20 tweets (if rtvisulization is third user, first two users only get first three points connected on summary graph and individual graphs)
 logarithmic shooting off page for tweet between 0 and 1 hour ago (for now, clamp solves)
 Bootstrap conversion
-Statistics
 Links on info above search box
-Fix delete buttons: summary graph only one messing up (needs to update automatically with new user)
-
-NEW IDEA: eliminate auto update and just do it every 1 minute by default, no checkboxes, update now only does control panel, delete buttons work
+Fix delete buttons: summary graph only one messing up (needs to update automatically with new user), THOROUGHLY TEST
+therock graph is wrong
+table: function with delete buttons
 
 Questions:
 What should we do for checked boxes, display those graphs?
@@ -65,19 +64,15 @@ $(document).ready(function(){
 		$('.graphbutton').hide();
 		$('#statistics').hide();
 		$('.deletebuttons').hide();
-		//$('Andy').insertAfter('#searchOption1');
-		//$('#searchOption1').html('Andy');
-		// Older delete buttons
-		//$('#searchOption1').hide();
-		//$('.delete1').hide();
-		//$('#searchOption2').hide();
-		//$('.delete2').hide();
-		//$('#searchOption3').hide();
-		//$('.delete3').hide();
-		//$('#searchOption4').hide();
-		//$('.delete4').hide();
-		//$('#searchOption5').hide();
-		//$('.delete5').hide();
+		$('#mousexample1').hide();
+		$('#mousexample2').hide();
+		$('.statsChecks').hide();
+		$('.stats1').hide();
+		$('.stats2').hide();
+		$('.stats3').hide();
+		$('.stats4').hide();
+		$('.stats5').hide();
+		//$('.explain').hide();
 	};
 
 	// Every one second, update gmt/local time
@@ -85,8 +80,6 @@ $(document).ready(function(){
         findTime();
     }, 1000);
 
-	// Create new array for json parse
-	var tweets = new Array();
 	// Keep track of text
 	var usertweets = new Array(5);
 	for (var i = 0; i < 5; i++)
@@ -105,6 +98,7 @@ $(document).ready(function(){
     var onegraohArray = new Array();
     var svgall;
     var combinedthickness = new Array(5);
+    var individualsvg = new Array(5);
 	////////////////////////////////////////
 
     // Success function for API
@@ -119,8 +113,11 @@ $(document).ready(function(){
 		// If user exists
 		if ((test != ERROR1) && (test != ERROR2)) {
 
+			usertime[whichToUse-1] = [];
+			usertweets[whichToUse-1] = [];
+
 			// Parse correct data
-			tweets = JSON.parse(data.query.results.result);
+			var tweets = JSON.parse(data.query.results.result);
 
 			// Set up text, dates, D3 variables
 			var finalArray = new Array();
@@ -198,6 +195,121 @@ $(document).ready(function(){
 
 			// See if user is protected (if so, can't retrieve text)
 			var protection = tweets[0].user.protected;
+			// Calculate statistics
+			findStatistics(usertime[whichToUse-1], screen_name, photo);
+			function findStatistics(info, name, img) {
+				$('#statsinfo' + whichToUse).html("<span>@" + name + "<br><img src='" + img + "'></span>");
+				// Total time between 20 tweets
+				var change1 = info[0];
+				var change2 = info[info.length-1];
+				
+				// Get both parsed times
+				var timeone = getParsedTime(change1);
+				var timetwo = getParsedTime(change2);
+				// Find difference
+				var longDistance = fancyDifference(timeone, timetwo);
+				// Display long distance
+				/*if (longDistance[0] > 0)
+					var timediff = "The amount of time that has elapsed between the first and last tweet we retrieved for the username @" + name + " is " + longDistance[0] + " days, " + longDistance[1] + " hours, " + longDistance[2] + " minutes, and " + longDistance[3] + " seconds.";
+				else
+					var timediff = "The amount of time that has elapsed between the first and last tweet we retrieved for the username @" + name + " is " + longDistance[1] + " hours, " + longDistance[2] + " minutes, and " + longDistance[3] + " seconds.";
+				*/
+				if (longDistance[0] > 0)
+					$('#range' + whichToUse).html(longDistance[0] + ' days, and ' + longDistance[1] + ':' + longDistance[2] + ':' + longDistance[3]);
+				else
+					$('#range' + whichToUse).html(longDistance[1] + ':' + longDistance[2] + ':' + longDistance[3]);
+				
+				// Get differences between tweets
+				var allDifferences = new Array();
+				for (var j = 0; j < (info.length-1); j++)
+				{
+					var y = info[j]; 
+					var z = info[j+1];
+					var yparse = getParsedTime(y);
+					var zparse = getParsedTime(z);
+					allDifferences[j] = zparse - yparse;
+				}
+
+				// Find maximum and minimum
+				var minimum = Math.min.apply(null, allDifferences);
+				var maximum = Math.max.apply(null, allDifferences);
+				var goodMinimum = fancyDifference(0, minimum);
+				var goodMaximum = fancyDifference(0, maximum);
+				/*if (goodMinimum[0] > 0)
+					timediff += " The minimum time between two tweets for the username @" + name + " was " + goodMinimum[0] + " days, " + goodMinimum[1] + " hours, " + goodMinimum[2] + " minutes, and " + goodMinimum[3] + " seconds.";
+				else
+					timediff += " The minimum time between two tweets for the username @" + name + " was " + goodMinimum[1] + " hours, " + goodMinimum[2] + " minutes, and " + goodMinimum[3] + " seconds.";
+				if (goodMaximum[0] > 0)
+					timediff += " The maximum time between two tweets for the username @" + name + " was " + goodMaximum[0] + " days, " + goodMaximum[1] + " hours, " + goodMaximum[2] + " minutes, and " + goodMaximum[3] + " seconds.";
+				else
+					timediff += " The maximum time between two tweets for the username @" + name + " was " + goodMaximum[1] + " hours, " + goodMaximum[2] + " minutes, and " + goodMaximum[3] + " seconds.";
+				*/
+				if (goodMinimum[0] > 0)
+					$('#minimum' + whichToUse).html(goodMinimum[0] + ' days, and ' + goodMinimum[1] + ':' + goodMinimum[2] + ':' + goodMinimum[3]);
+				else
+					$('#minimum' + whichToUse).html(goodMinimum[1] + ':' + goodMinimum[2] + ':' + goodMinimum[3]);
+				if (goodMaximum[0] > 0)
+					$('#maximum' + whichToUse).html(goodMaximum[0] + ' days, and ' + goodMaximum[1] + ':' + goodMaximum[2] + ':' + goodMaximum[3]);
+				else
+					$('#maximum' + whichToUse).html(goodMaximum[1] + ':' + goodMaximum[2] + ':' + goodMaximum[3]);
+				
+				// Mean
+				var sum = 0;
+				for(var i = 0; i < allDifferences.length; i++)
+					sum += allDifferences[i];
+				sum /= allDifferences.length;
+				var actualMean = fancyDifference(0, sum);
+				/*if (actualMean[0] > 0)
+					timediff += " The mean time between tweets for the username @" + name + " was " + actualMean[0] + " days, " + actualMean[1] + " hours, " + actualMean[2] + " minutes, and " + Math.round(actualMean[3]) + " seconds.";
+				else
+					timediff += " The mean time between tweets for the username @" + name + " was " + actualMean[1] + " hours, " + actualMean[2] + " minutes, and " + Math.round(actualMean[3]) + " seconds.";
+					*/
+				if (actualMean[0] > 0)
+					$('#mean' + whichToUse).html(actualMean[0] + ' days, and ' + actualMean[1] + ':' + actualMean[2] + ':' + Math.round(actualMean[3]));
+				else
+					$('#mean' + whichToUse).html(actualMean[1] + ':' + actualMean[2] + ':' + Math.round(actualMean[3]));
+
+				// Median
+				var sortedDiff = allDifferences.sort();
+				if ((sortedDiff % 2) == 0)
+				{ 
+					var lowmidpoint = (sortedDiff.length/2) - 1
+					var highmidpoint = sortedDiff.length/2
+					var median = Math.round(((sortedDiff[highmidpoint] - sortedDiff[lowmidpoint])/2));
+				}
+				else
+				{
+					var midpoint = (sortedDiff.length+1)/2;
+					var median = sortedDiff[midpoint - 1];
+				}
+				var actualMedian = fancyDifference(0, median);
+				/*if (actualMedian[0] > 0)
+					timediff += " The median time between tweets for the username @" + name + " was " + actualMedian[0] + " days, " + actualMedian[1] + " hours, " + actualMedian[2] + " minutes, and " + Math.round(actualMedian[3]) + " seconds.";
+				else
+					timediff += " The median time between tweets for the username @" + name + " was " + actualMedian[1] + " hours, " + actualMedian[2] + " minutes, and " + Math.round(actualMedian[3]) + " seconds.";
+				$('#stats' + whichToUse).html(timediff);
+				console.log(sortedDiff);*/
+				if (actualMedian[0] > 0)
+					$('#median' + whichToUse).html(actualMedian[0] + ' days, and ' + actualMedian[1] + ':' + actualMedian[2] + ':' + actualMedian[3]);
+				else
+					$('#median' + whichToUse).html(actualMedian[1] + ':' + actualMedian[2] + ':' + actualMedian[3]);
+
+				// Stddev
+				var stddevsum = 0;
+				for (var i = 0; i < allDifferences.length; i++)
+				{
+					var y = (allDifferences[i] - sum);
+					y *= y;
+					stddevsum += y;
+				}
+				stddevsum /= allDifferences.length;
+				stddevsum = Math.sqrt(stddevsum);
+				var actualStdDev = fancyDifference(0, stddevsum);
+				if (actualStdDev[0] > 0)
+					$('#stddev' + whichToUse).html(actualStdDev[0] + ' days, and ' + actualStdDev[1] + ':' + actualStdDev[2] + ':' + Math.round(actualStdDev[3]));
+				else
+					$('#stddev' + whichToUse).html(actualStdDev[1] + ':' + actualStdDev[2] + ':' + Math.round(actualStdDev[3]));
+			}
 
 			// Calculate thickness of line and circle radius
 			if (numberOfFollowers < INTERVALS[0])
@@ -237,6 +349,10 @@ $(document).ready(function(){
 				radius = RADIUS[5];
 			}
 
+			// Set up stats table
+			$('#statistics').slideUp(100);
+			$('.stats' + whichToUse).show();
+
 			// Hide all individual graphs
 			$('.individual').hide();
 
@@ -263,11 +379,15 @@ $(document).ready(function(){
 			$('#description' + whichToUse).html("<p align=center>" + name + "&nbsp&nbsp<img src='" + photo + "' class='profilephoto'>&nbsp&nbsp@" + screen_name + "<table border='1' align=center><tr><td># of Followers</td><td># of Statuses</td></tr><tr><td align=center>" + numberOfFollowers + "</td><td align=center>" + numberOfStatuses + "</td></tr></table><p align=center><a href='" + URL + "' target='_blank'</a>" + URL + "</p></p>");
 
 			// Show input along with checkbox and delete button
-			// $('#searchOption' + whichToUse).html("<input type='checkbox' id='box" + whichToUse + "'>&nbsp&nbsp&nbsp@" + screen_name + "&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>")
-			//$('#searchOption' + whichToUse).html("<button class='btn btn-mini btn-danger delete" + whichToUse +"' type='button'><i class='icon-remove icon-white'></i></button>&nbsp&nbsp&nbsp@" + screen_name + "<br><br>")
 			var htmlForUserDelete = "<span id='content" + whichToUse + "'>&nbsp&nbsp&nbsp@";
 			$(htmlForUserDelete + screen_name + '</span>').insertAfter("#searchOption" + whichToUse);
 			$('#searchOption' + whichToUse).show();
+
+			// Set up stats box
+			$("<span>&nbsp@" + screen_name + "</span>").insertAfter('#statsuser' + whichToUse);
+			$('#statsuser' + whichToUse).show().prop('checked', true);
+			checkStatsBox();
+			
 
 			// Set up tweet text boxes
 			var htmlstring = '';
@@ -316,10 +436,8 @@ $(document).ready(function(){
 			$('#description' + whichToUse).show();	
 
 			// Display tweettext for this user (button)
-			//$('#user' + whichToUse).html("<br><p align=center><button class='btn btn-info'>@" + screen_name + "</button></p>");
 			$('#user' + whichToUse).html("<br><p align=center><button class='btn " + BUTTONS[whichToUse-1] + "'>@" + screen_name + "</button></p>").show();
 			$('#texts').show();
-			$('#deletett' + whichToUse).show();
 
 			// Show the summary graph and the buttons for individual graphs
 			$('#sumbutton').show();
@@ -332,7 +450,7 @@ $(document).ready(function(){
 
 			// START OF D3 
 
-			lengthall[whichToUse-1]=finalArray.length;
+			lengthall[whichToUse-1] = finalArray.length;
 			
 			for (var i = 0; i < whichToUse-1; i++)
 			 	thenumber += lengthall[i];
@@ -347,7 +465,8 @@ $(document).ready(function(){
 			var xind = getXScale(dataset);
 			var yind = getYScale(dataset);
 			var rind = getRScale(radius, dataset);
-			var newGraph = createIndividualGraph(dataset, xind, yind, rind);    
+			individualsvg[whichToUse-1] = createIndividualGraph(dataset, xind, yind, rind);
+			//var newGraph = createIndividualGraph(dataset, xind, yind, rind);    
 
 			// Show graphing instructions after created
 		    $('.graphInstructions').show();	
@@ -391,7 +510,7 @@ $(document).ready(function(){
 			        .attr("stroke", COLORS[i])
 			        .style("stroke-opacity", 0.6);
 
-			        newGraph.append('line')
+			        individualsvg[whichToUse-1].append('line')
 			        .attr('x1',xind((finalArray[j])[0]))
 			        .attr('x2',xind((finalArray[j+1])[0]))                                        
 			        .attr('y1',yind((finalArray[j])[1]))
@@ -421,6 +540,43 @@ $(document).ready(function(){
 	// Keep track of input to make sure there are no duplicates
 	var enteredInput = new Array();
 	enteredInput[0], enteredInput[1], enteredInput[2], enteredInput[3], enteredInput[4] = '';
+
+	function getParsedTime(x) {
+		var month = x[4] + x[5] + x[6];
+		var day = x[8] + x[9];
+		var year = x[26] + x[27] + x[28] + x[29];
+		var hour = x[11] + x[12];
+		var minute = x[14] + x[15];
+		var second = x[17] + x[18];
+		var timeone = month + ' ' + day + ', ' + year + ' ' + hour + ':' + minute + ':' + second;
+		var parseone = Date.parse(timeone);
+		return parseone;
+	}
+
+	function fancyDifference(a, b)
+	{
+		var difference = (b - a) / 3600000;
+		var minuteremainder = (b - a) % 3600000;
+		difference = parseInt(difference);
+		// Take hour part
+		var hours = Math.floor(difference);
+		// Get days
+		var days = Math.floor(difference/24);
+		// If days > 0 modify hours
+		if (days > 0)
+			hours = hours % 24;
+		// Get minutes part
+		var minutes = Math.floor((minuteremainder/60000));
+		// Get seconds part
+		var secondremainder = minuteremainder % 60000;
+		var seconds = secondremainder/1000;
+		var arrayRet = new Array(4);
+		arrayRet[0] = days;
+		arrayRet[1] = hours;
+		arrayRet[2] = minutes;
+		arrayRet[3] = seconds;
+		return arrayRet;
+	}
 
 	// Display the usernames as checkboxes to graph
 	function displayCheckboxes(){
@@ -605,6 +761,47 @@ $(document).ready(function(){
 		$('#statistics').slideUp(200);
 	});
 
+	// Example mouseover
+	$('#example1').mouseover(function() {
+		$('#mousexample1').slideDown();
+	});
+	$('#example1').mouseout(function() {
+		$('#mousexample1').slideUp();
+	});
+	$('#example2').mouseover(function() {
+		$('#mousexample2').slideDown();
+	});
+	$('#example2').mouseout(function() {
+		$('#mousexample2').slideUp();
+	});
+
+	// Information mouseovers
+	$('#range').mouseover(function() {
+		$('#explainStats').html("The 'Range' is the distance between the most extreme points in the sample. For example, in a set {1, 5, 3, 17, 6, 10} the range is 16 since 17-1 is 16.<br><br>In our data, the range means the distance between the first and last tweet we retrieve.");
+	});
+	$('#median').mouseover(function() {
+		$('#explainStats').html("The 'Median' is the middle point of a sorted set (which is in ascending order). For example, in the set {1, 3, 6, 9, 11} the median is 6 since it is in the middle. In a set of even number of elements, the median is tha average of the two middle points. For example, in the set {1, 3, 5, 7} the median is 4 since 3 and 5 are in the middle and the average of 3 and 5 is 4.<br><br>In our data, the median is the middle point of our retrieved tweets and denotes the median time between two tweets of the same user.");
+	});
+	$('#mean').mouseover(function() {
+		$('#explainStats').html("The 'Mean' is the average of a set. For example, the mean of the set {1, 4, 7} is 3 since 1 + 4 + 7 = 12 and 12/3 = 4.<br><br>In our data, the mean denotes the average amount of time the user takes between subsequent tweets.");
+	});
+	$('#minimum').mouseover(function() {
+		$('#explainStats').html("The 'Minimum' is the lowest point in a set. For example in the set {1, 0, 12, 14, 2, 6} the minimum is 0.<br><br>In our data, the minimum denotes the smallest amount of time between subsequent tweets from the tweets we retrieved, in other words, when the user was quickest in sending out back to back tweets.");
+	});
+	$('#maximum').mouseover(function() {
+		$('#explainStats').html("The 'Maximum' is the highest point in a set. For example in the set { 4, 5, 2, 19, 23, 4, 8, 10, 34, 6} the maximum is 34.<br><br>In our data, the maximum denotes the most amount of time between subsequent tweets from the tweets we retrieved, in other words, when the user was very slow and inactive on Twitter.");
+	});
+	$('#stddev').mouseover(function() {
+		$('#explainStats').html("The 'Standard Deviation' shows how much variation there is from the mean. If it is small, then most points are close to the mean. If it is large, then most points are scattered.<br><br>In our data, the standard deviation denotes how consistently the user is on twitter. If it is small then that means the user is consistent and a frequent user and if large vice versa.");
+	});
+	$('.explain').mouseout(function() {
+		$('#explainStats').html("Mouseover another!");
+	});
+
+	// Statistics Tables
+	// Check statistics Options
+	$('.statsbutton').click(checkStatsBox);
+
 	// Collapsible tweet text
 	$('#user1').toggle(function(){
 		$('#tweettext1').slideDown(200);
@@ -631,6 +828,90 @@ $(document).ready(function(){
 	}, function() {
 		$('#tweettext5').slideUp(200);
 	});
+
+	// Perform checks on stats table
+	function checkStatsBox(){
+		if(document.getElementById('statsuser1').checked)
+			$('.stats1').show();
+		else
+			$('.stats1').hide();
+		if(document.getElementById('statsuser2').checked)
+			$('.stats2').show();
+		else
+			$('.stats2').hide();
+		if(document.getElementById('statsuser3').checked)
+			$('.stats3').show();
+		else
+			$('.stats3').hide();
+		if(document.getElementById('statsuser4').checked)
+			$('.stats4').show();
+		else
+			$('.stats4').hide();
+		if(document.getElementById('statsuser5').checked)
+			$('.stats5').show();
+		else
+			$('.stats5').hide();
+		if(document.getElementById('rangestats').checked)
+		{
+			$('#range').show();
+			$('#allranges').show();
+		}
+		else
+		{
+			$('#range').hide();
+			$('#allranges').hide();
+		}
+		if(document.getElementById('meanstats').checked)
+		{
+			$('#mean').show();
+			$('#allmeans').show();
+		}
+		else
+		{
+			$('#mean').hide();
+			$('#allmeans').hide();
+		}
+		if(document.getElementById('medianstats').checked)
+		{
+			$('#median').show();
+			$('#allmedians').show();
+		}
+		else
+		{
+			$('#median').hide();
+			$('#allmedians').hide();
+		}
+		if(document.getElementById('minimumstats').checked)
+		{
+			$('#minimum').show();
+			$('#allminimums').show();
+		}
+		else
+		{
+			$('#minimum').hide();
+			$('#allminimums').hide();
+		}
+		if(document.getElementById('maximumstats').checked)
+		{
+			$('#maximum').show();
+			$('#allmaximums').show();
+		}
+		else
+		{
+			$('#maximum').hide();
+			$('#allmaximums').hide();
+		}
+		if(document.getElementById('stddevstats').checked)
+		{
+			$('#stddev').show();
+			$('#allstddevs').show();
+		}
+		else
+		{
+			$('#stddev').hide();
+			$('#allstddevs').hide();
+		}
+	}
 
 	function getXScale(data) {
 		var xScale = d3.scale.linear()

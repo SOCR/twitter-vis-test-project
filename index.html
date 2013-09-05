@@ -91,7 +91,93 @@
 					<div class='graphInstructions'>Check out some statistics!<br><br>
 						<button class="btn btn-custom3" id='statsbutton'>Statistics</button>
 					</div>
-					<br><div id='statistics'>Here we will display some basic statistics like correlation measures, tweet 'explosions', and event prediction.</div><br>
+					<br><div id='statistics'><strong>Below we will show basic statistics about the users you have searched such as range, median, mean, etc. in addition to more complicated metrics like correlation. We will even use these statistics to predict tweeting patterns.</strong><br><br><strong>Mouseover the two following data reports to understand how we report data in the table below.</strong><br><br>
+					<div id='example1'>5:32:16</div><div id='mousexample1'>This statement is equivalent to saying 5 hours, 32 minutes, and 16 seconds.</div><br>
+					<div id='example2'>4 days, and 20:9:32</div><div id='mousexample2'>This statement is equivalent to saying 4 days, 20 hours, 9 minutes, and 32 seconds.</div><br>
+					<div class='span12'>
+						<div class='span6'>
+							<strong>Select which users you want to show statistics for:</strong>
+							<br><input type='checkbox' id='statsuser1' class='statsChecks' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser2' class='statsChecks' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser3' class='statsChecks' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser4' class='statsChecks' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser5' class='statsChecks' style="margin-top: -4px;">
+							<br><br><p><button class='btn btn-primary statsbutton'>Update!</button></p>
+						</div>
+						<div class='span6'>
+							<strong>Select which statistics you want to show:</strong>
+							<br><input type='checkbox' id='rangestats' style="margin-top: -4px;" checked>&nbspRange
+							<br><input type='checkbox' id='meanstats' style="margin-top: -4px;" checked>&nbspMean
+							<br><input type='checkbox' id='medianstats' style="margin-top: -4px;" checked>&nbspMedian
+							<br><input type='checkbox' id='minimumstats' style="margin-top: -4px;" checked>&nbspMinimum
+							<br><input type='checkbox' id='maximumstats' style="margin-top: -4px;" checked>&nbspMaximum
+							<br><input type='checkbox' id='stddevstats' style="margin-top: -4px;"checked>&nbspStandard Deviation
+						</div>
+					</div>
+					<br>
+					<br>
+					<p align='center'><u><strong>Basic Statistics for Selected Users (where all times are in terms of time between tweets)</u></strong></p>
+					<table border="1" align="center">
+					    <tr>
+					      <th></th>
+					      <th id='statsinfo1' class='stats1'></th>
+					      <th id='statsinfo2' class='stats2'></th>
+					      <th id='statsinfo3' class='stats3'></th>
+					      <th id='statsinfo4' class='stats4'></th>
+					      <th id='statsinfo5' class='stats5'></th>
+					    </tr>
+					    <tr id='allranges'>
+					      <th><i id='range' class='icon-info-sign explain'></i>Range</th>
+					      <td id='range1' class='stats1'></td>
+					      <td id='range2' class='stats2'></td>
+					      <td id='range3' class='stats3'></td>
+					      <td id='range4' class='stats4'></td>
+					      <td id='range5' class='stats5'></td>
+					    </tr>
+					    <tr id='allmeans'>
+					      <th><i id='mean' class='icon-info-sign explain'></i>Mean</th>
+					      <td id='mean1' class='stats1'></td>
+					      <td id='mean2' class='stats2'></td>
+					      <td id='mean3' class='stats3'></td>
+					      <td id='mean4' class='stats4'></td>
+					      <td id='mean5' class='stats5'></td>
+					    </tr>
+					    <tr id='allmedians'>
+					      <th><i id='median' class='icon-info-sign explain'></i>Median</th>
+					      <td id='median1' class='stats1'></td>
+					      <td id='median2' class='stats2'></td>
+					      <td id='median3' class='stats3'></td>
+					      <td id='median4' class='stats4'></td>
+					      <td id='median5' class='stats5'></td>
+					    </tr>
+					    <tr id='allminimums'>
+					      <th><i id='minimum' class='icon-info-sign explain'></i>Minimum</th>
+					      <td id='minimum1' class='stats1'></td>
+					      <td id='minimum2' class='stats2'></td>
+					      <td id='minimum3' class='stats3'></td>
+					      <td id='minimum4' class='stats4'></td>
+					      <td id='minimum5' class='stats5'></td>
+					    </tr>
+					    <tr id='allmaximums'>
+					      <th><i id='maximum' class='icon-info-sign explain'></i>Maximum</th>
+					      <td id='maximum1' class='stats1'></td>
+					      <td id='maximum2' class='stats2'></td>
+					      <td id='maximum3' class='stats3'></td>
+					      <td id='maximum4' class='stats4'></td>
+					      <td id='maximum5' class='stats5'></td>
+					    </tr>
+					    <tr id='allstddevs'>
+					      <th><i id='stddev' class='icon-info-sign explain'></i>Standard Deviation</th>
+					      <td id='stddev1' class='stats1'></td>
+					      <td id='stddev2' class='stats2'></td>
+					      <td id='stddev3' class='stats3'></td>
+					      <td id='stddev4' class='stats4'></td>
+					      <td id='stddev5' class='stats5'></td>
+					    </tr>
+					</table>
+					<br>
+					<div id='explainStats' align="center">Mouseover any info icon above to explain that statistic!</div>
+					</div><br>
 					<div class='graphInstructions'>The graph of all tweets is below. Need an individual graph? Click their button below!</div><br>
 					<div id='btn-group-wrap'>	
 						<div class="btn-group">
@@ -105,6 +191,26 @@
 					<div class='graphInstructions'>Or go back to the default graph of all the tweets!<br><br>
 						<button class="btn btn-custom2 graphbutton" id='sumbutton'>All Users</button><br><br>
 					</div>
+					<!--<div id='individualpanel'>
+						<div class='span12'>
+							<div id='individualpaneloptions'><strong>Controls for the User:</strong><br>
+							After setting your desired options, please click the 'Update Now' button below to refresh the graph below.</div><br>
+							<div class='span4'><strong>Time Scale:</strong><br>
+								Note: Default scale is Linear<br>
+								<input type="radio" style="margin-top: -4px;" name="timescale" value="Linear" id='linear' checked>&nbspLinear<br>
+								<input type="radio" style="margin-top: -4px;" name="timescale" value="Logarithmic" id='log'>&nbspLogarithmic (more advantageous for infrequent users)
+							</div>
+							<div class='span3'><strong>Graph Background Grid:</strong><br>
+								Note: Default setting is grid<br>
+								<input type='checkbox' style="margin-top: -4px;" name='grid' value='backgroundgrid' id='Grid' checked>&nbspShow Grid
+							</div>
+							<div class='span3'><strong>Tweet Numbering:</strong><br>
+								Note: Default setting is text<br>
+								<input type='checkbox' style="margin-top: -4px;" name='graphtext' value='gtext' checked>&nbspShow Tweet Numbering<br><br>
+							</div>
+							<div align="center"><button class="btn btn-primary" id='individualbutton' type="button"><i class='icon-refresh icon-white'></i> Update Now</button></div>
+						</div>
+					</div>-->
 					<div id='summarygraph'></div>
 					<div class='individual' id='graphuser1'></div>
 					<div class='individual' id='graphuser2'></div>

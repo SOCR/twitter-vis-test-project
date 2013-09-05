@@ -65,6 +65,11 @@
     border-color: solid black;
 }
 
+#individualpaneloptions {
+    font-style: italic;
+    text-align: center;
+}
+
 #paneltitle {
     font-style: italic;
     font-weight: bold;
@@ -72,7 +77,6 @@
 }
 
 #statistics {
-    font-weight: bold;
     font-style: italic;
     font-size: 14px;
     border-style: solid;
