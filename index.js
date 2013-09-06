@@ -11,7 +11,6 @@ Bootstrap conversion
 Links on info above search box
 Fix delete buttons: summary graph only one messing up (needs to update automatically with new user), THOROUGHLY TEST
 therock graph is wrong
-table: function with delete buttons
 
 Questions:
 What should we do for checked boxes, display those graphs?
@@ -384,7 +383,7 @@ $(document).ready(function(){
 			$('#searchOption' + whichToUse).show();
 
 			// Set up stats box
-			$("<span>&nbsp@" + screen_name + "</span>").insertAfter('#statsuser' + whichToUse);
+			$("<span id='statsname" + whichToUse + "'>&nbsp@" + screen_name + "</span>").insertAfter('#statsuser' + whichToUse);
 			$('#statsuser' + whichToUse).show().prop('checked', true);
 			checkStatsBox();
 			
@@ -1225,6 +1224,11 @@ $(document).ready(function(){
 		$('#content' + number).empty();
 		// Push that deleted entry into a queue so we can replace
 		queue.push(number);
+		// Statistics Box: Kill checkbox, hide table entries
+		$('#statsname' + number).empty();
+		$('#statsuser' + number).hide();
+		$('.stats' + number).hide();
+		$('#statsuser' + number).prop('checked', false);
 	}
 	// First user deleted
 	$('.delete1').click(function(){
