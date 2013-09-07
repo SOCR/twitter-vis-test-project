@@ -6,21 +6,10 @@ Currently to do within current scope:
 Resize screen on browser change
 Control panel for individual graphs: Text, logarithmic, grid
 Issue with users with less than 20 tweets (if rtvisulization is third user, first two users only get first three points connected on summary graph and individual graphs)
-logarithmic shooting off page for tweet between 0 and 1 hour ago (for now, clamp solves)
 Bootstrap conversion
 Links on info above search box
 Fix delete buttons: summary graph only one messing up (needs to update automatically with new user), THOROUGHLY TEST
 therock graph is wrong
-
-Questions:
-What should we do for checked boxes, display those graphs?
-Update now displays only checked graphs?
-
-Possible new functionality:
-On hover over line, display last tweet text and time photo screen name (or all tweets)
-Update now button (checkmarks tell which ones to include on summary graph)
-Do auto refresh once above works
-Animated summary graph
 
 */
 
@@ -697,7 +686,8 @@ $(document).ready(function(){
 	    }
 	});
 
-	$('#update').click(function(){
+	// If control panel modified do what user requests
+	$('.controls').click(function(){
 		var x = getXScaleAll();
 	    // Get yscale for all users entered
 	    var y = getYScaleAll();
@@ -755,7 +745,7 @@ $(document).ready(function(){
 
 	// Statistics Button
 	$('#statsbutton').toggle(function(){
-		$('#statistics').slideDown(200);
+		$('#statistics').slideDown(200)
 	}, function() {
 		$('#statistics').slideUp(200);
 	});
@@ -798,8 +788,7 @@ $(document).ready(function(){
 	});
 
 	// Statistics Tables
-	// Check statistics Options
-	$('.statsbutton').click(checkStatsBox);
+	$('.actualStats').click(checkStatsBox);
 
 	// Collapsible tweet text
 	$('#user1').toggle(function(){

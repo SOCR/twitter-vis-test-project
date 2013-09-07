@@ -97,25 +97,22 @@
 					<div class='span12'>
 						<div class='span6'>
 							<strong>Select which users you want to show statistics for:</strong>
-							<br><input type='checkbox' id='statsuser1' class='statsChecks' style="margin-top: -4px;">
-							<br><input type='checkbox' id='statsuser2' class='statsChecks' style="margin-top: -4px;">
-							<br><input type='checkbox' id='statsuser3' class='statsChecks' style="margin-top: -4px;">
-							<br><input type='checkbox' id='statsuser4' class='statsChecks' style="margin-top: -4px;">
-							<br><input type='checkbox' id='statsuser5' class='statsChecks' style="margin-top: -4px;">
-							<br><br><p><button class='btn btn-primary statsbutton'>Update!</button></p>
+							<br><input type='checkbox' id='statsuser1' class='statsChecks actualStats' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser2' class='statsChecks actualStats' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser3' class='statsChecks actualStats' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser4' class='statsChecks actualStats' style="margin-top: -4px;">
+							<br><input type='checkbox' id='statsuser5' class='statsChecks actualStats' style="margin-top: -4px;">
 						</div>
 						<div class='span6'>
 							<strong>Select which statistics you want to show:</strong>
-							<br><input type='checkbox' id='rangestats' style="margin-top: -4px;" checked>&nbspRange
-							<br><input type='checkbox' id='meanstats' style="margin-top: -4px;" checked>&nbspMean
-							<br><input type='checkbox' id='medianstats' style="margin-top: -4px;" checked>&nbspMedian
-							<br><input type='checkbox' id='minimumstats' style="margin-top: -4px;" checked>&nbspMinimum
-							<br><input type='checkbox' id='maximumstats' style="margin-top: -4px;" checked>&nbspMaximum
-							<br><input type='checkbox' id='stddevstats' style="margin-top: -4px;"checked>&nbspStandard Deviation
+							<br><input type='checkbox' id='rangestats' class='actualStats' style="margin-top: -4px;" checked>&nbspRange
+							<br><input type='checkbox' id='meanstats' class='actualStats' style="margin-top: -4px;" checked>&nbspMean
+							<br><input type='checkbox' id='medianstats' class='actualStats' style="margin-top: -4px;" checked>&nbspMedian
+							<br><input type='checkbox' id='minimumstats' class='actualStats' style="margin-top: -4px;" checked>&nbspMinimum
+							<br><input type='checkbox' id='maximumstats' class='actualStats' style="margin-top: -4px;" checked>&nbspMaximum
+							<br><input type='checkbox' id='stddevstats' class='actualStats' style="margin-top: -4px;"checked>&nbspStandard Deviation
 						</div>
 					</div>
-					<br>
-					<br>
 					<p align='center'><u><strong>Basic Statistics for Selected Users (where all times are in terms of time between tweets)</u></strong></p>
 					<table border="1" align="center">
 					    <tr>
@@ -269,20 +266,20 @@
 					  <button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button>
 					</p>-->
 					<div id='panel'>
-						<div align="center"><button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button></div>
+						<!--<div align="center"><button class="btn btn-large btn-primary" id='update' type="button"><i class='icon-refresh icon-white'></i> Update Now</button></div>-->
 						<fieldset>
 							<legend id='paneltitle'>Controls for the User:</legend>
 							After setting your desired options, please click the 'Update Now' button above to refresh the graphs.<br><br>
 							<fieldset>
 								<legend>Time Scale:</legend>
 								Note: Default scale is Linear<br>
-								<input type="radio" style="margin-top: -4px;" name="timescale" value="Linear" id='linear' checked>&nbspLinear<br>
-								<input type="radio" style="margin-top: -4px;" name="timescale" value="Logarithmic" id='log'>&nbspLogarithmic (more advantageous for infrequent users)<br><br>
+								<input type="radio" style="margin-top: -4px;" name="timescale" value="Linear" class='controls' id='linear' checked>&nbspLinear<br>
+								<input type="radio" style="margin-top: -4px;" name="timescale" value="Logarithmic" class='controls' id='log'>&nbspLogarithmic (more advantageous for infrequent users)<br><br>
 							</fieldset>
 							<fieldset>
 								<legend>Graph Background Grid:</legend>
 								Note: Default setting is grid<br>
-								<input type='checkbox' style="margin-top: -4px;" name='grid' value='backgroundgrid' id='Grid' checked>&nbspShow Grid<br><br>
+								<input type='checkbox' style="margin-top: -4px;" name='grid' value='backgroundgrid' class='controls' id='Grid' checked>&nbspShow Grid<br><br>
 							</fieldset>
 							<!--<fieldset>
 								<legend>Tweet Numbering (For All Users):</legend>
