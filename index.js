@@ -11,6 +11,10 @@ Links on info above search box
 Fix delete buttons: summary graph only one messing up (needs to update automatically with new user), THOROUGHLY TEST
 therock graph is wrong
 
+Scan text of tweets:
+1. Store hashtags of each tweet in an array of 20 elements, each element is another array/list of hashtags in that tweet
+2. If hashtag in one element matches another we know it is a repeat
+
 */
 
 $(document).ready(function(){
@@ -105,7 +109,7 @@ $(document).ready(function(){
 			usertweets[whichToUse-1] = [];
 
 			// Parse correct data
-			var tweets = JSON.parse(data.query.results.result);
+			var tweets = data.query.results.json.json;
 
 			// Set up text, dates, D3 variables
 			var finalArray = new Array();
@@ -197,11 +201,6 @@ $(document).ready(function(){
 				// Find difference
 				var longDistance = fancyDifference(timeone, timetwo);
 				// Display long distance
-				/*if (longDistance[0] > 0)
-					var timediff = "The amount of time that has elapsed between the first and last tweet we retrieved for the username @" + name + " is " + longDistance[0] + " days, " + longDistance[1] + " hours, " + longDistance[2] + " minutes, and " + longDistance[3] + " seconds.";
-				else
-					var timediff = "The amount of time that has elapsed between the first and last tweet we retrieved for the username @" + name + " is " + longDistance[1] + " hours, " + longDistance[2] + " minutes, and " + longDistance[3] + " seconds.";
-				*/
 				if (longDistance[0] > 0)
 					$('#range' + whichToUse).html(longDistance[0] + ' days, and ' + longDistance[1] + ':' + longDistance[2] + ':' + longDistance[3]);
 				else
@@ -223,15 +222,6 @@ $(document).ready(function(){
 				var maximum = Math.max.apply(null, allDifferences);
 				var goodMinimum = fancyDifference(0, minimum);
 				var goodMaximum = fancyDifference(0, maximum);
-				/*if (goodMinimum[0] > 0)
-					timediff += " The minimum time between two tweets for the username @" + name + " was " + goodMinimum[0] + " days, " + goodMinimum[1] + " hours, " + goodMinimum[2] + " minutes, and " + goodMinimum[3] + " seconds.";
-				else
-					timediff += " The minimum time between two tweets for the username @" + name + " was " + goodMinimum[1] + " hours, " + goodMinimum[2] + " minutes, and " + goodMinimum[3] + " seconds.";
-				if (goodMaximum[0] > 0)
-					timediff += " The maximum time between two tweets for the username @" + name + " was " + goodMaximum[0] + " days, " + goodMaximum[1] + " hours, " + goodMaximum[2] + " minutes, and " + goodMaximum[3] + " seconds.";
-				else
-					timediff += " The maximum time between two tweets for the username @" + name + " was " + goodMaximum[1] + " hours, " + goodMaximum[2] + " minutes, and " + goodMaximum[3] + " seconds.";
-				*/
 				if (goodMinimum[0] > 0)
 					$('#minimum' + whichToUse).html(goodMinimum[0] + ' days, and ' + goodMinimum[1] + ':' + goodMinimum[2] + ':' + goodMinimum[3]);
 				else
@@ -247,11 +237,6 @@ $(document).ready(function(){
 					sum += allDifferences[i];
 				sum /= allDifferences.length;
 				var actualMean = fancyDifference(0, sum);
-				/*if (actualMean[0] > 0)
-					timediff += " The mean time between tweets for the username @" + name + " was " + actualMean[0] + " days, " + actualMean[1] + " hours, " + actualMean[2] + " minutes, and " + Math.round(actualMean[3]) + " seconds.";
-				else
-					timediff += " The mean time between tweets for the username @" + name + " was " + actualMean[1] + " hours, " + actualMean[2] + " minutes, and " + Math.round(actualMean[3]) + " seconds.";
-					*/
 				if (actualMean[0] > 0)
 					$('#mean' + whichToUse).html(actualMean[0] + ' days, and ' + actualMean[1] + ':' + actualMean[2] + ':' + Math.round(actualMean[3]));
 				else
@@ -271,12 +256,6 @@ $(document).ready(function(){
 					var median = sortedDiff[midpoint - 1];
 				}
 				var actualMedian = fancyDifference(0, median);
-				/*if (actualMedian[0] > 0)
-					timediff += " The median time between tweets for the username @" + name + " was " + actualMedian[0] + " days, " + actualMedian[1] + " hours, " + actualMedian[2] + " minutes, and " + Math.round(actualMedian[3]) + " seconds.";
-				else
-					timediff += " The median time between tweets for the username @" + name + " was " + actualMedian[1] + " hours, " + actualMedian[2] + " minutes, and " + Math.round(actualMedian[3]) + " seconds.";
-				$('#stats' + whichToUse).html(timediff);
-				console.log(sortedDiff);*/
 				if (actualMedian[0] > 0)
 					$('#median' + whichToUse).html(actualMedian[0] + ' days, and ' + actualMedian[1] + ':' + actualMedian[2] + ':' + actualMedian[3]);
 				else
@@ -642,14 +621,13 @@ $(document).ready(function(){
 		{
 			// Keep track of input to check duplicates
 			enteredInput[whichToUse-1] = retrievedSearch;
-
 			// Set up first part of query
-			var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20%20consumer_key%20%3D%20'fEHJVzLzqYjRz9Ico8ZflA'%20and%20consumer_secret%20%3D%20'oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw'%0Aand%20access_token%20%3D%20'1594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx'%0Aand%20access_token_secret%20%3D%20'L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw'%20and%20screen_name%3D%22";
+			var first = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20FROM%20twitter.statuses.user_timeline%20WHERE%20screen_name%3D%22";
 			// Set up second part of query
-			var second = "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+			var second = "%22%20AND%20consumer_key%3D%22fEHJVzLzqYjRz9Ico8ZflA%22%20AND%20consumer_secret%3D%22oak7BhaW8hmhA2nR74aCTVOEzRuhJoKYQ4CQezNfKw%22%20AND%20access_token%3D%221594253827-Tj2P420D7VrJhAEjZOkX8P8pANG3eLIo4eCDwkx%22%20AND%20access_token_secret%3D%22L7FRshIA3VosFMsKhZRMcwMrikdV0YUi1s2flnFevw%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="
 			// Form URL to search for using AJAX
 			var searchURL = first + retrievedSearch + second;
-
+			
 			$('.progress').show();
 			$('#graph').show();
 
