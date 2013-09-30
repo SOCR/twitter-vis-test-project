@@ -180,6 +180,13 @@
     text-align: center;
 }
 
+#textComparison {
+    font-weight: bold;
+    font-style: oblique;
+    text-align: center;
+    font-size: 14px;
+}
+
 #texts {
     font-weight: bold;
     font-style: oblique;
