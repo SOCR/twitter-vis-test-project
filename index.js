@@ -7,12 +7,6 @@ Resize screen on browser change
 Control panel for individual graphs: Text, logarithmic, grid
 Issue with users with less than 20 tweets (if rtvisulization is third user, first two users only get first three points connected on summary graph and individual graphs)
 Fix delete buttons: summary graph only one messing up (needs to update automatically with new user), THOROUGHLY TEST
-therock graph is wrong
-
-Scan text of tweets:
-1. Store hashtags of each tweet in an array of 20 elements, each element is another array/list of hashtags in that tweet
-2. If hashtag in one element matches another we know it is a repeat
-3. Highlight the hashtags?
 
 */
 
@@ -63,8 +57,8 @@ $(document).ready(function(){
 		$('.stats3').hide();
 		$('.stats4').hide();
 		$('.stats5').hide();
-		//$('.textStuff').hide();
-		//$('.allphotos').hide();
+		$('.textStuff').hide();
+		$('.allphotos').hide();
 		//$('.explain').hide();
 	};
 
@@ -74,9 +68,10 @@ $(document).ready(function(){
     }, 1000);
 
 	// Keep track of text
-	var usertweets = new Array(5);
+	/*var usertweets = new Array(5);
 	for (var i = 0; i < 5; i++)
-		usertweets[i] = new Array(20);
+		usertweets[i] = new Array(20);*/
+	var usertweets = [];
 	// Keep track of time
 	var usertime = new Array(5);
 	for (var i = 0; i < 5; i++)
@@ -94,26 +89,47 @@ $(document).ready(function(){
     var individualsvg = new Array(5);
 	////////////////////////////////////////
 
+	/* To do with comparison function:
+	   Make all text of tweets lower case as well as search input to allow for easier search
+	   Verify search terms
+	   List all hashtags, usernames, etc?
+	   Option to close results
+	   Bad color for time
+	*/
+
 	// Text comparison function
 	function textCompare(letters) {
-		var htmlstring = "";
+		//letters.toLowerCase();
+		var htmlstring;		
 		for (var i = 0; i < usertweets.length; i++) {
-			for (var j = 0; j < usertweets[i].length; j++) {
-				if(usertweets[i][j].indexOf(letters) != -1)
+			htmlstring = "";
+			for (var j = usertweets[i].length; j > 0; j--) {
+				if(usertweets[i][j-1].indexOf(letters) != -1)
 				{
 					htmlstring += "<span><li>&nbsp";
-					htmlstring += changeDate(usertime[i][j]);
+					htmlstring += changeDate(usertime[i][j-1]);
 					htmlstring += ":&nbsp"
 					htmlstring += "\""
-					htmlstring += usertweets[i][j];
+					htmlstring += usertweets[i][j-1];
 					htmlstring += "\"</li><br></span>";
-					//#FFFF00
+					//#FFFF00 #2f96b4 ; color: white
 				}
 			}
 			var z = i + 1;
-			htmlstring = htmlstring.replace(letters, "<span style='background-color: #2f96b4; color: white'>" + letters + "</span>");
-			$('#textcomp' + z).html(htmlstring);
+			htmlstring = htmlstring.replace(new RegExp(letters,"g"), "<span style='background-color: #FFFF00'>" + letters + "</span>");
+			$('#textcomp' + z).html(htmlstring).show();
+			$('#results').slideDown(200);
 		}
+		if( $('#textcomp1').is(':empty') && !$('#photo1').is(':empty') )
+			$('#textcomp1').html("<p align=center>There is no match for your search! Please try again.</p>");
+		if( $('#textcomp2').is(':empty') && !$('#photo2').is(':empty') )
+			$('#textcomp2').html("<p align=center>There is no match for your search! Please try again.</p>");
+		if( $('#textcomp3').is(':empty') && !$('#photo3').is(':empty') )
+			$('#textcomp3').html("<p align=center>There is no match for your search! Please try again.</p>");
+		if( $('#textcomp4').is(':empty') && !$('#photo4').is(':empty') )
+			$('#textcomp4').html("<p align=center>There is no match for your search! Please try again.</p>");
+		if( $('#textcomp5').is(':empty') && !$('#photo5').is(':empty') )
+			$('#textcomp5').html("<p align=center>There is no match for your search! Please try again.</p>");	
 	}
 
 	$('#textOK').click(function() {
@@ -123,7 +139,7 @@ $(document).ready(function(){
 		$('#textInput').val('#search');
 		// verify input
 		// run text compare function
-		textCompare(retrievedSearch);
+		textCompare(retrievedSearch);//.toLowerCase());
 	});
 
     // Success function for API
@@ -219,7 +235,8 @@ $(document).ready(function(){
 			var name = tweets[0].user.name;
 
 			// Set up results
-			$('#photo' + whichToUse).html("<img src='" + photo + "'>");
+			$('#photo' + whichToUse).html("<img src='" + photo + "'>").show();
+			$('#results').hide();
 
 			// See if user is protected (if so, can't retrieve text)
 			var protection = tweets[0].user.protected;
@@ -1236,6 +1253,9 @@ $(document).ready(function(){
 		$('#statsuser' + number).hide();
 		$('.stats' + number).hide();
 		$('#statsuser' + number).prop('checked', false);
+		// Get rid of photo
+		$('#photo' + number).hide();
+		$('#textcomp' + number).hide();
 	}
 	// First user deleted
 	$('.delete1').click(function(){
