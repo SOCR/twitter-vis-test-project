@@ -63,7 +63,8 @@ $(document).ready(function(){
 		$('.stats3').hide();
 		$('.stats4').hide();
 		$('.stats5').hide();
-		$('.textStuff').hide();
+		//$('.textStuff').hide();
+		//$('.allphotos').hide();
 		//$('.explain').hide();
 	};
 
@@ -93,11 +94,43 @@ $(document).ready(function(){
     var individualsvg = new Array(5);
 	////////////////////////////////////////
 
+	// Text comparison function
+	function textCompare(letters) {
+		var htmlstring = "";
+		for (var i = 0; i < usertweets.length; i++) {
+			for (var j = 0; j < usertweets[i].length; j++) {
+				if(usertweets[i][j].indexOf(letters) != -1)
+				{
+					htmlstring += "<span><li>&nbsp";
+					htmlstring += changeDate(usertime[i][j]);
+					htmlstring += ":&nbsp"
+					htmlstring += "\""
+					htmlstring += usertweets[i][j];
+					htmlstring += "\"</li><br></span>";
+					//#FFFF00
+				}
+			}
+			var z = i + 1;
+			htmlstring = htmlstring.replace(letters, "<span style='background-color: #2f96b4; color: white'>" + letters + "</span>");
+			$('#textcomp' + z).html(htmlstring);
+		}
+	}
+
+	$('#textOK').click(function() {
+		// Retrieve input
+		var retrievedSearch = $('#textInput').val();
+		// Clear search field back to username
+		$('#textInput').val('#search');
+		// verify input
+		// run text compare function
+		textCompare(retrievedSearch);
+	});
+
     // Success function for API
 	var cb = function(data) {
 
 		// Clear array contents so graphs don't copy at all on accident
-		//finalArray = [whichToUse][];
+		// finalArray = [whichToUse][];
 
 		// Parse data and identify whether user exists
 		var test = JSON.stringify(data.query.results);
@@ -184,6 +217,9 @@ $(document).ready(function(){
 			var numberOfStatuses = tweets[0].user.statuses_count;
 			var photo = tweets[0].user.profile_image_url;
 			var name = tweets[0].user.name;
+
+			// Set up results
+			$('#photo' + whichToUse).html("<img src='" + photo + "'>");
 
 			// See if user is protected (if so, can't retrieve text)
 			var protection = tweets[0].user.protected;

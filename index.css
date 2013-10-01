@@ -194,6 +194,17 @@
     font-size: 14px;
 }
 
+#results {
+  border-style: solid;
+  border-width: 3px;
+  padding: 3px;
+  border-color: #2f96b4;
+}
+
+.allphotos {
+  text-align: center;
+}
+
 .description {
     border-style: solid;
     border-width: 3px;
