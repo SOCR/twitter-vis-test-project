@@ -22,6 +22,9 @@ $(document).ready(function(){
 	// Bad Twitter API Results
 	var ERROR1 = "{\"json\":{\"errors\":{\"message\":\"Sorry, that page does not exist\",\"code\":\"34\"}}}";
 	var ERROR2 = "{\"result\":\"[]\\n\"}";
+	var ERROR3 = "{\"result\":{\"result\":\"failure\",\"error\":\"Read timed out, url:";
+	var ERROR4 = "null";
+	// var ERROR3 = "{\"result\":{\"result\":\"failure\",\"error\":\"Read timed out, url: https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=%40latimes\"}}";
 	// Set a threshold to prompt user on an infrequent user
 	var TOOBIG = 1000;
 	// Twitter can only return 20 tweets max
@@ -36,7 +39,7 @@ $(document).ready(function(){
 	var COLORS = ['black', 'red', 'blue', 'green', 'purple'];
 	//////////////////////////////////////////////////////////////////
 
-	// Hide a lot of CSS stuff right after page load and let user display what they want
+	// Hide parts of page
 	window.onload = function(){
 		$('.searches').hide();
 		$('#graph').hide();
@@ -59,7 +62,7 @@ $(document).ready(function(){
 		$('.stats5').hide();
 		$('.textStuff').hide();
 		$('.allphotos').hide();
-		//$('.explain').hide();
+		$('#closeResults').hide();
 	};
 
 	// Every one second, update gmt/local time
@@ -68,18 +71,11 @@ $(document).ready(function(){
     }, 1000);
 
 	// Keep track of text
-	/*var usertweets = new Array(5);
-	for (var i = 0; i < 5; i++)
-		usertweets[i] = new Array(20);*/
 	var usertweets = [];
 	// Keep track of time
-	var usertime = new Array(5);
-	for (var i = 0; i < 5; i++)
-		usertime[i] = new Array(20);
+	var usertime = [];
 
 	//////////////// D3 ////////////////////
-	/*var scalingArray = new Array();
-	var maximum = new Array(0);*/
 	var fakedataset = new Array();
     var dataset = new Array();
     var lengthall = new Array();
@@ -93,14 +89,13 @@ $(document).ready(function(){
 	   Make all text of tweets lower case as well as search input to allow for easier search
 	   Verify search terms
 	   List all hashtags, usernames, etc?
-	   Option to close results
-	   Bad color for time
 	*/
 
 	// Text comparison function
 	function textCompare(letters) {
-		//letters.toLowerCase();
-		var htmlstring;		
+		var htmlstring;
+
+		// Search for input in tweets
 		for (var i = 0; i < usertweets.length; i++) {
 			htmlstring = "";
 			for (var j = usertweets[i].length; j > 0; j--) {
@@ -119,41 +114,46 @@ $(document).ready(function(){
 			htmlstring = htmlstring.replace(new RegExp(letters,"g"), "<span style='background-color: #FFFF00'>" + letters + "</span>");
 			$('#textcomp' + z).html(htmlstring).show();
 			$('#results').slideDown(200);
+			$('#closeResults').show();
 		}
-		if( $('#textcomp1').is(':empty') && !$('#photo1').is(':empty') )
-			$('#textcomp1').html("<p align=center>There is no match for your search! Please try again.</p>");
-		if( $('#textcomp2').is(':empty') && !$('#photo2').is(':empty') )
-			$('#textcomp2').html("<p align=center>There is no match for your search! Please try again.</p>");
-		if( $('#textcomp3').is(':empty') && !$('#photo3').is(':empty') )
-			$('#textcomp3').html("<p align=center>There is no match for your search! Please try again.</p>");
-		if( $('#textcomp4').is(':empty') && !$('#photo4').is(':empty') )
-			$('#textcomp4').html("<p align=center>There is no match for your search! Please try again.</p>");
-		if( $('#textcomp5').is(':empty') && !$('#photo5').is(':empty') )
-			$('#textcomp5').html("<p align=center>There is no match for your search! Please try again.</p>");	
+
+		// Display search results
+		for (var i = 1; i < 6; i++)
+		{
+			if( $('#textcomp' + i).is(':empty') && !$('#photo' + i).is(':empty') )
+				$('#textcomp' + i).html("<p align=center>There is no match for your search! Please try again.</p>");
+		}
 	}
 
+	// Search button clicked for text analysis
 	$('#textOK').click(function() {
+
 		// Retrieve input
 		var retrievedSearch = $('#textInput').val();
+
 		// Clear search field back to username
 		$('#textInput').val('#search');
-		// verify input
-		// run text compare function
-		textCompare(retrievedSearch);//.toLowerCase());
+
+		// Verify input?
+		// Run text compare function
+		textCompare(retrievedSearch);
 	});
+
+	// Results Close Box Button Clicked
+	$('#closeResults').click(function() {
+		$('#results').slideUp(200);
+		$('#closeResults').hide();
+	})
 
     // Success function for API
 	var cb = function(data) {
 
-		// Clear array contents so graphs don't copy at all on accident
-		// finalArray = [whichToUse][];
-
 		// Parse data and identify whether user exists
 		var test = JSON.stringify(data.query.results);
-		
-		// If user exists
-		if ((test != ERROR1) && (test != ERROR2)) {
 
+		// If user exists
+		if ((test != ERROR1) && (test != ERROR2) && (test.indexOf(ERROR3) == -1) && (test != ERROR4))// && (typeof test === 'undefined')) 
+		{
 			usertime[whichToUse-1] = [];
 			usertweets[whichToUse-1] = [];
 
@@ -550,6 +550,7 @@ $(document).ready(function(){
 			$('#noExistence').show().delay(2500).fadeOut();
 			$('.progress').hide();
 			$('#graph').hide();
+			enteredInput[whichToUse-1] = "";
 		}
 	};
 
@@ -606,9 +607,6 @@ $(document).ready(function(){
 
 		// Set focus onto home button to keep description boxes in view, also clears search form easier
 		$('#focusHere').focus();
-
-		//$('#userInput').attr('disabled', 'disabled');
-		//$('#usersearch').hide();
 		
 		// If anything lingering on screen, clear
 		$('.searches').hide();
@@ -700,12 +698,6 @@ $(document).ready(function(){
 			count--;
 			$('#failedSearch').show().delay(6000).fadeOut();
 		}
-
-		// Allow new input
-	    //$('#userInput').removeAttr('disabled');
-		//$('#usersearch').show();
-
-		
 	}
 
 	// Add button clicked
@@ -1224,6 +1216,7 @@ $(document).ready(function(){
 			$('#summarygraph').hide();
 			$('.badge-info').hide();
 			$('.textStuff').hide();
+			$('#closeResults').hide();
 		}
 		// Decrement count
 		count--;
@@ -1447,45 +1440,4 @@ $(document).ready(function(){
 	}
 
 	window.onresize = updateWindow(svgall);*/
-
-	// Press update now key
-	/*$('#update').click(function(){
-		// Make the checkmarks exist so it is easier to run graph
-		for (var i = count + 1; i < 6; i++)
-		{
-			$('#searchOption' + i).html("<input type='checkbox' id='box" + i + "'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button class='btn btn-mini btn-danger delete" + i +"' type='button'><i class='icon-remove icon-white'></i></button><br><br>").hide();
-		}
-		// Make array of checked boxes
-		var checks = new Array();
-		for (var i = 1; i < 6; i++)
-		{
-			var x = '#box' + i;
-			if($(x).prop('checked'))
-				checks.push(i);
-		}
-		var y = "SOCR will graph the tweets for the following users: ";
-		for (var i = 0; i < checks.length; i++)
-		{
-			y += checks[i];
-			if (i == (checks.length - 1))
-				y += '.';
-			else
-				y += ', ';
-		}
-		$('#toGraph').html(y);
-
-		// Make ajax calls to refresh graphs
-		for (var i = 1; i < 6; i++)
-		{
-			var x = '#box' + i;
-			if($(x).prop('checked'))
-			{
-				searchURL = first + enteredInput[i-1] + second;
-				$.ajax({
-			        url: searchURL,
-			        success: cb
-				});
-			}
-		}
-	})*/
 }); // end ready

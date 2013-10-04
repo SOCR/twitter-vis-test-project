@@ -31,6 +31,11 @@
 	<script type="text/javascript" src="index.js"></script>
 	<!-- d3.js -->
 	<script type="text/javascript" src="http://d3js.org/d3.v2.js"></script> 
+
+	<meta charset="UTF-8">
+	<meta name="description" content="SOCR Real Time Tweets Visualization">
+	<meta name="keywords" content="Twitter, Statistics, Stats, SOCR, Visualization, Real, Time, Tweets">
+	<meta name="author" content="Andrew Foglia, Brian Zhang, Abhishek Chowdhury">
 </head>
 
 <body>
@@ -218,6 +223,7 @@
 					<div id='textComparison'>Tweet text is below. But want to see who is tweeting about the same stuff? Enter any term that might be trending (e.g. use a #) and we will display which users are tweeting it and how often!<br><br>
 					<input type="text" id="textInput" value="" onFocus="this.value=''" placeholder='#search'><br><br>
 					<button id="textOK" class="btn btn-info">Search!</button>
+					<br><br><button id='closeResults' class="btn btn-danger">Close Results Box Below &nbsp<i class="icon-remove icon-white"></i></button>
 					</div>
 					<br>
 					<div id='results'>
@@ -261,7 +267,7 @@
 					<div id='usersearch'><input type="text" id="userInput" value="" onFocus="this.value=''" placeholder='@username'></div><br>
 					<p align=right><span class="badge badge-info"></span></p>			
 					<div class='searches' id="successfulSearch"><strong><i class='icon-ok-circle'></i> Found them!</strong></div>
-					<div class='searches' id="noExistence"><strong><i class='icon-ban-circle'></i> This username does not exist! Please try again.</strong></div>
+					<div class='searches' id="noExistence"><strong><i class='icon-ban-circle'></i> There was an error in this search. Either the username does not exist or the information was not correctly retrieved. Please try again.</strong></div>
 					<div class='searches' id="failedSearch"><strong><i class='icon-thumbs-down'></i> Try again please. Only search for a combination of letters, numbers, and underscores.</strong></div>
 					<div class='searches' id='none'><strong><i class='icon-question-sign'></i> Please enter something.</strong></div>
 					<div class='searches' id="tooMany"><strong><i class='icon-warning-sign'></i> We can only accept 5 usernames. Please delete one and try again.</strong></div>
